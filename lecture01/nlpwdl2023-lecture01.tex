@@ -1,3 +1,4 @@
+% !TeX document-id = {0e2e81f1-666c-46da-9cdb-892d275009a0}
 % !TeX program = lualatex
 % !BIB program = biber
 % Lualatex is important to render TTF fonts; with pdflatex it's just the regular one
@@ -126,6 +127,8 @@
 	neuron/.style={draw, circle, inner sep=0pt, minimum width=0.75cm, fill=blue!20},
 	param/.style={draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20},
 	constant/.style={draw, circle, inner sep=0pt, minimum width=0.75cm, fill=black!15},
+	% for citation nodes right top
+	ref/.style={anchor = north east, text width=7.8cm, yshift=-1.3cm, xshift=-0.2cm, scale=0.5}
 }
 
 
@@ -326,7 +329,7 @@ Your feedback is very important
 	
 	
 	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Goldberg.2017} \par};
+		\node at (current page.north east)[ref] {\fullcite{Goldberg.2017} \par};
 	\end{tikzpicture}	
 	
 \end{frame}
@@ -464,7 +467,7 @@ Binary classification of reviews from IMDB
 $\to$ semantic compositionality, long-range dependencies
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Maas.et.al.2011} \par};
+\node at (current page.north east)[ref] {\fullcite{Maas.et.al.2011} \par};
 \end{tikzpicture}
 
 \begin{itemize}
@@ -513,7 +516,7 @@ How is SNLI data different from the IMDB?
 
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Bowman.et.al.2015} \par};
+\node at (current page.north east)[ref] {\fullcite{Bowman.et.al.2015} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -539,7 +542,7 @@ Take chance agreement into account
 
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Habernal.et.al.2023.AILaw} 
+\node at (current page.north east)[ref] {\fullcite{Habernal.et.al.2023.AILaw} 
 \bigskip \newline	
 \fullcite{Artstein.Poesio.2008.CoLi} \par};
 \end{tikzpicture}
@@ -584,7 +587,7 @@ Named entity recognition: Find entities of predefined types
 How to model and annotate such a task?
 
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{TjongKimSang.DeMeulder.2003} \par};
+	\node at (current page.north east)[ref] {\fullcite{TjongKimSang.DeMeulder.2003} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -608,7 +611,7 @@ Tokenize, assign each word a type
 CoNLL 2003: Four entities (PER, ORG, LOC, MISC)
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{TjongKimSang.DeMeulder.2003} \par};
+\node at (current page.north east)[ref] {\fullcite{TjongKimSang.DeMeulder.2003} \par};
 \end{tikzpicture}
 \end{frame}
 
@@ -632,7 +635,7 @@ BIO encoding
 An instance of Multi-class classification on token level
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{TjongKimSang.DeMeulder.2003} \par};
+\node at (current page.north east)[ref] {\fullcite{TjongKimSang.DeMeulder.2003} \par};
 \end{tikzpicture}	
 \end{frame}
 
@@ -655,7 +658,7 @@ SuperGLUE --- popular benchmark collection of various tasks/datasets in English
 	
 
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Wang.et.al.2019.NeurIPS} \par};
+	\node at (current page.north east)[ref] {\fullcite{Wang.et.al.2019.NeurIPS} \par};
 \end{tikzpicture}
 	
 \end{frame}
@@ -673,7 +676,7 @@ SuperGLUE --- popular benchmark collection of various tasks/datasets in English
 	\end{example}
 	
 	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Dagan.et.al.2009.NLE} \par};
+		\node at (current page.north east)[ref] {\fullcite{Dagan.et.al.2009.NLE} \par};
 	\end{tikzpicture}
 	
 
@@ -697,7 +700,7 @@ Note: SNLI adapted RTE!
 	$\to$ everyday knowledge and commonsense reasoning to solve
 	
 	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Levesque.et.al.2012} \par};
+		\node at (current page.north east)[ref] {\fullcite{Levesque.et.al.2012} \par};
 	\end{tikzpicture}
 	
 \end{frame}
@@ -716,7 +719,7 @@ A: Yes. [An example event is given.]
 $\to$ complex, non-factoid information, requires difficult entailment-like inference to solve
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Clark.et.al.2019.NAACL} \par};
+\node at (current page.north east)[ref] {\fullcite{Clark.et.al.2019.NAACL} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -740,7 +743,7 @@ Desirable properties:
 
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Khashabi.et.al.2018.NAACL} \par};
+\node at (current page.north east)[ref] {\fullcite{Khashabi.et.al.2018.NAACL} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -763,7 +766,7 @@ Unanswerable questions w/ plausible (but incorrect) answers. Relevant keywords a
 
 	
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Rajpurkar.et.al.2018.ACL} \par};
+\node at (current page.north east)[ref] { \fullcite{Rajpurkar.et.al.2018.ACL} \par};
 \end{tikzpicture}
 	
 \end{frame}
@@ -780,8 +783,8 @@ Machine translation is still hard! (Feb 2023)
 Standard datasets from WMT (formerly Workshop on MT)
 
 
-\begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Bojar.et.al.2018.WMT} \par};
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] { \fullcite{Bojar.et.al.2018.WMT} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -809,7 +812,7 @@ Popular dataset: CNN/Daily Mail
 \end{itemize}
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Hermann.et.al.2015.NeurIPS} \par};
+\node at (current page.north east)[ref] {\fullcite{Hermann.et.al.2015.NeurIPS} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -821,7 +824,7 @@ Popular dataset: CNN/Daily Mail
 \includegraphics[width=\linewidth]{img/dial1.png}
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Zhang.et.al.2018.ACL} \par};
+\node at (current page.north east)[ref] {\fullcite{Zhang.et.al.2018.ACL} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -845,7 +848,7 @@ Expected output text: \emph{entailment}
 \end{example}
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Raffel.et.al.2020.JMLR} \par};
+\node at (current page.north east)[ref] {\fullcite{Raffel.et.al.2020.JMLR} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -981,7 +984,7 @@ $37 + 48 + 33 + 168 = 286$ $\to$ Test set size $|T| = 286$
 $\mathrm{Acc}_T(f) = \frac{1}{286} (37 + 168) = 0.7186$
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Japkowicz.Shah.2011} \par};
+\node at (current page.north east)[ref] {\fullcite{Japkowicz.Shah.2011} \par};
 \end{tikzpicture}
 	
 \end{frame}
@@ -1033,7 +1036,7 @@ Macro-averaging (average of F-1 scores), or micro-averaging
 These details might get tricky so always report exactly what you do!
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Sokolova.Lapalme.2009} \par};
+\node at (current page.north east)[ref] {\fullcite{Sokolova.Lapalme.2009} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -1060,7 +1063,7 @@ These details might get tricky so always report exactly what you do!
 \includegraphics[width=\linewidth]{img/nlg1.png}
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Sai.et.al.2023.CSUR} \par};
+\node at (current page.north east)[ref] {\fullcite{Sai.et.al.2023.CSUR} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -1088,7 +1091,7 @@ Corpus-level metric, i.e., BLEU gives a score over the entire corpus (as opposed
 Major drawbacks of BLEU: (i) it does not take recall into account and (ii) it only allows exact n-gram matching
 
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Papineni.et.al.2002.ACL} \par};
+\node at (current page.north east)[ref] {\fullcite{Papineni.et.al.2002.ACL} \par};
 \end{tikzpicture}
 
 \end{frame}
@@ -1104,7 +1107,7 @@ ROUGE metric includes a set of variants: ROUGE-N, ROUGE-L, ROUGE-W, and ROUGE-S
 \end{itemize}
 
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Lin.2004} \par};
+	\node at (current page.north east)[ref] {\fullcite{Lin.2004} \par};
 \end{tikzpicture}
 
 
@@ -1134,7 +1137,7 @@ This assumption often does not make sense, especially when language is involved
 \emph{Human label variation impacts all steps of the traditional ML pipeline, and is an opportunity, not a problem}
 
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Plank.2022.EMNLP} \par};
+	\node at (current page.north east)[ref] {\fullcite{Plank.2022.EMNLP} \par};
 \end{tikzpicture}
 
 \end{frame} \begin{frame}{ Human annotators are biased}
@@ -1147,7 +1150,7 @@ Datasets are often constructed using a small number of annotators, and humans ar
 \end{itemize}
 
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Geva.et.al.2019.EMNLP} \par};
+	\node at (current page.north east)[ref] {\fullcite{Geva.et.al.2019.EMNLP} \par};
 \end{tikzpicture}
 
 \end{frame} \begin{frame}{Artifacts in datasets}
@@ -1159,7 +1162,7 @@ Datasets have artifacts (spurious statistics) that can be exploited
 
 
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Habernal.et.al.2018.NAACL.ARCT} 
+	\node at (current page.north east)[ref] {\fullcite{Habernal.et.al.2018.NAACL.ARCT} 
 		\bigskip \newline	
 		\fullcite{Niven.Kao.2019.ACL} \par};
 \end{tikzpicture}
