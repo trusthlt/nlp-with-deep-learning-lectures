@@ -18,7 +18,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://youtube.c
 
 ## 2023-10-13 Lecture 01: NLP tasks and evaluation
 
-* TBD [Slides as PDF](/TODO/nlpwdl2023-lecture01.pdf)
+* [Slides as PDF](/lecture01/pdf/nlpwdl2023-lecture01-handout.pdf)
 * TBD [YouTube recording](https://www.youtube.com/watch?v=-cku_A34-qE)
 
  
