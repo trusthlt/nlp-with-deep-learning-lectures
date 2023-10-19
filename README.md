@@ -20,7 +20,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://youtube.c
 
 * [Slides as PDF](/lecture01/pdf/nlpwdl2023-lecture01-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=QQwJdUeONCI)
-
+* Exercise: See the PDF (including LaTeX source) and Python code under `exercises/ex01`
  
 ## FAQ
 
