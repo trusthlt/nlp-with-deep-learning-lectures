@@ -14,7 +14,7 @@ The content is licensed under [Creative Commons CC BY-SA 4.0](https://creativeco
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: https://youtube.com/playlist?list=PL6WLGVNe6ZcA4gUr5MaAKdrGxYzYAETK3
+Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcB00apoxMtj7WSUOlpm2Xvl
 
 ## 2023-10-13 Lecture 01: NLP tasks and evaluation
 
