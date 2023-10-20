@@ -46,20 +46,9 @@ texlive-fonts-extra texlive-bibtex-extra texlive-humanities texlive-science \
 texlive-luatex biber wget -y
 ```
 
-Install Fira Sans fonts required by the beamer template locally
+To install MS Segoe UI fonts required by the beamer template locally, run the following script (works also similarly on Mac OS): https://gist.github.com/habernal/ad1085ce5dc5e8cb3fbead354d8f4190
 
-```plain
-$ wget https://github.com/mozilla/Fira/archive/refs/tags/4.106.zip -O 4.106.zip \
-&& unzip -o 4.106.zip && mkdir -p ~/.fonts/FiraSans && cp Fira-4.106/otf/Fira* \
-~/.fonts/FiraSans/ && rm -rf Fira-4.106 && rm 4.106.zip && fc-cache -f -v && mktexlsr
-```
-
-Compile each lecture's slides using ``lualatex``
-
-```plain
-$ lualatex dl4nlp2023-lecture*.tex && biber dl4nlp2023-lecture*.bcf && \
-lualatex dl4nlp2023-lecture*.tex && lualatex dl4nlp2023-lecture*.tex
-```
+Run the script `compile-pdf.sh` in each lecture's folder to produce both handouts as well as unfolding PDFs used in the lecture.
 
 ### Compiling slides using Docker
 
@@ -84,24 +73,7 @@ texlive-pictures texlive-latex-extra texlive-fonts-extra texlive-bibtex-extra \
 texlive-humanities texlive-science texlive-luatex biber wget -y
 ```
 
-Fonts
+Install fonts as above: https://gist.github.com/habernal/ad1085ce5dc5e8cb3fbead354d8f4190
 
-```plain
-# wget https://github.com/mozilla/Fira/archive/refs/tags/4.106.zip -O 4.106.zip \
-&& unzip -o 4.106.zip && mkdir -p ~/.fonts/FiraSans && cp Fira-4.106/otf/Fira* \
-~/.fonts/FiraSans/ && rm -rf Fira-4.106 && rm 4.106.zip && fc-cache -f -v && mktexlsr
-```
+Run the script `compile-pdf.sh` in each lecture's folder to produce both handouts as well as unfolding PDFs used in the lecture, which generates the PDFs in your local folder (e.g, `/tmp/slides`).
 
-And compile
-
-```plain
-# cd /mnt/dl4nlp/latex/lecture01
-# lualatex dl4nlp2023-lecture*.tex && biber dl4nlp2023-lecture*.bcf && \
-lualatex dl4nlp2023-lecture*.tex && lualatex dl4nlp2023-lecture*.tex
-```
-
-which generates the PDF in your local folder (e.g, `/tmp/slides`).
-
-### Compiling handouts
-
-Run the script `compile-pdf.sh` to produce both handouts as well as unfolding PDFs used in the lecture.
