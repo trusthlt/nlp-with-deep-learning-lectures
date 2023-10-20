@@ -25,7 +25,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://youtube.c
 ## 2023-10-20 Lecture 02: Mathematical foundations of deep learning
 
 * [Slides as PDF](/lecture02/pdf/nlpwdl2023-lecture02-handout.pdf)
-* TBD [YouTube recording](https://www.youtube.com/watch?v=XXX)
+* [YouTube recording](https://www.youtube.com/watch?v=viej0VnvwMY)
  
 ## FAQ
 
