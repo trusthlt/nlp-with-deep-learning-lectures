@@ -26,7 +26,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * [Slides as PDF](/lecture02/pdf/nlpwdl2023-lecture02-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=viej0VnvwMY)
+
+## 2023-10-27 Lecture 03: Text classification 1: Log-linear models
+
+* [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture03-handout.pdf)
+* [YouTube recording TBD](https://www.youtube.com/watch?v=XXX)
  
+
 ## FAQ
 
 * What are some essential pre-requisites?
