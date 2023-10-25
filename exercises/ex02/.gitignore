@@ -3,3 +3,4 @@ venv
 nlpwdlfw.egg-info
 .idea
 __pycache__
+dist
