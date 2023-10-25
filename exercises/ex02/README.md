@@ -25,12 +25,6 @@ $ virtualenv venv
 $ source venv/bin/activate
 ```
 
-Install project and its dependencies (there are none so far)
-
-```bash
-$ python setup.py install
-```
-
 Run unittests from the command line
 
 ```bash

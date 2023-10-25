@@ -90,7 +90,7 @@ class SumNode(ScalarNode):
         # dy/dw_3 = 1
 
         # --- TASK_2 ---
-
+        return []  # This is obviously wrong
         # --- TASK_2 ---
 
 
