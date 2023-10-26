@@ -45,8 +45,7 @@ class TestNodes(TestCase):
 
     def test_task4(self):
         # dummy initialization
-        a, b, one, r, s = ConstantNode(1), ConstantNode(1), ConstantNode(1), ConstantNode(1), ConstantNode(1)
-
+        a, b, one, r, s, e = [ConstantNode(1)] * 6
         # --- TASK_4 ---
 
         # --- TASK_4 ---
