@@ -8,7 +8,7 @@ class TestNodes(TestCase):
     def test_task1(self):
         value = 2
         # --- TASK_1 ---
-
+        value = 1
         # --- TASK_1 ---
         self.assertEqual(1, value)
 
