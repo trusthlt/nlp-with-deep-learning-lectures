@@ -30,7 +30,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 ## 2023-10-27 Lecture 03: Text classification 1: Log-linear models
 
 * [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture03-handout.pdf)
-* [YouTube recording TBD](https://www.youtube.com/watch?v=XXX)
+* [YouTube recording](https://www.youtube.com/watch?v=BqvDHdOwCY4)
  
 
 ## FAQ

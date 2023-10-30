@@ -45,15 +45,9 @@ class TestNodes(TestCase):
 
     def test_task4(self):
         # dummy initialization
-        a, b, one, r, s = ConstantNode(1), ConstantNode(1), ConstantNode(1), ConstantNode(1), ConstantNode(1)
-
+        a, b, one, r, s, e = [ConstantNode(1)] * 6
         # --- TASK_4 ---
-        a = ConstantNode(2)
-        b = ConstantNode(3)
-        one = ConstantNode(1)
-        r = SumNode([a, b])
-        s = SumNode([b, one])
-        e = ProductNode([r, s])
+
         # --- TASK_4 ---
 
         # test that b has two parents

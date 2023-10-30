@@ -16,7 +16,11 @@ Task 5: Add function to compute "global" gradient wrt. every node. Verify with m
 
 Task 6: Current implementation is extremely inefficient, takes 5 seconds to compute the gradient. Implement caching to store intermediate results to speed up. Compare the running times.
 
+Task 7 (optional, do at home): Implement the Rosenbrock function (see Slide 19 from lecture 2). To do so, you will extend the framework by adding a SquareNode (which accepts only a single argument, so the length of arguments will be one). Compute all values in a mesh (-1.5:1.5, -1.5:2.0) as on slide 2 and plot the result using the existing code I used for slide 19 ( https://colab.research.google.com/drive/1mlZtxPXuk3mls56CQArmDzjdp5bLbrJC?usp=sharing ). Pick a few points and compute the gradient at the point, consult Slide 25. Make sure your intuition matches the results you see.
+
 ## Setup
+
+### Using a command line
 
 Create a virtual environment
 
@@ -30,3 +34,7 @@ Run unittests from the command line
 ```bash
 $ python -m unittest
 ```
+
+### Using PyCharm
+
+Simply open the folder as new project, PyCharm asks you automatically to create venv. Run unit test as usual in PyCharm.
