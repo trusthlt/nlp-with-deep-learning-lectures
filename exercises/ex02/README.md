@@ -4,7 +4,7 @@ Computational graph and backpropagation from scratch
 
 ## Tasks
 
-Task 1: Download empty project, make sure you can run it and run unit tests, fix unit tests
+Task 1: Download this empty Python project, make sure you can run it in an IDE of your choice (e.g., PyCharm) and run unit tests. Fix the first unit test entitled task 1.
 
 Task 2: Implement a sum function with derivatives
 
