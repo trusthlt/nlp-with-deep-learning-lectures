@@ -20,18 +20,28 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * [Slides as PDF](/lecture01/pdf/nlpwdl2023-lecture01-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=QQwJdUeONCI)
-* Exercise: See the PDF (including LaTeX source) and Python code under `exercises/ex01`
+
+## 2023-10-19 Exercise 01: Classification evaluation, text generation evaluation
+
+* See the PDF (including LaTeX source) and Python code under [exercises/ex01]()
 
 ## 2023-10-20 Lecture 02: Mathematical foundations of deep learning
 
 * [Slides as PDF](/lecture02/pdf/nlpwdl2023-lecture02-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=viej0VnvwMY)
 
+## 2023-10-26 Exercise 02: Computational graph and backpropagation from scratch
+
+* See the README.md and Python code under [exercises/ex02]()
+
 ## 2023-10-27 Lecture 03: Text classification 1: Log-linear models
 
 * [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture03-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=BqvDHdOwCY4)
  
+## 2023-11-02 Exercise 03: TBD
+
+* TBD See the README.md and Python code under [exercises/ex03]()
 
 ## FAQ
 
