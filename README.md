@@ -23,7 +23,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 ## 2023-10-19 Exercise 01: Classification evaluation, text generation evaluation
 
-* See the PDF (including LaTeX source) and Python code under [exercises/ex01]()
+* See the PDF (including LaTeX source) and Python code under [exercises/ex01](exercises/ex01)
 
 ## 2023-10-20 Lecture 02: Mathematical foundations of deep learning
 
@@ -32,7 +32,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 ## 2023-10-26 Exercise 02: Computational graph and backpropagation from scratch
 
-* See the README.md and Python code under [exercises/ex02]()
+* See the README.md and Python code under [exercises/ex02](exercises/ex02)
 
 ## 2023-10-27 Lecture 03: Text classification 1: Log-linear models
 
