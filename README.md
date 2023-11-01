@@ -39,9 +39,9 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture03-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=BqvDHdOwCY4)
  
-## 2023-11-02 Exercise 03: TBD
+## 2023-11-02 Exercise 03: Gradient of a log-linear model, logistic loss, and parameter update
 
-* TBD See the README.md and Python code under [exercises/ex03]()
+* See the README.md and Python code under [exercises/ex03](exercises/ex03)
 
 ## FAQ
 
