@@ -45,7 +45,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 ## 2023-11-03 Lecture 04: Text classification 2: Deep neural networks
 
-* [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture04-handout.pdf)
+* [Slides as PDF](/lecture04/pdf/nlpwdl2023-lecture04-handout.pdf)
 
 ## FAQ
 
