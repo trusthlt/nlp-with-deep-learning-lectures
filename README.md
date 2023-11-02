@@ -43,6 +43,10 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * See the README.md and Python code under [exercises/ex03](exercises/ex03)
 
+## 2023-11-03 Lecture 04: Text classification 2: Deep neural networks
+
+* [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture04-handout.pdf)
+
 ## FAQ
 
 * What are some essential pre-requisites?
