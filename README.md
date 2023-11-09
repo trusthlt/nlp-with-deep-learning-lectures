@@ -52,6 +52,11 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * See the README.md and Python code under [exercises/ex04](exercises/ex04)
 
+## 2023-11-10 Lecture 05: Text generation 1: Language models and word embeddings
+
+* [Slides as PDF](/lecture05/pdf/nlpwdl2023-lecture05-handout.pdf)
+* TBD [YouTube recording](https://www.youtube.com/watch?v=)
+
 ## FAQ
 
 * What are some essential pre-requisites?
