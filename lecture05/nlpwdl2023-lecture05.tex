@@ -148,7 +148,7 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 
 
 
-\section{Stacking transformations and non-linearity}
+\section{Finishing previous lecture: Stacking layers, non-linearity}
 
 
 \begin{frame}
@@ -197,18 +197,18 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
 			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
 			
-			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
-			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
+%			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
+%			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
 			
 			\begin{scope}[thick, black, ->, >=latex]
 				\draw (x) -- (f1);
 				\draw (w) -- (f1);
 				\draw (b) -- (f1);
 				\draw (f1) -- (f2);
-				\draw (f2) -- (l);
+%				\draw (f2) -- (l);
 				\draw (w2) -- (f2);
 				\draw (b2) -- (f2);
-				\draw (y) -- (l);
+%				\draw (y) -- (l);
 			\end{scope}	
 		\end{tikzpicture}
 		\caption{Computational graph; green boxes are trainable parameters, gray are constant inputs}
@@ -252,8 +252,8 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
 			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
 			
-			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
-			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
+%			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
+%			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
 			
 			\begin{scope}[thick, black, ->, >=latex]
 				\draw (x) -- (f1);
@@ -261,10 +261,10 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 				\draw (b) -- (f1);
 				\draw (f1) -- (g);
 				\draw (g) -- (f2);
-				\draw (f2) -- (l);
+%				\draw (f2) -- (l);
 				\draw (w2) -- (f2);
 				\draw (b2) -- (f2);
-				\draw (y) -- (l);
+%				\draw (y) -- (l);
 			\end{scope}	
 		\end{tikzpicture}
 		\caption{Computational graph; green boxes are trainable parameters, gray are constant inputs}
@@ -358,6 +358,56 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 		\includegraphics[width=1.2\linewidth]{img/xor1.pdf}	
 		\caption{$V = \{\text{not}, \text{bad}, \text{good}\}$, binary features $\in \{0, 1\}$}
 	\end{figure}	
+\end{frame}
+
+
+
+
+\begin{frame}{Multi-layer perceptron (MLP)}
+	\vspace{-1em}
+	$$
+	f(\bm{x}) = \sigma \left( g \left(
+	\bm{x} \bm{W^1} + \bm{b^1}
+	\right)
+	\bm{W^2} + \bm{b^2} \right)
+	$$
+	
+	\begin{figure}
+		\begin{tikzpicture}	
+			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+			\node (x) [constant] {$\bm{x}$};
+			\node (w) [param, below of=x] {$\bm{W^1}$};
+			\node (b) [param, below of=w] {$\bm{b^1}$};
+			
+			\node (f1) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \bm{W^1} + \bm{b^1}$};
+			
+			\node (g) [neuron, right of=f1, xshift=1.5cm] {$g$};
+			\node (f2) [neuron, right of=g, xshift=1.5cm] {$\bm{h^1} \bm{W^2} + \bm{b^2}$};
+			
+			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
+			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
+			
+			\node (sigma) [neuron, right of=f2, xshift=2cm] {$\sigma$ or softmax};
+			
+			\node (l) [neuron, right of=sigma, xshift=1.5cm] {$L$};
+			\node (y) [constant, below of=sigma, xshift=1.5cm] {$\bm{y}$};
+			
+			\begin{scope}[thick, black, ->, >=latex]
+				\draw (x) -- (f1);
+				\draw (w) -- (f1);
+				\draw (b) -- (f1);
+				\draw (f1) -- (g);
+				\draw (g) -- (f2);
+				\draw (f2) -- (sigma);
+				\draw (sigma) -- (l);
+				\draw (w2) -- (f2);
+				\draw (b2) -- (f2);
+				\draw (y) -- (l);
+			\end{scope}	
+		\end{tikzpicture}
+		\caption{Computational graph; green boxes are trainable parameters, gray are constant inputs}
+	\end{figure}	
+	
 \end{frame}
 
 
@@ -458,7 +508,7 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 	$$
 	\Pr(w_{1:n}) = \Pr(w_1, w_2, \ldots, w_n)
 	$$
-	\begin{block}{Note: we're sloppy in notation and usually omit the RVs}
+	\begin{block}{Note: We misuse notation and usually omit the RVs}
 		$\Pr(W_1 = w_1, W_1 = w_2, \ldots, W_n = w_n)$
 	\end{block}
 	
@@ -467,7 +517,10 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 		\item One factorization is very useful: left-to-right
 	\end{itemize}
 	$$
-	\Pr(w_{1:n}) = \Pr(w_1 | \text{<s>}) \Pr (w_2 | \text{<s>}, w_1) \Pr(w_3 | \text{<s>}, w_1, w_2) \cdots \Pr(w_k | \text{<s>}, w_1, w_2, \ldots, w_{n-1})
+	\begin{aligned}
+	\Pr(w_{1:n}) &= \Pr(w_1 | \text{<s>}) \Pr (w_2 | \text{<s>}, w_1) \Pr(w_3 | \text{<s>}, w_1, w_2) \cdots\\
+	&\cdots \Pr(w_k | \text{<s>}, w_1, w_2, \ldots, w_{n-1})
+	\end{aligned}
 	$$
 	
 \end{frame}
@@ -546,10 +599,11 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 		\item Having observed \emph{black car} and \emph{blue car} does not influence our estimates of the event \emph{red car} if we haven't see it before
 	\end{itemize}
 	
-	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite[p.~108]{Goldberg.2017} \par};
-	\end{tikzpicture}
-	
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite[p.~108]{Goldberg.2017} \par};
+\end{tikzpicture}
+
+
 \end{frame}
 
 \subsection{Neural language models}
@@ -618,15 +672,14 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 			\node (w) [param, below of=concat, yshift=-0.2cm] {$\bm{W^1}$};
 			\node (b) [param, below of=w] {$\bm{b^1}$};
 			
-			\node (f1) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \bm{W^1} + \bm{b^1}$};
+			\node (f1) [neuron, right of=w, xshift=1.5cm] {$g(\bm{x} \bm{W^1} + \bm{b^1})$};
 			
-			\node (g) [neuron, right of=f1, xshift=1cm] {$g$};
-			\node (f2) [neuron, right of=g, xshift=1cm] {$\bm{h^1} \bm{W^2} + \bm{b^2}$};
+			\node (f2) [neuron, right of=f1, xshift=3cm] {$\softmax(\bm{h^1} \bm{W^2} + \bm{b^2})$};
 			
 			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
 			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
 			
-			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
+			\node (l) [neuron, right of=f2, xshift=2cm] {$L$};
 			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
 			
 			\begin{scope}[thick, black, ->, >=latex]
@@ -644,8 +697,7 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 				\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
 				\draw (w) -- (f1);
 				\draw (b) -- (f1);
-				\draw (f1) -- (g);
-				\draw (g) -- (f2);
+				\draw (f1) -- (f2);
 				\draw (f2) -- (l);
 				\draw (w2) -- (f2);
 				\draw (b2) -- (f2);
@@ -750,59 +802,57 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 	\vspace{-1em}
 	%	$$	f(\bm{x}) = g \left(	\bm{x} \bm{W^1} + \bm{b^1}	\right)	\bm{W^2} + \bm{b^2}	$$
 	\begin{figure}
-		\begin{tikzpicture}	
-			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	\begin{tikzpicture}	
+		%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+		
+		\node (the) {the};
+		\node (black) [below of=the, yshift=-0.5cm]{black};
+		\node (dog) [below of=black, yshift=-0.5cm]{dog};
+		\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
+		
+		\node (lookup1) [neuron, right of=the, xshift=1.5cm] {lookup};
+		\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {lookup};
+		\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {lookup};			
+		\node (concat) [neuron, right of=lookup1, xshift=1cm, yshift=-1cm] {concat};
+		
+		
+		%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
+		\node (w) [param, below of=concat, yshift=-0.2cm] {$\bm{W^1}$};
+		\node (b) [param, below of=w] {$\bm{b^1}$};
+		
+		\node (f1) [neuron, right of=w, xshift=1.5cm] {$g(\bm{x} \bm{W^1} + \bm{b^1})$};
+		
+		\node (f2) [neuron, right of=f1, xshift=3cm] {$\softmax(\bm{h^1} \bm{W^2} + \bm{b^2})$};
+		
+		\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
+		\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
+		
+		\node (l) [neuron, right of=f2, xshift=2cm] {$L$};
+		\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (the) -- (lookup1);
+			\draw (black) -- (lookup2);
+			\draw (dog) -- (lookup3);
+			\draw (e) -- (lookup1);
+			\draw (e) -- (lookup2);
+			\draw (e) -- (lookup3);
 			
-			\node (the) {the};
-			\node (black) [below of=the, yshift=-0.5cm]{black};
-			\node (dog) [below of=black, yshift=-0.5cm]{dog};
-			\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
+			\draw (lookup1) -- (concat);
+			\draw (lookup2) -- (concat);
+			\draw (lookup3) -- (concat);								
 			
-			\node (lookup1) [neuron, right of=the, xshift=1.5cm] {lookup};
-			\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {lookup};
-			\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {lookup};			
-			\node (concat) [neuron, right of=lookup1, xshift=1cm, yshift=-1cm] {concat};
-			
-			
-			%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
-			\node (w) [param, below of=concat, yshift=-0.2cm] {$\bm{W^1}$};
-			\node (b) [param, below of=w] {$\bm{b^1}$};
-			
-			\node (f1) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \bm{W^1} + \bm{b^1}$};
-			
-			\node (g) [neuron, right of=f1, xshift=1cm] {$g$};
-			\node (f2) [neuron, right of=g, xshift=1cm] {$\bm{h^1} \bm{W^2} + \bm{b^2}$};
-			
-			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
-			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
-			
-			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
-			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
-			
-			\begin{scope}[thick, black, ->, >=latex]
-				\draw (the) -- (lookup1);
-				\draw (black) -- (lookup2);
-				\draw (dog) -- (lookup3);
-				\draw (e) -- (lookup1);
-				\draw (e) -- (lookup2);
-				\draw (e) -- (lookup3);
-				
-				\draw (lookup1) -- (concat);
-				\draw (lookup2) -- (concat);
-				\draw (lookup3) -- (concat);								
-				
-				\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
-				\draw (w) -- (f1);
-				\draw (b) -- (f1);
-				\draw (f1) -- (g);
-				\draw (g) -- (f2);
-				\draw (f2) -- (l);
-				\draw (w2) -- (f2);
-				\draw (b2) -- (f2);
-				\draw (y) -- (l);
-			\end{scope}	
-		\end{tikzpicture}
-	\end{figure}	
+			\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
+			\draw (w) -- (f1);
+			\draw (b) -- (f1);
+			\draw (f1) -- (f2);
+			\draw (f2) -- (l);
+			\draw (w2) -- (f2);
+			\draw (b2) -- (f2);
+			\draw (y) -- (l);
+		\end{scope}	
+	\end{tikzpicture}
+\end{figure}	
 	
 	Each row of $\bm{E}$ learns a word representation
 	
