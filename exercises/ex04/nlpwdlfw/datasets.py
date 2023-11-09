@@ -3,7 +3,7 @@ from random import Random
 
 
 class BinaryClassificationExample:
-    def __init__(self, feature_vector: List[float], label=float):
+    def __init__(self, feature_vector: List[float], label: float):
         assert label == 0.0 or label == 1.0
         self.feature_vector = feature_vector
         self.label = label
@@ -18,6 +18,23 @@ class BinaryClassificationDataset:
         raise NotImplementedError()
 
 
+class SimplestBinaryClassificationDataset(BinaryClassificationDataset):
+
+    def get_training_examples(self) -> List[BinaryClassificationExample]:
+        return [
+            BinaryClassificationExample([0.1], 0.0),
+            BinaryClassificationExample([0.8], 1.0),
+            BinaryClassificationExample([0.3], 0.0),
+            BinaryClassificationExample([1.0], 1.0),
+        ]
+
+    def get_test_examples(self) -> List[BinaryClassificationExample]:
+        return [
+            BinaryClassificationExample([0.2], 0.0),
+            BinaryClassificationExample([0.9], 1.0),
+        ]
+
+
 class SyntheticBinaryClassificationDataset(BinaryClassificationDataset):
 
     def __init__(self):
@@ -27,7 +44,7 @@ class SyntheticBinaryClassificationDataset(BinaryClassificationDataset):
         # Generate n positive and n negative examples
         # Positive examples are centered around (1,1), negative around (3,3)
         result = []
-        sigma = 0.5
+        sigma = 0.3
         for _ in range(n):
             result.append(BinaryClassificationExample(
                 [self.random_gen.gauss(1.0, sigma), self.random_gen.gauss(1.0, sigma)],

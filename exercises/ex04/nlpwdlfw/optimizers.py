@@ -13,7 +13,7 @@ class OnlineGradientDescent:
                     input_layer: InputLayer,
                     gold_label_node: InputNode,
                     training_data: List[BinaryClassificationExample],
-                    learning_rate: float = 0.001) -> None:
+                    learning_rate: float = 0.01) -> None:
         # we will just iterate over training data
         data_iterator = training_data.__iter__()
 
@@ -26,14 +26,13 @@ class OnlineGradientDescent:
                 example = data_iterator.__next__()
 
             # Set the input feature vector values
+            loss_node.clean_cache_recursively()
             input_layer.set_values_from_training_example_feature_vector(example.feature_vector)
 
             # Set the gold label
             gold_label_node.set_value(example.label)
 
             # --- TODO TASK_2 ---
-
-            # --- TASK_2 ---
 
             loss_value = loss_node.value()
             print("{:10.4f}".format(loss_value))

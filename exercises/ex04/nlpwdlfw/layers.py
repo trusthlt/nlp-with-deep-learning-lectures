@@ -3,24 +3,32 @@ from nlpwdlfw.nodes import ScalarNode, InputNode, LinearNode, ParameterNode
 
 
 class Layer:
-    nodes = []
+
+    def __init__(self):
+        self.nodes = []
 
 
 class InputLayer(Layer):
 
     def __init__(self, dim: int):
+        super().__init__()
         # Create "dim" input nodes
-        self.nodes: List[InputNode] = [InputNode()] * dim
+        for _ in range(dim):
+            self.nodes.append(InputNode())
 
     def set_values_from_training_example_feature_vector(self, values: List[float]) -> None:
         assert len(values) == len(self.nodes)
         for i in range(len(values)):
-            self.nodes[i].set_value(values[i])
+            i_th_node = self.nodes[i]
+            assert isinstance(i_th_node, InputNode)
+            i_th_node.set_value(values[i])
 
 
 class LinearLayer(Layer):
     def __init__(self, output_dim: int, previous_layer: Layer):
-        pass
+        super().__init__()
         # --- TODO TASK_1 ---
 
+            # and add a linear node
+            self.nodes.append(LinearNode(previous_layer_nodes, weights, bias))
         # --- TASK_1 ---
