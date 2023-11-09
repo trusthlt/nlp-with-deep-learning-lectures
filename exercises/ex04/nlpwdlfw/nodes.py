@@ -264,7 +264,7 @@ class CrossEntropyLoss(ScalarNode):
         if y_val == y_hat_val:
             result = 0
         else:
-            result = - y_val * math.log2(y_hat_val) - (1 - y_val) * math.log(1 - y_hat_val)
+            result = - y_val * math.log2(y_hat_val) - (1 - y_val) * math.log2(1 - y_hat_val)
 
         # Save to the cache
         self._cache.value = result
