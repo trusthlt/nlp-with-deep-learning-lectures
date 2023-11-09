@@ -24,6 +24,7 @@ def predict(input_layer: InputLayer, output_node: ScalarNode,
     for test_example in test_data:
         # Set the input feature vector values
         input_layer.set_values_from_training_example_feature_vector(test_example.feature_vector)
+        output_node.clean_cache_recursively()
         prediction = output_node.value()
         # Turn probability into 0 or 1
         result.append(1.0 if prediction >= 0.5 else 0.0)
