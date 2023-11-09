@@ -29,6 +29,4 @@ class LinearLayer(Layer):
         super().__init__()
         # --- TODO TASK_1 ---
 
-            # and add a linear node
-            self.nodes.append(LinearNode(previous_layer_nodes, weights, bias))
         # --- TASK_1 ---

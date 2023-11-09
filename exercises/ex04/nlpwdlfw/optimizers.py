@@ -34,5 +34,4 @@ class OnlineGradientDescent:
 
             # --- TODO TASK_2 ---
 
-            loss_value = loss_node.value()
-            print("{:10.4f}".format(loss_value))
+            # --- TASK_2 ---
