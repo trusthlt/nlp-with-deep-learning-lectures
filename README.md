@@ -48,6 +48,10 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture04/pdf/nlpwdl2023-lecture04-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=xOoJX_RXu50)
 
+## 2023-11-09 Exercise 04: Linear layer, online gradient descent, training with data
+
+* See the README.md and Python code under [exercises/ex04](exercises/ex04)
+
 ## FAQ
 
 * What are some essential pre-requisites?
