@@ -37,6 +37,14 @@ class TestTasksEx4(TestCase):
         # 100 * 0.01 + 100 * 0.01 + 1 * 0.01 = 2.01
         self.assertAlmostEqual(2.01, linear_layer.nodes[0].value(), 4)
 
+    def test_task1_4(self):
+        input_layer = InputLayer(2)
+        linear_layer = LinearLayer(2, input_layer)
+
+        weights_n1 = linear_layer.__getattribute__('nodes')[0].__getattribute__('_weights')[0]
+        weights_n2 = linear_layer.__getattribute__('nodes')[1].__getattribute__('_weights')[0]
+        self.assertTrue(weights_n1 is not weights_n2)
+
     def test_task2_1(self):
         dataset: BinaryClassificationDataset = SyntheticBinaryClassificationDataset()
 
