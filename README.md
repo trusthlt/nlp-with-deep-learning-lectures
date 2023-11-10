@@ -16,43 +16,63 @@ The content is licensed under [Creative Commons CC BY-SA 4.0](https://creativeco
 
 Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcB00apoxMtj7WSUOlpm2Xvl
 
-## 2023-10-13 Lecture 01: NLP tasks and evaluation
+## Lectures and exercises
+
+### Lecture 01: NLP tasks and evaluation
+
+2023-10-13
 
 * [Slides as PDF](/lecture01/pdf/nlpwdl2023-lecture01-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=QQwJdUeONCI)
 
-## 2023-10-19 Exercise 01: Classification evaluation, text generation evaluation
+### Exercise 01: Classification evaluation, text generation evaluation
+
+2023-10-19
 
 * See the PDF (including LaTeX source) and Python code under [exercises/ex01](exercises/ex01)
 
-## 2023-10-20 Lecture 02: Mathematical foundations of deep learning
+### Lecture 02: Mathematical foundations of deep learning
+
+2023-10-20
 
 * [Slides as PDF](/lecture02/pdf/nlpwdl2023-lecture02-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=viej0VnvwMY)
 
-## 2023-10-26 Exercise 02: Computational graph and backpropagation from scratch
+### Exercise 02: Computational graph and backpropagation from scratch
+
+2023-10-26
 
 * See the README.md and Python code under [exercises/ex02](exercises/ex02)
 
-## 2023-10-27 Lecture 03: Text classification 1: Log-linear models
+### Lecture 03: Text classification 1: Log-linear models
+
+2023-10-27
 
 * [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture03-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=BqvDHdOwCY4)
  
-## 2023-11-02 Exercise 03: Gradient of a log-linear model, logistic loss, and parameter update
+### Exercise 03: Gradient of a log-linear model, logistic loss, and parameter update
+
+2023-11-02
 
 * See the README.md and Python code under [exercises/ex03](exercises/ex03)
 
-## 2023-11-03 Lecture 04: Text classification 2: Towards deep neural networks
+### Lecture 04: Text classification 2: Towards deep neural networks
+
+2023-11-03
 
 * [Slides as PDF](/lecture04/pdf/nlpwdl2023-lecture04-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=xOoJX_RXu50)
 
-## 2023-11-09 Exercise 04: Linear layer, online gradient descent, training with data
+### Exercise 04: Linear layer, online gradient descent, training with data
+
+2023-11-09
 
 * See the README.md and Python code under [exercises/ex04](exercises/ex04)
 
-## 2023-11-10 Lecture 05: Text generation 1: Language models and word embeddings
+### Lecture 05: Text generation 1: Language models and word embeddings
+
+2023-11-10
 
 * [Slides as PDF](/lecture05/pdf/nlpwdl2023-lecture05-handout.pdf)
 * TBD [YouTube recording](https://www.youtube.com/watch?v=)
