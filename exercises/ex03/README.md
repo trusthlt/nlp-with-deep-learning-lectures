@@ -40,8 +40,9 @@ Implement a per-example binary logistic loss (cross-entropy loss)
 
 Implement updating the parameters by taking the step determined by the gradient
 
+## Solutions
 
-
+Will be included in the codebase in the next exercise.
 
 ## Setup
 

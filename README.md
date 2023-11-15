@@ -1,6 +1,6 @@
 # Natural Language Processing with Deep Learning 2023/2024
 
-This repository contains **slide decks**, **programming exercises**, and **recorded lectures videos** for the course "L.079.05551 Natural Language Processing with Deep Learning" (Paderborn University, winter term 2023/2024).
+This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "L.079.05551 Natural Language Processing with Deep Learning" (Paderborn University, winter term 2023/2024).
 
 This course is lectured by [Prof. Dr. Ivan Habernal](https://www.trusthlt.org).
 
