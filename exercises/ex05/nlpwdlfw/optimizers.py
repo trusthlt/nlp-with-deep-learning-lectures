@@ -33,8 +33,8 @@ class OnlineGradientDescent:
 
             # --- EX4_TASK_2 ---
             loss_value = loss_node.value()
-            # print every 10 steps
-            if n % 10 == 0:
+            # print every 100 steps
+            if n % 100 == 0:
                 print("{:10.4f}".format(loss_value))
 
             # Update parameters

@@ -84,7 +84,8 @@ class TestTasksEx4(TestCase):
         test_examples = dataset.get_test_examples()
         predictions = predict(input_layer, sigmoid_node, test_examples)
         acc = accuracy(predictions, test_examples)
-        print(acc)
+        # We must learn almost 100% accuracy
+        self.assertGreater(acc, 0.98)
 
         # Inspect parameters
         linear_node: LinearNode = linear_layer.__getattribute__('nodes')[0]

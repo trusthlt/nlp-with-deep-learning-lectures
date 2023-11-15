@@ -69,7 +69,7 @@ class ScalarNode:
         if isinstance(self, ParameterNode):
             # --- EX3_TASK_5 ---
             gradient_of_node = self.global_derivative_wrt_self()
-            print("Grad of par:  {:10.4f}".format(gradient_of_node))
+            # print("Grad of par:  {:10.4f}".format(gradient_of_node))
 
             # Perform step
             new_parameter_value = self.value() - learning_rate * gradient_of_node
@@ -178,7 +178,7 @@ class ParameterNode(ConstantNode):
 
     def set_value(self, value: float) -> None:
         # --- EX3_TASK_0 ---
-        print("Param update: {:10.4f} -> {:10.4f}".format(self._value, value))
+        # print("Param update: {:10.4f} -> {:10.4f}".format(self._value, value))
         self._value = value
         # --- EX3_TASK_0 ---
 
