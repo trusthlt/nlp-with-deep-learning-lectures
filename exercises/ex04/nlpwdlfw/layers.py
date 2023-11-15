@@ -27,6 +27,6 @@ class InputLayer(Layer):
 class LinearLayer(Layer):
     def __init__(self, output_dim: int, previous_layer: Layer):
         super().__init__()
-        # --- TODO TASK_1 ---
+        # --- TODO EX4_TASK_1 ---
 
-        # --- TASK_1 ---
+        # --- EX4_TASK_1 ---

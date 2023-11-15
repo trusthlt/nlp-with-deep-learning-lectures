@@ -32,6 +32,6 @@ class OnlineGradientDescent:
             # Set the gold label
             gold_label_node.set_value(example.label)
 
-            # --- TODO TASK_2 ---
+            # --- TODO EX4_TASK_2 ---
 
-            # --- TASK_2 ---
+            # --- EX4_TASK_2 ---

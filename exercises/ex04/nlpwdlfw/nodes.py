@@ -67,16 +67,14 @@ class ScalarNode:
         # simply as a method in ParameterNode, but it's here for simplicity to keep the update
         # at one place
         if isinstance(self, ParameterNode):
-            # --- TODO TASK_5 ---
-            pass
-
+            # --- EX3_TASK_5 ---
             gradient_of_node = self.global_derivative_wrt_self()
             print("Grad of par:  {:10.4f}".format(gradient_of_node))
 
             # Perform step
             new_parameter_value = self.value() - learning_rate * gradient_of_node
             self.set_value(new_parameter_value)
-            # --- TASK_5 ---
+            # --- EX3_TASK_5 ---
 
         # And call it recursively on all children
         for child in self._children:
@@ -84,11 +82,9 @@ class ScalarNode:
 
     def clean_cache_recursively(self) -> None:
         # We need to do a certain operation with every node
-        # --- TODO TASK_5 ---
-        pass
-
+        # --- EX3_TASK_5 ---
         self._cache = ScalarNodeCache()
-        # --- TASK_5 ---
+        # --- EX3_TASK_5 ---
 
         # And call it recursively on all children
         for child in self._children:
@@ -181,12 +177,10 @@ class ProductNode(ScalarNode):
 class ParameterNode(ConstantNode):
 
     def set_value(self, value: float) -> None:
-        # --- TODO TASK_0 ---
-        pass
+        # --- EX3_TASK_0 ---
         print("Param update: {:10.4f} -> {:10.4f}".format(self._value, value))
-
         self._value = value
-        # --- TASK_0 ---
+        # --- EX3_TASK_0 ---
 
 
 class LinearNode(ScalarNode):
@@ -208,7 +202,7 @@ class LinearNode(ScalarNode):
 
         result = 0.0
 
-        # --- TODO TASK_1 ---
+        # --- EX3_TASK_1 ---
         for i, arg in enumerate(self._arguments):
             x_i = arg.value()
             w_i = self._weights[i].value()
@@ -216,7 +210,7 @@ class LinearNode(ScalarNode):
 
         # Add the bias
         result += self._bias.value()
-        # --- TASK_1 ---
+        # --- EX3_TASK_1 ---
 
         # Save to the cache
         self._cache.value = result
@@ -228,7 +222,7 @@ class LinearNode(ScalarNode):
             return self._cache.local_partial_derivatives_wrt_children
 
         result = None
-        # --- TODO TASK_2 ---
+        # --- EX3_TASK_2 ---
         result = [a.value() for a in self._weights] + [w.value() for w in self._arguments] + [1]
         # --- TASK_2 ---
 
@@ -249,7 +243,7 @@ class SigmoidNode(ScalarNode):
             return self._cache.value
 
         result = 0.0
-        # --- TODO TASK_3 ---
+        # --- EX3_TASK_3 ---
         result = 1 / (1 + math.exp(- self._children[0].value()))
         # --- TASK_3 ---
 
@@ -263,7 +257,7 @@ class SigmoidNode(ScalarNode):
             return self._cache.local_partial_derivatives_wrt_children
 
         result = []
-        # --- TODO TASK_3 ---
+        # --- EX3_TASK_3 ---
         result = [self.value() * (1 - self.value())]
         # --- TASK_3 ---
 
@@ -286,16 +280,16 @@ class CrossEntropyLoss(ScalarNode):
             return self._cache.value
 
         result = 0.0
-        # --- TODO TASK_4 ---
+        # --- EX3_TASK_4 ---
         y_val = self._gold_label.value()
         y_hat_val = self._children[0].value()
 
         # Corner case
-        if y_val == y_hat_val:
+        if y_val == y_hat_val:  # We discussed this in the exercise class and in reality this should never happen
             result = 0
         else:
             result = - y_val * math.log2(y_hat_val) - (1 - y_val) * math.log2(1 - y_hat_val)
-        # --- TASK_4 ---
+        # --- EX3_TASK_4 ---
 
         # Save to the cache
         self._cache.value = result
@@ -307,12 +301,12 @@ class CrossEntropyLoss(ScalarNode):
             return self._cache.local_partial_derivatives_wrt_children
 
         result = []
-        # --- TODO TASK_4 ---
+        # --- EX3_TASK_4 ---
         y_val = self._gold_label.value()
         y_hat_val = self._children[0].value()
 
         result = [- (y_val - y_hat_val) / (y_hat_val * (1 - y_hat_val))]
-        # --- TASK_4 ---
+        # --- EX3_TASK_4 ---
 
         # Save to the cache
         self._cache.local_partial_derivatives_wrt_children = result
