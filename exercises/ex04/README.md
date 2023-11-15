@@ -10,13 +10,9 @@ Implement a list of ScalarNodes that we will call a LinearLayer that takes the p
 
 Implement online gradient descent training of a log-linear model. We have synthetic, linearly separable data for a binary classification task (labeled as 0 and 1), see the Jupyter notebook in bin/notebooks/ex4_dataset_visualisations.ipynb
 
-### Task 3 - TBD
+### Solutions
 
-minibatch SGD
-
-Softmax
-
-Categorical cross entropy
+Solutions will be included as part of the next exercise
 
 ## Setup
 
