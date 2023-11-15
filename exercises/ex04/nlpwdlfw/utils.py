@@ -22,6 +22,9 @@ def predict(input_layer: InputLayer, output_node: ScalarNode,
             test_data: List[BinaryClassificationExample]) -> List[float]:
     result = []
     for test_example in test_data:
+        # We must clean the cache before any computations!
+        output_node.clean_cache_recursively()
+
         # Set the input feature vector values
         input_layer.set_values_from_training_example_feature_vector(test_example.feature_vector)
         output_node.clean_cache_recursively()
