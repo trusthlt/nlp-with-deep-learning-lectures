@@ -1,5 +1,6 @@
 import math
 from typing import List
+
 from nlpwdlfw.nodes import ScalarNode, InputNode, LinearNode, ParameterNode, ReLUNode
 
 
@@ -53,26 +54,45 @@ class ReLULayer(Layer):
 
 class SoftMaxLayerNode(ScalarNode):
 
-    def __init__(self, argument: ScalarNode, softmax_layer: 'SoftMaxLayer') -> None:
-        super().__init__([argument])
+    def __init__(self, previous_layer: Layer, softmax_layer: 'SoftMaxLayer',
+                 index_of_self_in_softmax_layer: int) -> None:
+        super().__init__(previous_layer.nodes)
         # we need to know to which layer this node belongs to because of the global computation
         # of the denominator
         self._softmax_layer = softmax_layer
+        # and also on which position in the softmax layer this node is
+        self._index_of_self_in_softmax_layer = index_of_self_in_softmax_layer
 
     def get_argument_value(self) -> float:
-        return self._children[0].value()
+        return self._children[self._index_of_self_in_softmax_layer].value()
 
     def value(self) -> float:
+        if self._cache.value is not None:
+            return self._cache.value
+
         result = 0.0
         # --- TODO EX5_TASK_3 ---
 
         # --- EX5_TASK_3 ---
+
+        # Save to the cache
+        self._cache.value = result
+
         return result
 
     def local_partial_derivatives_wrt_children(self) -> List[float]:
+        if self._cache.local_partial_derivatives_wrt_children is not None:
+            return self._cache.local_partial_derivatives_wrt_children
+
+        result = []
         # --- TODO EX5_TASK_3 ---
         pass
-        # --- EX5_TASK_2 ---
+        # --- EX5_TASK_3 ---
+
+        # Save to the cache
+        self._cache.local_partial_derivatives_wrt_children = result
+
+        return result
 
 
 class SoftMaxLayer(Layer):
@@ -80,9 +100,9 @@ class SoftMaxLayer(Layer):
     def __init__(self, previous_layer: Layer):
         super().__init__()
         # For each previous node
-        for previous_node in previous_layer.nodes:
+        for i, previous_node in enumerate(previous_layer.nodes):
             # Create a new SoftMax node
-            self.nodes.append(SoftMaxLayerNode(previous_node, self))
+            self.nodes.append(SoftMaxLayerNode(previous_layer, self, i))
 
     def compute_denominator(self) -> float:
         # Naive implementation will result in overflows

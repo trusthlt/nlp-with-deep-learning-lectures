@@ -326,10 +326,9 @@ class InputNode(ConstantNode):
 
 class ReLUNode(ScalarNode):
 
-    def __init__(self, children: List['ScalarNode']) -> None:
-        super().__init__(children)
+    def __init__(self, argument: ScalarNode) -> None:
         # Only single-argument function
-        assert len(children) == 1
+        super().__init__([argument])
 
     def value(self) -> float:
         # --- TODO EX5_TASK_1 ---
