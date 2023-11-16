@@ -322,3 +322,21 @@ class InputNode(ConstantNode):
 
     def set_value(self, value: float) -> None:
         self._value = value
+
+
+class ReLUNode(ScalarNode):
+
+    def __init__(self, children: List['ScalarNode']) -> None:
+        super().__init__(children)
+        # Only single-argument function
+        assert len(children) == 1
+
+    def value(self) -> float:
+        # --- TODO EX5_TASK_1 ---
+        pass
+        # --- EX5_TASK_1 ---
+
+    def local_partial_derivatives_wrt_children(self) -> List[float]:
+        # --- TODO EX5_TASK_1 ---
+        pass
+
