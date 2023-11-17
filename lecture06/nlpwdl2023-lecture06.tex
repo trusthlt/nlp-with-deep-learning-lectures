@@ -796,7 +796,7 @@ What could such a score be?
 
 \begin{frame}{Negative sampling}
 	
-Instead of predicting probability distribution for the target word, we \textbf{create an artificial binary task} by randomly shuffling the target word $w$ \pause
+Instead of predicting probability distribution for the target word, we \textbf{create an artificial binary task} by choosing either the correct or a random incorrect target word \pause
 $$
 y = 
  \begin{cases}
@@ -1041,12 +1041,15 @@ word2vec simplifies the neural LM by removing the hidden layer (so turning it in
 
 %- we have obtained the best performance on the taskintroduced in the next section by building a log-linear classifier with four future and four history words at the input, where the training criterion is to correctly classify the current (middle) word.
 
+
 Variant 1: Continuous bag of words (CBOW)
 $\bm{c} = \sum_{i = 1}^{k} v(c_i)$
 
+
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Mikolov.et.al.2013.ICLR} \par};
+	\node at (current page.north east)[ref] {\fullcite{Mikolov.et.al.2013.ICLR} \par};
 \end{tikzpicture}
+
 
 \end{frame}
 
@@ -1228,10 +1231,10 @@ $\to$ Model each word as a bag of character $n$-grams
 \item Word is represented as a sum of $n$-gram emeddings	
 \end{itemize}
 
-
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Bojanowski.et.al.2017.TACL} \par};
+	\node at (current page.north east)[ref] {\fullcite{Bojanowski.et.al.2017.TACL} \par};
 \end{tikzpicture}
+
 
 \end{frame}
 
@@ -1251,10 +1254,13 @@ $$
 \end{example}
 
 Train with skip-gram and negative sampling (same as word2vec)
-	
+
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Bojanowski.et.al.2017.TACL} \par};
+	\node at (current page.north east)[ref] {\fullcite{Bojanowski.et.al.2017.TACL} \par};
 \end{tikzpicture}
+
+
+
 	
 \end{frame}
 
@@ -1289,8 +1295,7 @@ What can possibly go wrong?
 
 \onslide<1->{
 \begin{tikzpicture}[overlay, remember picture] 
-\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize 
-\fullcite{Kuzi.et.al.2016.CIKM} \par};
+	\node at (current page.north east)[ref] {\fullcite{Kuzi.et.al.2016.CIKM} \par};
 \end{tikzpicture}
 }
 \end{frame}
@@ -1351,11 +1356,10 @@ The corpora reflect human biases in the real world (cultural or otherwise)
 \end{block}
 
 
-
 \begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \fullcite{Caliskan.et.al.2017.science} \par};
+	\node at (current page.north east)[ref] {\fullcite{Caliskan.et.al.2017.science} \par};
 \end{tikzpicture}
-	
+
 \end{frame}
 
 \begin{frame}{Limitations of word embeddings (3)}

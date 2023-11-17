@@ -77,6 +77,20 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture05/pdf/nlpwdl2023-lecture05-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=NhL916qhdWs)
 
+### Exercise 05: ReLU and SoftMax
+
+2023-11-16
+
+* See the README.md and Python code under [exercises/ex05](exercises/ex05)
+
+### Lecture 06: Text classification 3: Learning word embeddings
+
+2023-11-17
+
+* [Slides as PDF](/lecture06/pdf/nlpwdl2023-lecture06-handout.pdf)
+* TBD [YouTube recording](https://www.youtube.com/watch?v=)
+
+
 ## FAQ
 
 * What are some essential pre-requisites?
