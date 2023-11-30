@@ -103,6 +103,12 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture07/pdf/nlpwdl2023-lecture07-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=-83Fsl9csKA)
 
+### Lecture 08: Text generation 2: Autoregressive encoder-decoder with RNNs and attention
+
+2023-12-01
+
+* [Slides as PDF](/lecture08/pdf/nlpwdl2023-lecture08-handout.pdf)
+* TBD [YouTube recording](https://www.youtube.com/watch?v=)
 
 ## FAQ
 
