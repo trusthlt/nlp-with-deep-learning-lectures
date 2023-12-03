@@ -1,0 +1,202 @@
+% !TeX document-id = {66b2d4b6-7613-4c19-b40c-a50fc00d38ff}
+% !TeX program = lualatex
+% !BIB program = biber
+% Lualatex is important to render TTF fonts; with pdflatex it's just the regular one
+% ratio 16:9 -- https://tex.stackexchange.com/questions/14336/
+
+% compile two versions, inspired by https://tex.stackexchange.com/a/1501
+% use the script "compile-pdf.sh"
+\newif\ifhandout
+% if flags.tex does not exist, create an empty file to be able to compile in TeXstudio
+\input{flags}
+
+\ifhandout
+\documentclass[12pt,aspectratio=169,handout]{beamer}
+\else
+\documentclass[12pt,aspectratio=169]{beamer}
+\fi
+
+% adjust for 16:9
+% https://tex.stackexchange.com/questions/354022/modifying-the-margins-of-all-slides-in-beamer
+\setbeamersize{text margin left=0.3cm,text margin right=4.5cm} 
+
+%\usepackage{xcolor}
+
+% use Metropolis as the basis theme
+\usetheme[subsectionpage=progressbar]{metropolis}
+% blocks with background globally
+\metroset{block=fill}
+
+% ------- Paderborn specifics ----------
+\usepackage{fontspec}
+%\setsansfont{karla} % looked bad, too fat
+\setsansfont{Segoe UI} % looks OK-ish
+
+% Paderborn color scheme
+\definecolor{UPBUltraBlue}{RGB}{0, 37, 170}
+
+\setbeamercolor{frametitle}{bg=white, fg=UPBUltraBlue}
+
+% name in footer
+\setbeamertemplate{frame numbering}{Prof.\ Dr.\ Ivan Habernal ~ | ~ \insertframenumber }
+
+% adjust the background to be completely white
+\setbeamercolor{background canvas}{bg=white}
+
+% add Paderborn logo at each slide
+% actually not -- it's just eating up space
+%\addtobeamertemplate{frametitle}{}{%
+	%\begin{tikzpicture}[remember picture,overlay]
+	%	\node[anchor=north east,yshift=2pt] at (current page.north east) {\includegraphics[height=0.9cm]{img/UPB_Logo_ENG_coloured_RGB}};
+	%\end{tikzpicture}
+	%}
+
+% show TOC at every section start
+\AtBeginSection{
+	\frame{
+		\vspace{2em}
+		\sectionpage
+		\hspace*{2.2em}\begin{minipage}{10cm}
+			\tableofcontents[currentsection]
+		\end{minipage}
+		% we need the logo to show up here as well
+		\begin{tikzpicture}[remember picture,overlay]
+			\node[anchor=north east,yshift=2pt] at (current page.north east) {\includegraphics[height=0.9cm]{img/UPB_Logo_ENG_coloured_RGB}};
+		\end{tikzpicture}
+	}
+}
+% ------- end of Paderborn specifics ----------
+
+
+% typeset mathematics on serif
+\usefonttheme[onlymath]{serif}
+
+% better bibliography using biber as backend
+\usepackage[natbib=true,backend=biber,style=authoryear-icomp,maxbibnames=30,maxcitenames=9,uniquelist=false,giveninits=true,doi=false,url=false,dashed=false,isbn=false]{biblatex}
+% shared bibliography
+\addbibresource{../nlpwdl-bibliography.bib}
+% disable "ibid" for repeated citations
+\boolfalse{citetracker}
+
+
+
+\usepackage{xspace}
+
+
+% for derivatives, https://tex.stackexchange.com/a/412442
+\usepackage{physics}
+
+\usepackage{tikz}
+\usetikzlibrary{matrix, positioning}
+\usetikzlibrary{angles,quotes} % for angles
+\usetikzlibrary{backgrounds} % background
+\usetikzlibrary{decorations.pathreplacing} % curly braces
+\usetikzlibrary{calligraphy}
+\usetikzlibrary{calc} % for neural nets
+
+% for plotting functions
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+% sub-figures
+\usepackage{caption}
+\usepackage{subcaption}
+
+% book tabs
+\usepackage{booktabs}
+
+
+% argmin, argmax
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\!\max}
+\DeclareMathOperator*{\argmin}{arg\!\min}
+% softmax
+\DeclareMathOperator*{\softmax}{soft\!\max}
+
+% bold math
+\usepackage{bm}
+
+% for \mathclap
+\usepackage{mathtools}
+
+% algorithms
+\usepackage[noend]{algpseudocode}
+
+
+% for neurons and layers in tikz
+\tikzset{
+	neuron/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=blue!20},
+	param/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=green!20},
+	constant/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!15},
+	% for citation nodes right top
+	ref/.style={anchor = north east, text width=7.8cm, yshift=-1.3cm, xshift=-0.2cm, scale=0.5},
+	state/.style={rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!5},
+}
+
+% for strike-through text (added in Lecture 06)
+\usepackage[normalem]{ulem}
+
+% added in Lecture 7
+% RNN
+\DeclareMathOperator*{\rnn}{RNN}
+% RNN star
+\DeclareMathOperator*{\rnnstar}{RNN^{*}}
+% bi-RNN
+\DeclareMathOperator*{\birnn}{biRNN}
+
+
+
+
+
+\title{Natural Language Processing with Deep Learning}
+\subtitle{Lecture 9 -- Text classification X: Introduction to Transformers with BERT}
+\date{December 8, 2023}
+\author{Prof.\ Dr.\ Ivan Habernal}
+\institute{Natural Language Processing Group 
+	\hfill \includegraphics[height=1.4cm]{img/UPB_Logo_ENG_coloured_RGB} \\
+	Paderborn University \\
+	We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.org} }
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Motivation}
+TBD
+
+
+\end{frame}
+
+
+
+
+\begin{frame}{License and credits}
+
+	\begin{columns}
+		\begin{column}{0.7\textwidth}
+			Licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+		\end{column}
+		\begin{column}{0.2\textwidth}
+			\includegraphics[width=0.9\linewidth]{img/cc-by-sa-icon.pdf}
+		\end{column}
+	\end{columns}
+	
+	\bigskip
+	
+	Credits
+	
+	\begin{scriptsize}
+		
+		Ivan Habernal
+		
+		Content from ACL Anthology papers licensed under CC-BY \url{https://www.aclweb.org/anthology}
+		
+	
+	\end{scriptsize}
+	
+\end{frame}
+
+
+
+\end{document}
+
