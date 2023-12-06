@@ -153,7 +153,7 @@
 
 
 \title{Natural Language Processing with Deep Learning}
-\subtitle{Lecture 9 -- Text classification X: Introduction to Transformers with BERT}
+\subtitle{Lecture 9 -- Text classification 5: Introduction to transformers with BERT}
 \date{December 8, 2023}
 \author{Prof.\ Dr.\ Ivan Habernal}
 \institute{Natural Language Processing Group 
@@ -405,33 +405,27 @@ Params for each {\colorbox{yellow!30}{$h \in [H]$}}: $\bm{\mathcal{W}_{qkv}}^h$:
 \end{frame}
 
 
-\iffalse
+\begin{frame}{Layer normalization}
 
+Input: $\bm{e} \in \mathbb{R}^{d}$, output of a layer
 
-% ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Input: $\bm{\hat e} \in \mathbb{R}^{d}$, normalized output of a layer
 
-%-------------------------------%
-\begin{algorithm}[h] % Attention
-%-------------------------------%
-\caption{$\m{\tilde V}\gets$~\texttt{Attention}$(\m{X},\m{Z}|\bmcWqkv,\text{Mask})$}
-\label{algo:attention}
-\DontPrintSemicolon
-\tcc{Computes a single (masked) self- or cross- attention head.}
-\KwIn{$\m{X}∈ℝ^{d_\t{x}×\ell_\t{x}}, \m{Z}∈ℝ^{d_\t{z}×\ell_\t{z}}$, vector representations of primary and context  sequence.}
-\KwOut{$\m{\tilde V}∈ℝ^{d_\t{out}×\ell_\t{x}} $, updated representations of tokens in $\m{X}$, folding in information from tokens in $\m{Z}$.}
-\KwParam{$\bmcWqkv$ consisting of: 
-	$\m{W_q}∈ℝ^{d_\t{attn}×d_\t{x}}$, $\v{b_q}∈ℝ^{d_\t{attn}}$
-	$\m{W_k}∈ℝ^{d_\t{attn}×d_\t{z}}$, $\v{b_k}∈ℝ^{d_\t{attn}}$
-	$\m{W_v}∈ℝ^{d_\t{out}×d_\t{z}}$, ~$\v{b_v}∈ℝ^{d_\t{out}}$.}
-\KwHyper{Mask$∈\!\!\{0,\!1\}^{\ell_\t{z}×\ell_\t{x}}$, $\uparrow$\eqref{eq:mask}}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-$\m{Q} \gets \m{W_q} \m{X} + \v{b_q} \v{1}^\intercal$ ~~~ [\![$\m{Q}\t{uery}∈ℝ^{d_\t{attn}×\ell_\t{x}}$]\!] \;
-$\m{K} \gets \m{W_k} \m{Z} + \v{b_k} \v{1}^\intercal$ ~~~~~~~ [\![$\m{K}\t{ey}∈ℝ^{d_\t{attn}×\ell_\t{z}}$]\!] \;
-$\m{V} \gets \m{W_v} \m{Z} + \v{b_v} \v{1}^\intercal$ ~~~~~ [\![$\m{V}\t{alue}∈ℝ^{d_\t{out}×\ell_\t{z}}$]\!] \;
-$\m{S} \gets \m{K}^\intercal \m{Q}$ ~~~~~~~~~~~~~~~~~~~ [\![$\m{S}\t{core}∈ℝ^{\ell_\t{z}×\ell_\t{x}}$]\!] \;
-$\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\t{x}] \gets -∞ $ \;
-\Return $\m{\tilde V} = \m{V}\cdot \t{softmax}\left( \m{S} / \sqrt{d_\t{attn}} \right)$    
-\end{algorithm}
+Parameters: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, element-wise scale and offset
+
+\begin{algorithmic}[1]
+\Function{LayerNorm}{$\bm{e} ; \bm{\gamma}, \bm{\beta}$}
+\State $m \gets \frac{1}{d} \sum_{i = 1}^{d} \bm{e}[i]$
+\Comment{`Sample mean' of $\bm{e}$}
+\State $v \gets \frac{1}{d} \sum_{i = 1}^{d} (\bm{e}[i] - m)^2$
+\Comment{`Sample variance' of $\bm{e}$}
+\State \Return $\bm{\hat e} = \frac{\bm{e} - m}{\sqrt{v}} \odot \bm{\gamma} + \bm{\beta}$
+\Comment{$\odot$ element-wise product}
+\EndFunction
+\end{algorithmic}	
+
+\end{frame}
+
 
 
 
@@ -585,49 +579,6 @@ $\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\
 	
 \end{frame}
 
-\begin{frame}{Roadmap}
-	
-	\begin{columns}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-			NLP tasks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Long-range dependencies, hard to represent meaning}
-			\end{itemize}
-			
-			Neural networks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Learn non-linear dependencies, learn representations}
-			\end{itemize}
-			
-			Embeddings $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Dense token representation}
-			\end{itemize}
-			
-			Neural machine translation $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Sequence to sequence models}
-				\item {\scriptsize Positional embeddings}
-			\end{itemize}
-			
-		\end{column}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-		\end{column}
-		
-	\end{columns}
-	
-\end{frame}
-
 \section{Attention ``is all you need"}
 
 \begin{frame}{Attention: Modeling dependencies}
@@ -758,116 +709,6 @@ $\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\
 \end{frame}
 
 
-
-\begin{frame}{Roadmap}
-	
-	\begin{columns}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-			NLP tasks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Long-range dependencies, hard to represent meaning}
-			\end{itemize}
-			
-			Neural networks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Learn non-linear dependencies, learn representations}
-			\end{itemize}
-			
-			Embeddings $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Dense token representation}
-			\end{itemize}
-			
-			Neural machine translation $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Sequence to sequence models}
-				\item {\scriptsize Positional embeddings}
-			\end{itemize}
-			
-		\end{column}
-		
-		\begin{column}{0.5\linewidth}
-			
-			Attention $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Efficient long-range dependencies}
-			\end{itemize}
-			
-			
-			
-		\end{column}
-		
-	\end{columns}
-	
-\end{frame}
-
-
-\begin{frame}{Roadmap}
-	
-	\begin{columns}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-			NLP tasks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Long-range dependencies, hard to represent meaning}
-			\end{itemize}
-			
-			Neural networks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Learn non-linear dependencies, learn representations}
-			\end{itemize}
-			
-			Embeddings $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Dense token representation}
-			\end{itemize}
-			
-			Neural machine translation $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Sequence to sequence models}
-				\item {\scriptsize Positional embeddings}
-			\end{itemize}
-			
-		\end{column}
-		
-		\begin{column}{0.5\linewidth}
-			
-			Attention $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Efficient long-range dependencies}
-			\end{itemize}
-			
-			
-			Out-of-vocabulary words $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize WordPiece sub-word units can be truly multi-lingual and prevent OOV}
-			\end{itemize}
-			
-			
-			
-		\end{column}
-		
-	\end{columns}
-	
-\end{frame}
-
-
 \section{Multi-task learning}
 
 
@@ -941,158 +782,6 @@ $\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\
 \end{frame}
 
 
-\begin{frame}{Roadmap}
-	
-	\begin{columns}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-			NLP tasks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Long-range dependencies, hard to represent meaning}
-			\end{itemize}
-			
-			Neural networks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Learn non-linear dependencies, learn representations}
-			\end{itemize}
-			
-			Embeddings $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Dense token representation}
-			\end{itemize}
-			
-			Neural machine translation $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Sequence to sequence models}
-				\item {\scriptsize Positional embeddings}
-			\end{itemize}
-			
-		\end{column}
-		
-		\begin{column}{0.5\linewidth}
-			
-			Attention $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Efficient long-range dependencies}
-			\end{itemize}
-			
-			
-			Out-of-vocabulary words $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize WordPiece sub-word units can be truly multi-lingual and prevent OOV}
-			\end{itemize}
-			
-			
-			Multi-task learning $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Shared representation improves generalization; transfer learning}
-			\end{itemize}
-			
-			
-		\end{column}
-		
-	\end{columns}
-	
-\end{frame}
-
-\section{``Unsupervised'' Pre-Training}
-
-\begin{frame}{"Un-supervised" Pre-Training}
-	
-	\begin{itemize}
-		\item Deep neural nets are trained with full supervision
-		\begin{itemize}
-			\item Even autoencoders are supervised by the reconstruction error
-		\end{itemize}
-		\item "Unsupervised" training scenario usually means:
-		\begin{itemize}
-			\item 	I don't have any labeled data for my target task (e.g., no labels for "word similarity")
-			\item 	But I can design a proxy supervised task (e.g., "given a context of a missing word, predict that word")
-			\item	And create positive and negative instances by exploiting a large unlabeled corpus (e.g., words in their context as positive, and randomly swapped words with their context as negative)
-		\end{itemize}
-	\end{itemize}
-	
-	
-\end{frame}
-
-\begin{frame}{Roadmap}
-	
-	\begin{columns}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-			NLP tasks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Long-range dependencies, hard to represent meaning}
-			\end{itemize}
-			
-			Neural networks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Learn non-linear dependencies, learn representations}
-			\end{itemize}
-			
-			Embeddings $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Dense token representation}
-			\end{itemize}
-			
-			Neural machine translation $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Sequence to sequence models}
-				\item {\scriptsize Positional embeddings}
-			\end{itemize}
-			
-		\end{column}
-		
-		\begin{column}{0.5\linewidth}
-			
-			Attention $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Efficient long-range dependencies}
-			\end{itemize}
-			
-			
-			Out-of-vocabulary words $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize WordPiece sub-word units can be truly multi-lingual and prevent OOV}
-			\end{itemize}
-			
-			
-			Multi-task learning $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Shared representation improves generalization; transfer learning}
-			\end{itemize}
-			
-			"Unsupervised" Pre-Training $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Proxy task and unlimited data from unlabeled corpora}
-			\end{itemize}
-			
-		\end{column}
-		
-	\end{columns}
-	
-\end{frame}
-
-
 \section{BERT}
 
 
@@ -1153,18 +842,16 @@ $\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\
 	
 \end{frame}
 
-\begin{frame}{BERT: The Transformer}
+\begin{frame}{BERT: The transformer encoder}
 	
 	\begin{columns}
 		\begin{column}{0.6\linewidth}
 			\begin{itemize}
-				\item The good-old-friend "Self-Attention"
 				\item Multiple parallel attention "heads” (16 heads)
 				\item With residual connections
 				\item With layer normalization
 				\item Stacked on top of each other (24-times)
 				\item 310,000,000 trainable parameters
-				\item ...we've seen that already
 			\end{itemize}
 		\end{column}
 		\begin{column}{0.3\linewidth}
@@ -1322,78 +1009,6 @@ $\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\
 \end{frame}
 
 
-
-
-
-\begin{frame}{Roadmap}
-	
-	\begin{columns}
-		
-		\begin{column}{0.5\linewidth}
-			
-			
-			NLP tasks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Long-range dependencies, hard to represent meaning}
-			\end{itemize}
-			
-			Neural networks $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Learn non-linear dependencies, learn representations}
-			\end{itemize}
-			
-			Embeddings $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Dense token representation}
-			\end{itemize}
-			
-			Neural machine translation $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Sequence to sequence models}
-				\item {\scriptsize Positional embeddings}
-			\end{itemize}
-			
-		\end{column}
-		
-		\begin{column}{0.5\linewidth}
-			
-			Attention $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Efficient long-range dependencies}
-			\end{itemize}
-			
-			
-			Out-of-vocabulary words $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize WordPiece sub-word units can be truly multi-lingual and prevent OOV}
-			\end{itemize}
-			
-			
-			Multi-task learning $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Shared representation improves generalization; transfer learning}
-			\end{itemize}
-			
-			"Unsupervised" Pre-Training $\checkmark$
-			
-			\begin{itemize}
-				\item {\scriptsize Proxy task and unlimited data from unlabeled corpora}
-			\end{itemize}
-			
-		\end{column}
-		
-	\end{columns}
-	
-\end{frame}
-
-
 \begin{frame}{BERT Recap}
 	
 	BERT stays on the shoulders of many clever concepts and techniques, mastered into a single model
@@ -1442,7 +1057,7 @@ $\forall t_\t{z}, t_\t{x},$ if $\neg$Mask$[t_\t{z},t_\t{x}]$ then $S[t_\t{z},t_\
 	
 \end{frame}
 
-\fi
+
 
 \end{document}
 
