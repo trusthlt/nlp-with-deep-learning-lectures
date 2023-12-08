@@ -110,6 +110,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture08/pdf/nlpwdl2023-lecture08-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=94bA72X8lDo)
 
+### Lecture 09: Text classification 5: Introduction to transformers with BERT
+
+2023-12-08
+
+* [Slides as PDF](/lecture09/pdf/nlpwdl2023-lecture09-handout.pdf)
+* TBD [YouTube recording](https://www.youtube.com/watch?v=)
+
 ## FAQ
 
 * What are some essential pre-requisites?
