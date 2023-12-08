@@ -564,54 +564,6 @@ RNN processes left-to-right (or right-to-left)
 \end{frame}
 
 
-\begin{frame}{BERT: Tokenization}
-	
-	Tokenizing into a multilingual WordPiece inventory
-	
-	\begin{itemize}
-		\item Recall that WordPiece units are sub-word units
-		\item 30,000 WordPiece units (newer models 110k units, 100 languages)
-	\end{itemize}
-	
-	Implications: BERT can "consume" any language
-	
-	
-\end{frame}
-
-
-\begin{frame}{BERT: Input representation}
-	
-	\begin{itemize}
-		\item Each WordPiece token from the input is represented by a \textbf{WordPiece embedding} (randomly initialized)
-		\item Each position from the input is associated with a \textbf{positional embedding} (also randomly initialized)
-		\item Input length limited to \textbf{512} WordPiece tokens, using \texttt{<PAD>}ding
-		\item Special tokens
-		\begin{itemize}
-			\item The fist token is always a special token \textbf{[CLS]}
-			\item If the task involves two sentences (e.g., NLI), these two sentences are separated by a special token \textbf{[SEP]}; also special two \textbf{segment position embeddings} 
-		\end{itemize}
-		
-	\end{itemize}
-	
-\end{frame}
-
-
-\begin{frame}{BERT: Input representation summary}
-	
-	\begin{figure}
-		\includegraphics[width=\linewidth]{img/bert-input.png}	
-	\end{figure}
-	
-\end{frame}
-
-\begin{frame}{BERT: Very abstract view}
-	
-	\begin{figure}
-		\includegraphics[width=\linewidth]{img/bert1.png}
-	\end{figure}	
-	
-\end{frame}
-
 \begin{frame}{BERT: The transformer encoder}
 	
 	\begin{columns}
@@ -645,9 +597,9 @@ RNN processes left-to-right (or right-to-left)
 	For example $t \in [N] \equiv t \in \{1, 2, \ldots, N\}$
 	
 	
-\begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[ref] {\fullcite{Phuong.Hutter.2022} \par};
-\end{tikzpicture}
+	\begin{tikzpicture}[overlay, remember picture] 
+		\node at (current page.north east)[ref] {Notation and formal description of algorithms adopted from \fullcite{Phuong.Hutter.2022} Note that they use column-vector notation while here (and in all lectures) we use row-vector notation. \par};
+	\end{tikzpicture}
 	
 \end{frame}
 
@@ -887,60 +839,53 @@ RNN processes left-to-right (or right-to-left)
 
 
 
+\subsection{Input and pre-training}
 
-\begin{frame}{BERT: Very abstract view}
+\begin{frame}{BERT: Tokenization}
 	
-	\begin{figure}
-		\includegraphics[width=\linewidth]{img/bert1.png}
-	\end{figure}	
+	Tokenizing into a multilingual WordPiece inventory
+	
+	\begin{itemize}
+		\item Recall that WordPiece units are sub-word units
+		\item 30,000 WordPiece units (newer models 110k units, 100 languages)
+	\end{itemize}
+	
+	Implications: BERT can "consume" any language
+	
 	
 \end{frame}
 
 
-\begin{frame}{BERT: Representing various NLP tasks}
+\begin{frame}{BERT: Input representation}
+	
+	\begin{itemize}
+		\item Each WordPiece token from the input is represented by a \textbf{WordPiece embedding} (randomly initialized)
+		\item Each position from the input is associated with a \textbf{positional embedding} (also randomly initialized)
+		\item Input length limited to \textbf{512} WordPiece tokens, using \texttt{<PAD>}ding
+		\item Special tokens
+		\begin{itemize}
+			\item The fist token is always a special token \textbf{[CLS]}
+			\item If the task involves two sentences (e.g., NLI), these two sentences are separated by a special token \textbf{[SEP]}; also special two \textbf{segment position embeddings} 
+		\end{itemize}
+		
+	\end{itemize}
+	
+\end{frame}
+
+
+\begin{frame}{BERT: Input representation summary}
 	
 	\begin{figure}
-		\includegraphics[width=0.5\linewidth]{img/task1.png}
+		\includegraphics[width=\linewidth]{img/bert-input.png}	
 	\end{figure}
 	
-	That explains the special [CLS] token at sequence start
-	
 \end{frame}
 
 
-
-\begin{frame}{BERT: Representing various NLP tasks}
-	
-	\begin{figure}
-		\includegraphics[width=0.6\linewidth]{img/task2.png}
-	\end{figure}
-	
-	
-\end{frame}
+\subsection{Pre-training}
 
 
-
-\begin{frame}{BERT: Representing various NLP tasks}
-	
-	\begin{figure}
-		\includegraphics[width=0.5\linewidth]{img/task3.png}
-	\end{figure}
-	
-	
-	Not conditioned on surrounding predictions	
-	
-\end{frame}
-
-\begin{frame}{BERT: Very abstract view}
-	
-	\begin{figure}
-		\includegraphics[width=\linewidth]{img/bert1.png}
-	\end{figure}	
-	
-\end{frame}
-
-
-\begin{frame}{BERT: "Unsupervised" multi-task pre-training}
+\begin{frame}{BERT: Self-supervised multi-task pre-training}
 	
 	Prepare two auxiliary tasks that need no labeled data
 	
@@ -1016,6 +961,41 @@ RNN processes left-to-right (or right-to-left)
 
 
 
+\subsection{Downstream tasks and fine-tuning}
+
+\begin{frame}{BERT: Representing various NLP tasks}
+	
+	\begin{figure}
+		\includegraphics[width=0.5\linewidth]{img/task1.png}
+	\end{figure}
+	
+	That explains the special [CLS] token at sequence start
+	
+\end{frame}
+
+
+
+\begin{frame}{BERT: Representing various NLP tasks}
+	
+	\begin{figure}
+		\includegraphics[width=0.6\linewidth]{img/task2.png}
+	\end{figure}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{BERT: Representing various NLP tasks}
+	
+	\begin{figure}
+		\includegraphics[width=0.5\linewidth]{img/task3.png}
+	\end{figure}
+	
+	
+	Not conditioned on surrounding predictions	
+	
+\end{frame}
 
 \begin{frame}{BERT: Very abstract view}
 	
@@ -1023,32 +1003,44 @@ RNN processes left-to-right (or right-to-left)
 		\includegraphics[width=\linewidth]{img/bert1.png}
 	\end{figure}	
 	
-	Pretraining this monster took them 4 days on 64 TPU chips
-	(estimated \$500 USD)
+\end{frame}
+
+
+\begin{frame}{BERT: Very abstract view}
+	
+	\begin{figure}
+		\includegraphics[width=\linewidth]{img/bert1.png}
+	\end{figure}	
+	
+	Pretraining BERT took originally 4 days on 64 TPUs\footnote{Can be done more efficiently, see, e.g., \citet{izsak-etal-2021-train}}
 	
 	\bigskip
 	
-	Once pre-trained, transfer and "fine-tune" on your small-data task and get state-of-the-art results :)
+	Once pre-trained, transfer and "fine-tune" on your small-data task and get competitive results
+
+
 	
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{izsak-etal-2021-train} \par};
+\end{tikzpicture}
+
 	
 \end{frame}
 
 
-\begin{frame}{BERT Recap}
+\begin{frame}{Recap}
 	
 	BERT stays on the shoulders of many clever concepts and techniques, mastered into a single model
 	
-\end{frame}
+\textbf{What do we know about how BERT works?}
 
-\section{What do we know about how BERT works?}
-
-\begin{frame}{Highly recommended reading}
 	
-	\emph{``BERTology has clearly come a long way, but it is fair to say we still have more questions than answers about how BERT works.''}
+\emph{``BERTology has clearly come a long way, but it is fair to say we still have more questions than answers about how BERT works.''} --- \citet{Rogers.et.al.2020.BERT}\footnote{Highly recommended reading!}
 	
-	\bigskip
 	
-	\fullcite{Rogers.et.al.2020.BERT}
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Rogers.et.al.2020.BERT} \par};
+\end{tikzpicture}
 	
 \end{frame}
 
