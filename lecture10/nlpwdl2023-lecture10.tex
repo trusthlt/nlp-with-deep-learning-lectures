@@ -574,34 +574,172 @@ $\bm{W_u} \in \mathbb{R}^{d_\text{e} \times N_\text{V}}$, the unembedding matrix
 
 
 
-\begin{frame}{BERT (encoding-only transformer, forward pass)}
+\begin{frame}{BERT (training by masked language modeling)}
+
+
+%Output: $\bm{\hat{\theta}}$ trained parameters
+
+%Hyperparameters: $p_{\text{mask}} \in (0, 1)$, $N_\text{epochs}$, $\eta$
+
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETraining}{$\left\{ \bm{x}_n \right\}_{n = 1}^{N_\text{data}}$ sequences,  $\bm{\theta}$ init.\ params; $p_{\text{mask}} \in (0, 1)$, $N_\text{epochs}$, $\eta$}
+\For{$i \in [N_{\text{epochs}}]$}
+\For{$n \in [N_{\text{data}}]$}
+	\State $\ell \gets \text{length}(\bm{x}_n)$
+	\For{$t \in [\ell]$}
+	\State $\tilde{\bm{x}}_n[t] \gets \texttt{<mask\_token>}$ with prob.\ $p_{\text{mask}}$, otherwise $\bm{x}_n[t]$
+	\EndFor
+	\State $\tilde{T} \gets \left\{ t \in [\ell] : \tilde{\bm{x}}_n[t] = \texttt{<mask\_token>} \right\}$
+	\Comment{Indices of masked tokens}
+	\State $\bm{P_{\theta}} \gets \textsc{ETransformer}(\tilde{\bm{x}}_n | \bm{\theta})$
+	\State $\text{loss}_{\bm{\theta}} \gets - \sum_{t \in \tilde{T}} \log \bm{P_{\theta}} [t, \bm{x}_n[t]] $
+	\State $\bm{\theta} \gets \bm{\theta} - \eta \cdot \nabla \text{loss}_{\bm{\theta}}$
+\EndFor
+\EndFor
+\State \Return $\bm{\theta}$
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+\begin{frame}{Simple example explaining lines 6--7 (masking)}
+$
+\begin{pmatrix}
+	\text{The} &
+	\text{cat} &
+	\text{sat}
+\end{pmatrix}
+\rightarrow
+\bm{x}_n =
+\begin{pmatrix}
+	21 &
+	11987 &
+	5438
+\end{pmatrix}
+\quad \text{(Indices in $V$)}
+$
+
+Random masking (index of \texttt{<mask\_token>} = 50001):
+\begin{enumerate}
+\item For $t = 1$, the random outcome is "mask"
+\item For $t = 2$, the random outcome is "keep"
+\item For $t = 3$, the random outcome is "mask"
+\end{enumerate}
+$
+\bm{\tilde{x}}_n =
+\begin{pmatrix}
+	50001 &
+	11987 &
+	50001
+\end{pmatrix},
+\tilde{T} = \left\{ 1, 3 \right\}
+$
+
 	
-	\vspace{-2em}
-	\begin{minipage}[t][10cm][t]{15cm}
-		\begin{algorithmic}[1]
-			\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
-			\State $\ell \gets \text{length}(\bm{x})$
-			\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
-			\Comment{Token emb. + positional emb.}
-			\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
-			\For{$l = 1, 2, \dots, L$}
-			\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
-			\Comment{Multi-head att., residual conn}
-			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
-			\State $\bm{X} \gets \bm{X} + \left(
-			\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
-			\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
-			\Comment{MLP}
-			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
-			\EndFor
-			\State $\bm{X} \gets \textsc{GELU}(\bm{X} \bm{W_f}  +_{\text{(row)}} \bm{b_f} )$
-			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma}_l, \bm{\beta}_l)$
-			\State \Return $\bm{P} = \softmax(\bm{X} \bm{W_u}) $
-			\Comment{Project to vocab., probabilities}
-			\EndFunction
-		\end{algorithmic}
+	
+\end{frame}
+
+
+
+\begin{frame}{Explaining line 9 (negative log likelihood)}
+	
+$
+\begin{pmatrix}
+	\text{The} &
+	\text{cat} &
+	\text{sat}
+\end{pmatrix}
+\rightarrow
+\bm{x}_n =
+\begin{pmatrix}
+	21 &
+	11987 &
+	5438 
+\end{pmatrix},
+\bm{\tilde{x}}_n =
+\begin{pmatrix}
+	50001 &
+	11987 &
+	50001
+\end{pmatrix},
+\tilde{T} = \left\{ 1, 3 \right\}
+$
+
+$\bm{P_{\theta}} \gets \textsc{ETransformer}(\tilde{\bm{x}}_n | \bm{\theta})$
+$$
+\bm{P_{\theta}} =
+\begin{pmatrix}
+0.001 & 0.0007 & \ldots & 0.0003 \\
+0.0013 & 0.0065 & \ldots & 0.0001 \\
+0.079 & 0.015 & \ldots & 0.0001 \\
+\end{pmatrix}
+$$
+
+$\bm{P_{\theta}} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+
+\end{frame}
+
+
+\begin{frame}{Explaining line 9 (negative log likelihood)}
+
+\begin{small}
+$\bm{x}_n = (21, 11987, 5438), \bm{\tilde{x}}_n = (50001, 11987, 50001), \tilde{T} = \left\{ 1, 3 \right\}$
+
+$
+\bm{P_{\theta}} =
+\begin{pmatrix}
+	0.001 & \ldots & 0.0041_{21} & \ldots 0.0003 \\
+	\vdots &  &  &  \\
+\end{pmatrix}
+$
+\end{small}	
+
+For $t = 1$, the model should learn to predict "The" (index 21)
+
+Gold: $\bm{y} = (0, 0, \ldots, 1_{21}, \ldots, 0) \in \mathbb{R}^{N_{\text{V}}}$
+
+Pred: $\bm{\hat{y}} = \bm{P_{\theta}}[1,:] = (0.001, \ldots, 0.0041_{21}, \ldots 0.0003) \in \mathbb{R}^{N_{\text{V}}}$
+
+\begin{block}{Categorical cross entropy loss (Lec.\ 4)}
+$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
+$= - 1 \cdot \log (\bm{\hat{y}}[21])
+= - \log(\bm{P_{\theta}}[1, 21])$ \\
+$= - \log(\bm{P_{\theta}}[1, \bm{x}_n[1]]) 
+= - \log(\bm{P_{\theta}}[t, \bm{x}_n[t]])$	
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}{Explaining line 9 (negative log likelihood)}
+	
+	\begin{small}
+		$\bm{x}_n = (21, 11987, 5438), \bm{\tilde{x}}_n = (50001, 11987, 50001), \tilde{T} = \left\{ 1, 3 \right\}$
 		
-	\end{minipage}
+		$
+		\bm{P_{\theta}} =
+		\begin{pmatrix}
+			\vdots &  \cdots &  \cdots &  \\
+		\end{pmatrix}
+		$
+	\end{small}	
+	
+	For $t = 3$, the model should learn to predict "sat" (index 5438)
+	
+	\begin{block}{Categorical cross entropy loss}
+		$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
+		$= - 1 \cdot \log (\bm{\hat{y}}[5438])
+		= - \log(\bm{P_{\theta}}[3, 5438])
+		= - \log(\bm{P_{\theta}}[t, \bm{x}_n[t]])$	
+	\end{block}
+	
+
+Sum over all masked token positions in $\tilde{T}$ gives us line 9:\\
+$$\text{loss}_{\bm{\theta}} \gets - \sum_{t \in \tilde{T}} \log \bm{P_{\theta}} [t, \bm{x}_n[t]] $$
+	
 \end{frame}
 
 
