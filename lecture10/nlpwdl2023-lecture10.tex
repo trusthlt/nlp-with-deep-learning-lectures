@@ -175,16 +175,127 @@
 
 \maketitle
 
-%-------------------------------------------------------------
-\iffalse
+\begin{frame}{Motivation}
+
+Last time we started with the transformer and BERT, but we
+
+\begin{itemize}
+\item skipped some important architectural details
+\item were unprecise with graphical representation and alogritms
+\item did not talk about pre-training and fine-tuning
+\end{itemize}
+
+Let's fix that today!
+
+After this lecture you should be able to build BERT
+	
+\end{frame}
+
+
+\section{BERT --- Encoder architecture in detail}
+
+
+\subsection{Prerequisites}
 
 
 
-\section{BERT --- Encoder in detail}
+
+\begin{frame}{GELU --- Gaussian Error Linear Units}
+	
+	\begin{block}{Recall: CDF $\Phi(x)$ of standard normal $X \sim \mathcal{N}(0; 1)$}
+		$\Phi(x) = \Pr(X \leq x) = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{x} \exp \left(
+		\frac{-t^2}{2} \right) \mathrm{d}t$
+	\end{block}
+	$$
+	\begin{aligned}
+		\textsc{GELU}(x) &= x \cdot \Phi(x) \\
+		&\approx x \cdot \sigma(1.702 x) \qquad \text{(if speed $>$ exactness)}
+	\end{aligned}
+	$$
+	
+	\begin{figure}
+		\begin{tikzpicture}
+			
+			\begin{axis}[
+				xmin = -4, xmax = 4,
+				ymin = -1, ymax = 4,
+				xtick distance = 2,
+				ytick distance = 2,
+				grid = both,
+				minor tick num = 1,
+				major grid style = {lightgray},
+				minor grid style = {lightgray!25},
+				width = 0.45\textwidth,
+				height = 0.35\textwidth,
+				legend pos = north west
+				]
+				
+				\addplot[
+				domain = -10:10,
+				samples = 200,
+				smooth,
+				thick,
+				blue,
+				] {
+					x * 1/(1 + exp(-1 * 1.702 * x))
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{figure}
+	
+	
+	
+	
+	\begin{tikzpicture}[overlay, remember picture] 
+		\node at (current page.north east)[ref] {\fullcite{Hendrycks.Gimpel.2016.arXiv} \newline \newline
+			For vectors $\bm{x} \in \mathbb{R}^n$, $\textsc{GELU}(\bm{x})$ is applied element-wise
+			\par};
+	\end{tikzpicture}
+	
+	
+\end{frame}
 
 
 
-\begin{frame}{BERT (Enc-Transformer) --- compute contextualized embeddings}
+
+\begin{frame}{Simplifying notation: Perform \textsc{LayerNorm} on each row}
+	
+	\begin{block}{Recall: LayerNorm}
+		Input: $\bm{e} \in \mathbb{R}^{d}$ (output of a layer), Output: $\bm{\hat e} \in \mathbb{R}^{d}$ \\
+		Params: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, trainable element-wise scale and offset
+		
+		\begin{algorithmic}[1]
+			\Function{LayerNorm}{$\bm{e} | \bm{\gamma}, \bm{\beta}$}
+			\State $m \gets \frac{1}{d} \sum_{i = 1}^{d} \bm{e}[i]$
+			\Comment{`Sample mean' of $\bm{e}$}
+			\State $v \gets \frac{1}{d} \sum_{i = 1}^{d} (\bm{e}[i] - m)^2$
+			\Comment{`Sample variance' of $\bm{e}$}
+			\State \Return $\bm{\hat e} = \frac{\bm{e} - m}{\sqrt{v}} \odot \bm{\gamma} + \bm{\beta}$
+			\Comment{Offset and scale}
+			\EndFunction
+		\end{algorithmic}
+	\end{block}
+	
+	
+	\begin{algorithmic}[1]
+		\Function{LayerNormEachRow}{$\bm{X} \in \mathbb{R}^{m \times n} | \bm{\gamma}, \bm{\beta}$}
+		\For{$t \in [m]$}
+		\State $˝\bm{X}[t,:] \gets \textsc{LayerNorm}(\bm{X}{[t,:]} | \bm{\gamma}, \bm{\beta})$
+		\EndFor
+		\State \Return $\bm{X}$
+		\EndFunction
+	\end{algorithmic}
+	
+	
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{BERT parameters and hyperparameters}
 	
 	\begin{minipage}[t][10cm][t]{15cm}
 		
@@ -220,7 +331,343 @@
 
 
 
-\section{BERT (finishing)}
+\section{BERT architecture}
+
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P_{\theta}}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+	\vspace{4em}
+	As usual, green boxes are functions with trainable parameters
+	
+\end{frame}	
+
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+	\begin{minipage}[t][3em][t]{15cm}
+		\begin{algorithmic}[1]
+			\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+			\State $\ldots$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+	
+Input:
+
+$\bm{x}$ --- $\bm{x} \in V^*$, a sequence of token IDs
+
+$\bm{\mathcal{W}}$ --- all trainable parameters
+
+Output:
+
+Typically an embedding vector for each input token
+
+Or: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+
+\end{frame}
+
+
+
+
+\begin{frame}{Input embeddings}
+	
+	The cat sat $\bm{x}_n =
+	\begin{pmatrix}
+		21 &
+		11987 &
+		5438
+	\end{pmatrix}$
+	
+	\begin{tikzpicture}
+		
+		\matrix[mtx, ampersand replacement=\&] (X) at (0,0) {
+			21 \& 11987 \& 5438 \\
+		};
+		
+		\node (embfn) [param, right of=X, xshift=4cm] {Input embeddings};
+		
+		\matrix[mtx,  ampersand replacement=\&, right=of embfn ] (embeddings) { 
+			\cdots \& \bm{e}_1 \&  \cdots \\
+			\cdots \& \bm{e}_2 \&  \cdots \\
+			\cdots \& \bm{e}_3 \&  \cdots \\
+			%		\cdots \& h_4 \&  \cdots \\
+			%		\cdots \& h_5 \&  \cdots \\
+		};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (X) -- (embfn) node [midway, above] {$\bm{x}_n$};
+			\draw (embfn) -- (embeddings) node [midway, above] {$\bm{X}$};
+		\end{scope}	
+	\end{tikzpicture}
+\end{frame}	
+
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\State $\ldots$
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+\begin{frame}{BERT parameters and hyperparameters}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		
+		Hyperparameters: $\ell_{\text{max}}, d_{\text{e}}, d_{\text{mlp}}, d_{\text{f}} \in \mathbb{N}$
+		
+		Parameters:
+		
+		$\bm{W_e} \in \mathbb{R}^{N_\text{V} \times d_\text{e}}$, $\bm{W_p} \in \mathbb{R}^{\ell_{\text{max}} \times d_\text{e}}$, the token and positional embedding matrices
+		
+		$\ldots$
+		
+%		For $l \in [L]$:
+%		
+%		$\bm{\mathcal{W}}_l$, multi-head attention parameters for layer $l$
+%		
+%		$\bm{\gamma^1}_l, \bm{\beta^1}_l, \bm{\gamma^2}_l, \bm{\beta^2}_l$, two sets of layer-norm parameters
+%		
+%		$\bm{W}^{\text{mlp1}}_l \in \mathbb{R}^{d_{\text{e}} \times d_\text{mlp}}$, $\bm{b}^{\text{mlp1}}_l \in \mathbb{R}^{d_\text{mlp}}$
+%		
+%		$\bm{W}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{mlp} \times d_{\text{e}}}$, $\bm{b}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{e}}$
+%		
+%		
+%		$\bm{W_f} \in \mathbb{R}^{d_\text{e} \times d_\text{f}}, \bm{b_f} \in \mathbb{R}^{d_\text{f}}$, $\bm{\gamma},\bm{\beta} \in \mathbb{R}^{d_\text{f}}$, the final linear projection and layer-norm parameters.
+%		
+%		
+%		$\bm{W_u} \in \mathbb{R}^{d_\text{e} \times N_\text{V}}$, the unembedding matrix
+		
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P_{\theta}}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+	\vspace{4em}
+	The transformer encoder layer is repeated L-times (each with different parameters)
+	
+\end{frame}	
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\For{$l = 1, 2, \dots, L$}
+\State $\ldots$
+\EndFor
+\EndFunction
+\end{algorithmic}
+
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P_{\theta}}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+	\vspace{4em}
+	Let's look at a single transformer encoder layer
+	
+\end{frame}	
+
+\begin{frame}{Transformer encoder layer (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (mhattention) [param, right of=X, text centered, text width=2cm, xshift=1cm, yshift=-1.6cm] {Multi-Head Self Attention};
+		
+		\node (sum1) [neuron, right of=X, text centered, text width=1.5cm, xshift=2.5cm] {Sum};
+		
+		\node (norm1) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 1};
+		
+		\node (mlp1) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-1.4cm] {Linear layer 1};
+		
+		\node (gelu) [neuron, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-2.6cm] {GELU};
+		
+		\node (mlp2) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-3.8cm] {Linear layer 2};
+		
+		\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.8cm] {Sum};
+		
+		\node (norm2) [param, right of=sum2, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 2};
+		
+		\node (out) [right of=norm2, xshift=1cm] {$\bm{X}$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (mhattention);
+			\draw (x) -- (sum1);
+			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
+			\draw (sum1) -- (norm1) node [midway, above] {$\bm{X}$};
+			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			\draw (norm1) edge[out=0,in=170] (mlp1);
+			\draw (mlp1) -- (gelu);
+			\draw (gelu) -- (mlp2);
+			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (norm2) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+
+Let's focus on Multi-Head Self Attention	
+\end{frame}
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+
+\vspace{-2em}
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\For{$l = 1, 2, \dots, L$}
+\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
+\Comment{Multi-head att., residual conn}
+\State $\ldots$
+\EndFor
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Multi-head unmasked self-attention (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (ahead1) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=1.6cm] {Attention head 1};
+		
+		\node (ahead2) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=0cm] {Attention head 2};
+		
+		\node (aheadH) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=-1.6cm] {Attention head H};
+		
+		\node (stack) [neuron, right of=ahead2, text centered, text width=1.5cm, xshift=2.5cm] {Stack};
+		
+		\node (linear) [param, right of=stack, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
+		
+		\node (out) [right of=linear, xshift=1cm] {$\bm{X}$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (ahead1);
+			\draw (x) edge[out=0,in=180] (ahead2);
+			\draw (x) edge[out=0,in=180] (aheadH);
+			%			\draw (x) -- (sum1);
+			\draw (ahead1) edge[out=0,in=170] (stack) node [right of=ahead1, xshift=0.5cm, yshift=0.4cm] {$\bm{Y^1}$};
+			\draw (ahead2) edge[out=0,in=180] (stack) node [right of=ahead2, xshift=0.5cm, yshift=0.4cm] {$\bm{Y^2}$};
+			\draw (aheadH) edge[out=0,in=190] (stack) node [right of=aheadH, xshift=0.5cm, yshift=0.6cm] {$\bm{Y^H}$};
+			\draw (stack) -- (linear) node [midway, above] {$\bm{Y}$};
+			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			%			\draw (norm1) edge[out=0,in=180] (mlp);
+			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (linear) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
 
 
 \subsection{Input and pre-training}
@@ -468,97 +915,6 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 \end{frame}
 
 
-\begin{frame}{GELU --- Gaussian Error Linear Units}
-	
-\begin{block}{Recall: CDF $\Phi(x)$ of standard normal $X \sim \mathcal{N}(0; 1)$}
-$\Phi(x) = \Pr(X \leq x) = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{x} \exp \left(
-\frac{-t^2}{2} \right) \mathrm{d}t$
-\end{block}
-$$
-\begin{aligned}
-\textsc{GELU}(x) &= x \cdot \Phi(x) \\
-&\approx x \cdot \sigma(1.702 x) \qquad \text{(if speed $>$ exactness)}
-\end{aligned}
-$$
-
-\begin{figure}
-\begin{tikzpicture}
-
-\begin{axis}[
-	xmin = -4, xmax = 4,
-	ymin = -1, ymax = 4,
-	xtick distance = 2,
-	ytick distance = 2,
-	grid = both,
-	minor tick num = 1,
-	major grid style = {lightgray},
-	minor grid style = {lightgray!25},
-	width = 0.45\textwidth,
-	height = 0.35\textwidth,
-	legend pos = north west
-	]
-	
-	\addplot[
-	domain = -10:10,
-	samples = 200,
-	smooth,
-	thick,
-	blue,
-	] {
-		x * 1/(1 + exp(-1 * 1.702 * x))
-	};
-	
-\end{axis}
-\end{tikzpicture}
-\end{figure}
-
-
-	
-
-\begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[ref] {\fullcite{Hendrycks.Gimpel.2016.arXiv} \newline \newline
-		For vectors $\bm{x} \in \mathbb{R}^n$, $\textsc{GELU}(\bm{x})$ is applied element-wise
-		\par};
-\end{tikzpicture}
-
-	
-\end{frame}
-
-
-\begin{frame}{Simplifying notation: Perform \textsc{LayerNorm} on each row}
-	
-	\begin{block}{Recall: LayerNorm}
-		Input: $\bm{e} \in \mathbb{R}^{d}$ (output of a layer), Output: $\bm{\hat e} \in \mathbb{R}^{d}$ \\
-		Params: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, trainable element-wise scale and offset
-		
-		\begin{algorithmic}[1]
-			\Function{LayerNorm}{$\bm{e} | \bm{\gamma}, \bm{\beta}$}
-			\State $m \gets \frac{1}{d} \sum_{i = 1}^{d} \bm{e}[i]$
-			\Comment{`Sample mean' of $\bm{e}$}
-			\State $v \gets \frac{1}{d} \sum_{i = 1}^{d} (\bm{e}[i] - m)^2$
-			\Comment{`Sample variance' of $\bm{e}$}
-			\State \Return $\bm{\hat e} = \frac{\bm{e} - m}{\sqrt{v}} \odot \bm{\gamma} + \bm{\beta}$
-			\Comment{Offset and scale}
-			\EndFunction
-		\end{algorithmic}
-	\end{block}
-	
-	
-	\begin{algorithmic}[1]
-		\Function{LayerNormEachRow}{$\bm{X} \in \mathbb{R}^{m \times n} | \bm{\gamma}, \bm{\beta}$}
-		\For{$t \in [m]$}
-		\State $˝\bm{X}[t,:] \gets \textsc{LayerNorm}(\bm{X}{[t,:]} | \bm{\gamma}, \bm{\beta})$
-		\EndFor
-		\State \Return $\bm{X}$
-		\EndFunction
-	\end{algorithmic}
-	
-	
-\end{frame}
-
-
-
-
 
 \begin{frame}{BERT (encoding-only transformer, forward pass)}
 
@@ -764,156 +1120,15 @@ $$\text{loss}_{\bm{\theta}} \gets - \sum_{t \in \tilde{T}} \log \bm{P_{\theta}} 
 
 
 
-%-------------------------------------------------------------
-\fi
 
 
 
-\begin{frame}{Input embedding}
 
-The cat sat $\bm{x}_n =
-\begin{pmatrix}
-	21 &
-	11987 &
-	5438
-\end{pmatrix}$
-
-\begin{tikzpicture}
-	
-	\matrix[mtx, ampersand replacement=\&] (X) at (0,0) {
-	21 \& 11987 \& 5438 \\
-	};
-	
-	\node (embfn) [param, right of=X, xshift=4cm] {Input emb. $\bm{W_e}, \bm{W_p}$};
-	
-	\matrix[mtx,  ampersand replacement=\&, right=of embfn ] (embeddings) { 
-		\cdots \& \bm{e}_1 \&  \cdots \\
-		\cdots \& \bm{e}_2 \&  \cdots \\
-		\cdots \& \bm{e}_3 \&  \cdots \\
-%		\cdots \& h_4 \&  \cdots \\
-%		\cdots \& h_5 \&  \cdots \\
-	};
-	
-	\begin{scope}[thick, black, ->, >=latex]
-		\draw (X) -- (embfn) node [midway, above] {$\bm{x}_n$};
-		\draw (embfn) -- (embeddings) node [midway, above] {$\bm{X}$};
-	\end{scope}	
-\end{tikzpicture}
-\end{frame}	
-
-
-\begin{frame}{Transformer encoder (BERT)}
-	
-\begin{tikzpicture}
-
-\node (x) {$\bm{x}_n$};
-
-\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
-
-%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
-
-\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
-
-\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer N};
-
-\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
-
-\node (out) [right of=finallayer, xshift=1cm] {$\bm{P_{\theta}}$};
-
-\begin{scope}[thick, black, ->, >=latex]
-	\draw (x) -- (emblayer);
-	\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
-	\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
-	\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
-	\draw (finallayer) -- (out);
-\end{scope}	
-\end{tikzpicture}
-
-\vspace{4em}
-As usual, green boxes are functions with trainable parameters
-
-\end{frame}	
 	
 
 
 
-\begin{frame}{Transformer encoder layer (BERT)}
-	
-\begin{tikzpicture}
-	
-	\node (X) {$\bm{X}$};
-	
-	\node (mhattention) [param, right of=X, text centered, text width=2cm, xshift=1cm, yshift=-1.6cm] {Multi-Head Self Attention};
 
-	\node (sum1) [neuron, right of=X, text centered, text width=1.5cm, xshift=2.5cm] {Sum};
-	
-	\node (norm1) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm 1};
-	
-	\node (mlp1) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-1.4cm] {Linear layer 1};
-
-	\node (gelu) [neuron, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-2.6cm] {GELU};
-
-	\node (mlp2) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-3.8cm] {Linear layer 2};
-
-	\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.8cm] {Sum};
-	
-	\node (norm2) [param, right of=sum2, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm 2};
-		
-	\node (out) [right of=norm2, xshift=1cm] {$\bm{X}$};		
-
-	\begin{scope}[thick, black, ->, >=latex]
-		\draw (x) edge[out=0,in=180] (mhattention);
-		\draw (x) -- (sum1);
-		\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
-		\draw (sum1) -- (norm1) node [midway, above] {$\bm{X}$};
-		\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
-		\draw (norm1) edge[out=0,in=170] (mlp1);
-		\draw (mlp1) -- (gelu);
-		\draw (gelu) -- (mlp2);
-		\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-		\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
-		\draw (norm2) -- (out);
-	\end{scope}	
-\end{tikzpicture}
-	
-\end{frame}
-
-\begin{frame}{Multi-head unmasked self-attention (BERT)}
-	
-	\begin{tikzpicture}
-		
-		\node (X) {$\bm{X}$};
-		
-		\node (ahead1) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=1.6cm] {Attention head 1};
-
-		\node (ahead2) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=0cm] {Attention head 2};
-
-		\node (aheadH) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=-1.6cm] {Attention head H};
-
-		\node (stack) [neuron, right of=ahead2, text centered, text width=1.5cm, xshift=2.5cm] {Stack};
-		
-		\node (linear) [param, right of=stack, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
-		
-		\node (out) [right of=linear, xshift=1cm] {$\bm{X}$};		
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (x) edge[out=0,in=180] (ahead1);
-			\draw (x) edge[out=0,in=180] (ahead2);
-			\draw (x) edge[out=0,in=180] (aheadH);
-%			\draw (x) -- (sum1);
-			\draw (ahead1) edge[out=0,in=170] (stack) node [right of=ahead1, xshift=0.5cm, yshift=0.4cm] {$\bm{Y^1}$};
-			\draw (ahead2) edge[out=0,in=180] (stack) node [right of=ahead2, xshift=0.5cm, yshift=0.4cm] {$\bm{Y^2}$};
-			\draw (aheadH) edge[out=0,in=190] (stack) node [right of=aheadH, xshift=0.5cm, yshift=0.6cm] {$\bm{Y^H}$};
-			\draw (stack) -- (linear) node [midway, above] {$\bm{Y}$};
-%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
-%			\draw (norm1) edge[out=0,in=180] (mlp);
-%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
-			\draw (linear) -- (out);
-		\end{scope}	
-	\end{tikzpicture}
-	
-\end{frame}
 
 \begin{frame}{Single unmasked self-attention head (BERT)}
 	
@@ -968,7 +1183,7 @@ As usual, green boxes are functions with trainable parameters
 	
 	\node (gelu) [neuron, right of=linear, text centered, text width=1.5cm, xshift=1.5cm] {GELU};
 	
-	\node (norm) [param, right of=gelu, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm};
+	\node (norm) [param, right of=gelu, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm};
 	
 	\node (out) [right of=norm, xshift=1cm] {$\bm{Z}$};
 	
