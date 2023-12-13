@@ -133,6 +133,16 @@
 	state/.style={rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!5},
 }
 
+% added in lecture 10
+\tikzset{
+	mtx/.style={
+		matrix of math nodes,
+		left delimiter={[}, right delimiter={]}
+	},
+	hlt/.style={opacity=0.1, line width=4 mm, line cap=round},
+	hltr/.style={opacity=0.5, rounded corners=2pt, inner sep=-1pt}
+}
+
 % for strike-through text (added in Lecture 06)
 \usepackage[normalem]{ulem}
 
@@ -165,7 +175,51 @@
 
 \maketitle
 
+%-------------------------------------------------------------
 \iffalse
+
+
+
+\section{BERT --- Encoder in detail}
+
+
+
+\begin{frame}{BERT (Enc-Transformer) --- compute contextualized embeddings}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{x} \in V^*$, a sequence of token IDs
+		
+		Output: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+		
+		Hyperparameters: $\ell_{\text{max}}, L, H, d_{\text{e}}, d_{\text{mlp}}, d_{\text{f}} \in \mathbb{N}$
+		
+		Parameters: $\bm{\theta}$ includes all of the following parameters:
+		
+		$\bm{W_e} \in \mathbb{R}^{N_\text{V} \times d_\text{e}}$, $\bm{W_p} \in \mathbb{R}^{\ell_{\text{max}} \times d_\text{e}}$, the token and positional embedding matrices
+		
+		For $l \in [L]$:
+		
+		$\bm{\mathcal{W}}_l$, multi-head attention parameters for layer $l$
+		
+		$\bm{\gamma^1}_l, \bm{\beta^1}_l, \bm{\gamma^2}_l, \bm{\beta^2}_l$, two sets of layer-norm parameters
+		
+		$\bm{W}^{\text{mlp1}}_l \in \mathbb{R}^{d_{\text{e}} \times d_\text{mlp}}$, $\bm{b}^{\text{mlp1}}_l \in \mathbb{R}^{d_\text{mlp}}$
+		
+		$\bm{W}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{mlp} \times d_{\text{e}}}$, $\bm{b}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{e}}$
+		
+		
+		$\bm{W_f} \in \mathbb{R}^{d_\text{e} \times d_\text{f}}, \bm{b_f} \in \mathbb{R}^{d_\text{f}}$, $\bm{\gamma},\bm{\beta} \in \mathbb{R}^{d_\text{f}}$, the final linear projection and layer-norm parameters.
+		
+		
+		$\bm{W_u} \in \mathbb{R}^{d_\text{e} \times N_\text{V}}$, the unembedding matrix
+		
+	\end{minipage}
+\end{frame}
+
+
+
+
 \section{BERT (finishing)}
 
 
@@ -375,8 +429,6 @@
 \end{frame}
 
 
-\fi
-
 \begin{frame}{Multi-head bidirectional / unmasked self-attention}
 	
 \begin{minipage}[t][10cm][t]{15cm}
@@ -477,7 +529,7 @@ $$
 	
 	\begin{block}{Recall: LayerNorm}
 		Input: $\bm{e} \in \mathbb{R}^{d}$ (output of a layer), Output: $\bm{\hat e} \in \mathbb{R}^{d}$ \\
-		Parameters: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, element-wise scale and offset
+		Params: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, trainable element-wise scale and offset
 		
 		\begin{algorithmic}[1]
 			\Function{LayerNorm}{$\bm{e} | \bm{\gamma}, \bm{\beta}$}
@@ -502,40 +554,6 @@ $$
 	\end{algorithmic}
 	
 	
-\end{frame}
-
-
-\begin{frame}{BERT (Enc-Transformer) --- compute contextualized embeddings}
-
-\begin{minipage}[t][10cm][t]{15cm}
-
-Input: $\bm{x} \in V^*$, a sequence of token IDs
-
-Output: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
-
-Hyperparameters: $\ell_{\text{max}}, L, H, d_{\text{e}}, d_{\text{mlp}}, d_{\text{f}} \in \mathbb{N}$
-
-Parameters: $\bm{\theta}$ includes all of the following parameters:
-
-$\bm{W_e} \in \mathbb{R}^{N_\text{V} \times d_\text{e}}$, $\bm{W_p} \in \mathbb{R}^{\ell_{\text{max}} \times d_\text{e}}$, the token and positional embedding matrices
-
-For $l \in [L]$:
-
-$\bm{\mathcal{W}}_l$, multi-head attention parameters for layer $l$
-
-$\bm{\gamma^1}_l, \bm{\beta^1}_l, \bm{\gamma^2}_l, \bm{\beta^2}_l$, two sets of layer-norm parameters
-
-$\bm{W}^{\text{mlp1}}_l \in \mathbb{R}^{d_{\text{e}} \times d_\text{mlp}}$, $\bm{b}^{\text{mlp1}}_l \in \mathbb{R}^{d_\text{mlp}}$
-
-$\bm{W}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{mlp} \times d_{\text{e}}}$, $\bm{b}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{e}}$
-
-
-$\bm{W_f} \in \mathbb{R}^{d_\text{e} \times d_\text{f}}, \bm{b_f} \in \mathbb{R}^{d_\text{f}}$, $\bm{\gamma},\bm{\beta} \in \mathbb{R}^{d_\text{f}}$, the final linear projection and layer-norm parameters.
-
-
-$\bm{W_u} \in \mathbb{R}^{d_\text{e} \times N_\text{V}}$, the unembedding matrix
-
-\end{minipage}
 \end{frame}
 
 
@@ -743,6 +761,122 @@ Sum over all masked token positions in $\tilde{T}$ gives us line 9:\\
 $$\text{loss}_{\bm{\theta}} \gets - \sum_{t \in \tilde{T}} \log \bm{P_{\theta}} [t, \bm{x}_n[t]] $$
 	
 \end{frame}
+
+
+
+%-------------------------------------------------------------
+\fi
+
+
+
+\begin{frame}{Input embedding}
+
+The cat sat $\bm{x}_n =
+\begin{pmatrix}
+	21 &
+	11987 &
+	5438
+\end{pmatrix}$
+
+\begin{tikzpicture}
+	
+	\matrix[mtx, ampersand replacement=\&] (X) at (0,0) {
+	21 \& 11987 \& 5438 \\
+	};
+	
+	\node (embfn) [param, right of=X, xshift=4cm] {Input emb. $\bm{W_e}, \bm{W_p}$};
+	
+	\matrix[mtx,  ampersand replacement=\&, right=of embfn ] (embeddings) { 
+		\cdots \& \bm{e}_1 \&  \cdots \\
+		\cdots \& \bm{e}_2 \&  \cdots \\
+		\cdots \& \bm{e}_3 \&  \cdots \\
+%		\cdots \& h_4 \&  \cdots \\
+%		\cdots \& h_5 \&  \cdots \\
+	};
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (X) -- (embfn) node [midway, above] {$\bm{x}_n$};
+		\draw (embfn) -- (embeddings) node [midway, above] {$\bm{X}$};
+	\end{scope}	
+\end{tikzpicture}
+\end{frame}	
+
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+\begin{tikzpicture}
+
+\node (x) {$\bm{x}_n$};
+
+\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+
+%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+
+\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+
+\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer N};
+
+\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+
+\node (out) [right of=finallayer, xshift=1cm] {$\bm{P_{\theta}}$};
+
+\begin{scope}[thick, black, ->, >=latex]
+	\draw (x) -- (emblayer);
+	\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+	\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
+	\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+	\draw (finallayer) -- (out);
+\end{scope}	
+\end{tikzpicture}
+
+\vspace{4em}
+As usual, green boxes are functions with trainable parameters
+
+\end{frame}	
+	
+
+
+
+\begin{frame}{Transformer encoder layer (BERT)}
+	
+\begin{tikzpicture}
+	
+	\node (X) {$\bm{X}$};
+	
+	\node (mhattention) [param, right of=X, text centered, text width=2cm, xshift=1cm, yshift=-1.6cm] {Multi-Head Self Attention};
+
+	\node (sum1) [neuron, right of=X, text centered, text width=1.5cm, xshift=2.5cm] {Sum};
+	
+	\node (norm1) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm 1};
+	
+	\node (mlp) [param, right of=norm1, text centered, text width=1cm, xshift=1.2cm, yshift=-1.6cm] {MLP};
+	
+	\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.3cm] {Sum};
+	
+	\node (norm2) [param, right of=sum2, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm 2};
+		
+	\node (out) [right of=norm2, xshift=1cm] {$\bm{X}$};		
+
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (x) edge[out=0,in=180] (mhattention);
+		\draw (x) -- (sum1);
+		\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
+		\draw (sum1) -- (norm1) node [midway, above] {$\bm{X}$};
+		\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+		\draw (norm1) edge[out=0,in=180] (mlp);
+		\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+		\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+		\draw (norm2) -- (out);
+	\end{scope}	
+\end{tikzpicture}
+	
+\end{frame}
+
+
+
+
+TODO Adam optimizer
+
 
 
 \begin{frame}{License and credits}
