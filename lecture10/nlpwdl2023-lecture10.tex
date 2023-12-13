@@ -849,9 +849,13 @@ As usual, green boxes are functions with trainable parameters
 	
 	\node (norm1) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm 1};
 	
-	\node (mlp) [param, right of=norm1, text centered, text width=1cm, xshift=1.2cm, yshift=-1.6cm] {MLP};
-	
-	\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.3cm] {Sum};
+	\node (mlp1) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-1.4cm] {Linear layer 1};
+
+	\node (gelu) [neuron, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-2.6cm] {GELU};
+
+	\node (mlp2) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-3.8cm] {Linear layer 2};
+
+	\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.8cm] {Sum};
 	
 	\node (norm2) [param, right of=sum2, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm 2};
 		
@@ -863,8 +867,10 @@ As usual, green boxes are functions with trainable parameters
 		\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
 		\draw (sum1) -- (norm1) node [midway, above] {$\bm{X}$};
 		\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
-		\draw (norm1) edge[out=0,in=180] (mlp);
-		\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+		\draw (norm1) edge[out=0,in=170] (mlp1);
+		\draw (mlp1) -- (gelu);
+		\draw (gelu) -- (mlp2);
+		\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
 		\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
 		\draw (norm2) -- (out);
 	\end{scope}	
@@ -872,7 +878,118 @@ As usual, green boxes are functions with trainable parameters
 	
 \end{frame}
 
+\begin{frame}{Multi-head unmasked self-attention (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (ahead1) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=1.6cm] {Attention head 1};
 
+		\node (ahead2) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=0cm] {Attention head 2};
+
+		\node (aheadH) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=-1.6cm] {Attention head H};
+
+		\node (stack) [neuron, right of=ahead2, text centered, text width=1.5cm, xshift=2.5cm] {Stack};
+		
+		\node (linear) [param, right of=stack, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
+		
+		\node (out) [right of=linear, xshift=1cm] {$\bm{X}$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (ahead1);
+			\draw (x) edge[out=0,in=180] (ahead2);
+			\draw (x) edge[out=0,in=180] (aheadH);
+%			\draw (x) -- (sum1);
+			\draw (ahead1) edge[out=0,in=170] (stack) node [right of=ahead1, xshift=0.5cm, yshift=0.4cm] {$\bm{Y^1}$};
+			\draw (ahead2) edge[out=0,in=180] (stack) node [right of=ahead2, xshift=0.5cm, yshift=0.4cm] {$\bm{Y^2}$};
+			\draw (aheadH) edge[out=0,in=190] (stack) node [right of=aheadH, xshift=0.5cm, yshift=0.6cm] {$\bm{Y^H}$};
+			\draw (stack) -- (linear) node [midway, above] {$\bm{Y}$};
+%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+%			\draw (norm1) edge[out=0,in=180] (mlp);
+%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (linear) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{Single unmasked self-attention head (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (query) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=1.6cm] {Linear layer (query)};
+		
+		\node (key) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=0cm] {Linear layer (key)};
+		
+		\node (value) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=-1.6cm] {Linear layer (value)};
+		
+		\node (scaled) [neuron, right of=key, text centered, text width=1.5cm, xshift=2.5cm, yshift=1cm] {Scaled dot product};
+
+		\node (softmax) [neuron, right of=scaled, text centered, text width=1.8cm, xshift=1.6cm] {Softmax (row)};
+		
+		\node (matmul) [param, right of=softmax, text centered, text width=1.5cm, xshift=1.5cm] {Matmul $\bm{\tilde{S}}\bm{V}$};
+		
+		\node (out) [right of=matmul, xshift=1cm] {$\bm{Y}^h$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (query);
+			\draw (x) edge[out=0,in=180] (key);
+			\draw (x) edge[out=0,in=180] (value);
+			%			\draw (x) -- (sum1);
+			\draw (query) edge[out=0,in=170] (scaled) node [right of=query, xshift=0.5cm, yshift=0.4cm] {$\bm{Q}$};
+			\draw (key) edge[out=0,in=190] (scaled) node [right of=key, xshift=0.5cm, yshift=0.4cm] {$\bm{K}$};
+			\draw (value) edge[out=0,in=210] (matmul) node [right of=value, xshift=0.5cm, yshift=0.6cm] {$\bm{V}$};
+			\draw (scaled) -- (softmax) node [midway, above] {$\bm{S}$};
+			\draw (softmax) -- (matmul) node [midway, above] {$\bm{\tilde{S}}$};
+
+			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			%			\draw (norm1) edge[out=0,in=180] (mlp);
+			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (matmul) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+
+\begin{frame}{Final layer (BERT)}
+
+\begin{tikzpicture}
+	
+	\node (X) {$\bm{X}$};
+		
+	\node (linear) [param, right of=X, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
+	
+	\node (gelu) [neuron, right of=linear, text centered, text width=1.5cm, xshift=1.5cm] {GELU};
+	
+	\node (norm) [param, right of=gelu, text centered, text width=1.5cm, xshift=1.5cm] {Layer norm};
+	
+	\node (out) [right of=norm, xshift=1cm] {$\bm{Z}$};
+	
+	\node (linear2) [param, below of=linear, text centered, text width=1.5cm, yshift=-1.5cm] {Linear layer};
+
+	\node (softmax) [neuron, right of=linear2, text centered, text width=1.8cm, xshift=1.5cm] {Softmax (row)};
+		
+	\node (out2) [right of=softmax, xshift=1cm] {$\bm{P}$};
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (x) -- (linear);
+		\draw (linear) -- (gelu);
+		\draw (gelu) -- (norm);
+		\draw (norm) -- (out);
+		\draw (out) edge[out=270,in=90, dotted] (linear2) node [right of=linear2, xshift=0.5cm, yshift=1.1cm] {unembedding};
+		\draw (linear2) -- (softmax);
+		\draw (softmax) -- (out2);
+	\end{scope}
+\end{tikzpicture}
+	
+\end{frame}
 
 
 TODO Adam optimizer
