@@ -117,6 +117,19 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture09/pdf/nlpwdl2023-lecture09-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=pTHlQXnr024)
 
+### Exercise 09: Language modeling from scratch
+
+2023-12-14
+
+* See the README.md and Python code under [exercises/ex09](exercises/ex09)
+
+### Lecture 10: Text classification 6: BERT part two
+
+2023-12-15
+
+* [Slides as PDF](/lecture10/pdf/nlpwdl2023-lecture10-handout.pdf)
+* TBD [YouTube recording](https://www.youtube.com/watch?v=)
+
 ## FAQ
 
 * What are some essential pre-requisites?
