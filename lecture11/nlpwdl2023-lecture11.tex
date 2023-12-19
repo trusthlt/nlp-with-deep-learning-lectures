@@ -163,8 +163,8 @@
 
 
 \title{Natural Language Processing with Deep Learning}
-\subtitle{Lecture 10 -- Text classification 6: BERT part two}
-\date{December 15, 2023}
+\subtitle{Lecture 11 -- Text generation 4: Decoder-only models and GPT}
+\date{December 22, 2023}
 \author{Prof.\ Dr.\ Ivan Habernal}
 \institute{Natural Language Processing Group 
 	\hfill \includegraphics[height=1.4cm]{img/UPB_Logo_ENG_coloured_RGB} \\
@@ -177,19 +177,47 @@
 
 \begin{frame}{Motivation}
 
-Last time we started with the transformer and BERT, but we
+We introduced BERT, a powerful transformer model for learning contextualized token embeddings
 
+BERT can be used for
 \begin{itemize}
-\item skipped some important architectural details
-\item were unprecise with some graphical representation
-\item did not talk about pre-training and fine-tuning
+	\item text classification (one sequence, two concatenated sequences)
+	\item sequence labeling (classify each token, e.g., NER, POS)
 \end{itemize}
 
-Let's fix that today!
-
-After this lecture you should be able to build BERT
 	
 \end{frame}
+
+\begin{frame}{Motivation}
+	
+
+Although BERT is pre-trained with masked-language modeling, it is \textbf{not designed to generate text} by predicting the next token
+
+Why?
+\pause
+
+We mask random tokens from the sequence and perform self-attention over past and future tokens
+
+\bigskip
+
+Can we use a transformer as a `true' language model, aka.\ to conditionally generate text?
+	
+\end{frame}
+
+
+Bottom-up masking
+
+
+Recap single-query attention with softmax
+
+Show what needs to happen if you want to predict the last token
+
+The last two tokens
+
+On the full matrix
+
+
+
 
 
 \section{BERT --- Encoder architecture in detail}
@@ -940,50 +968,8 @@ Let's look at the final layers
 \end{frame}
 
 
-\begin{frame}{BERT: Input representation summary}
-	
-	\begin{figure}
-		\includegraphics[width=\linewidth]{img/bert-input.png}	
-	\end{figure}
-	
-\end{frame}
-
-
 \section{Pre-training}
 
-
-\begin{frame}{BERT: Self-supervised multi-task pre-training}
-	
-	Prepare two auxiliary tasks that need no labeled data
-	
-	\bigskip
-	
-	\begin{columns}
-		\begin{column}{0.5\linewidth}
-			\begin{small}
-				Task 1: Cloze-test task
-				\begin{itemize}
-					\item 	Predict the masked WordPiece unit (multi-class, 30k classes)
-				\end{itemize}
-				
-				
-				Task 2: Consecutive segment prediction
-				
-				\begin{itemize}
-					\item Did the second text segment appeared after the first segment? (binary)
-				\end{itemize}
-			\end{small}
-			
-		\end{column}
-		\begin{column}{0.5\linewidth}
-			
-			\begin{figure}
-				\includegraphics[width=\linewidth]{img/bert-pretraining.png}
-			\end{figure}
-		\end{column}
-		
-	\end{columns}
-\end{frame}
 
 
 
@@ -1001,31 +987,6 @@ Let's look at the final layers
 	
 	
 \end{frame}
-
-
-\begin{frame}{BERT: Pre-training data -- Simplified example}
-	
-	\begin{columns}
-		\begin{column}{0.9\linewidth}
-			\begin{figure}
-				\includegraphics[width=\linewidth]{img/bert-pretraining2.png}
-			\end{figure}
-		\end{column}
-		\begin{column}{0.5\linewidth}
-			\begin{small}
-				
-				\begin{itemize}
-					\item $<$PAD$>$ding is missing
-					\item The actual segments are longer and not necessarily sentences (just spans)
-					\item The WordPiece tokens match full words here
-				\end{itemize}
-			\end{small}
-		\end{column}
-	\end{columns}
-	
-	
-\end{frame}
-
 
 
 
@@ -1203,42 +1164,7 @@ Let's look at the final layers
 
 \section{Downstream tasks and fine-tuning}
 
-\begin{frame}{BERT: Representing various NLP tasks}
-	
-	\begin{figure}
-		\includegraphics[width=0.6\linewidth]{img/task1.png}
-	\end{figure}
 
-
-\begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[ref] {	That explains the special [CLS] token at sequence start \par};
-\end{tikzpicture}
-	
-\end{frame}
-
-
-
-\begin{frame}{BERT: Representing various NLP tasks}
-	
-	\begin{figure}
-		\includegraphics[width=0.6\linewidth]{img/task2.png}
-	\end{figure}
-	
-	
-\end{frame}
-
-
-
-\begin{frame}{BERT: Representing various NLP tasks}
-	
-	\begin{figure}
-		\includegraphics[width=0.5\linewidth]{img/task3.png}
-	\end{figure}
-	
-	
-	Not conditioned on surrounding predictions	
-	
-\end{frame}
 
 
 
