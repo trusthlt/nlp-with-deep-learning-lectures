@@ -112,6 +112,8 @@
 \DeclareMathOperator*{\argmin}{arg\!\min}
 % softmax
 \DeclareMathOperator*{\softmax}{soft\!\max}
+% Mask
+\DeclareMathOperator*{\mask}{mask}
 
 % bold math
 \usepackage{bm}
@@ -188,6 +190,40 @@ BERT can be used for
 	
 \end{frame}
 
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+	\vspace{4em}
+	For each input token, BERT produces contextualized word embeddings
+	
+\end{frame}	
+
+
 \begin{frame}{Motivation}
 	
 
@@ -204,6 +240,7 @@ Can we use a transformer as a `true' language model, aka.\ to conditionally gene
 	
 \end{frame}
 
+\begin{frame}{misc}
 
 Bottom-up masking
 
@@ -215,6 +252,334 @@ Show what needs to happen if you want to predict the last token
 The last two tokens
 
 On the full matrix
+
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Radford.et.al.2018.GPT1.report} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+\begin{frame}{Rel works}
+	
+Liu et al. Transformer (referred from GPT1 paper)
+
+\begin{tikzpicture}[overlay, remember picture]
+	\node at (current page.north east)[ref] {\fullcite{Liu.et.al.2018.ICLR} \par};
+\end{tikzpicture}
+
+	
+\end{frame}
+
+
+
+\begin{frame}{Recap: Single unmasked self-attention head (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (query) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=1.6cm] {Linear layer (query)};
+		
+		\node (key) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=0cm] {Linear layer (key)};
+		
+		\node (value) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=-1.6cm] {Linear layer (value)};
+		
+		\node (scaled) [neuron, right of=key, text centered, text width=1.5cm, xshift=2.5cm, yshift=1cm] {Scaled dot product};
+		
+		\node (softmax) [neuron, right of=scaled, text centered, text width=1.8cm, xshift=1.6cm] {Softmax (row)};
+		
+		\node (matmul) [neuron, right of=softmax, text centered, text width=1.5cm, xshift=1.5cm] {Matmul $\bm{\tilde{S}}\bm{V}$};
+		
+		\node (out) [right of=matmul, xshift=1cm] {$\bm{Y}^h$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (query);
+			\draw (x) edge[out=0,in=180] (key);
+			\draw (x) edge[out=0,in=180] (value);
+			%			\draw (x) -- (sum1);
+			\draw (query) edge[out=0,in=170] (scaled) node [right of=query, xshift=0.5cm, yshift=0.4cm] {$\bm{Q}$};
+			\draw (key) edge[out=0,in=190] (scaled) node [right of=key, xshift=0.5cm, yshift=0.4cm] {$\bm{K}$};
+			\draw (value) edge[out=0,in=210] (matmul) node [right of=value, xshift=0.5cm, yshift=0.6cm] {$\bm{V}$};
+			\draw (scaled) -- (softmax) node [midway, above] {$\bm{S}$};
+			\draw (softmax) -- (matmul) node [midway, above] {$\bm{\tilde{S}}$};
+			
+			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			%			\draw (norm1) edge[out=0,in=180] (mlp);
+			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (matmul) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Recap: Bidirectional / unmasked self-attention}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{X} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{x}}}$, vector representations of the sequence of length $\ell_{\text{x}}$
+		
+		Output: $\bm{\tilde{V}} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$, updated vector representations of tokens in $\bm{X}$
+		
+		Params $\bm{\mathcal{W}_{qkv}}$: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{x} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
+		
+		\begin{algorithmic}[1]
+			\Function{Attention}{$\bm{X} ; \bm{\mathcal{W}_{qkv}}$}
+			\State $\bm{Q} \gets \bm{X} \bm{W_q} +_{\text{(rows)}} \bm{b_q}$
+			\Comment{Query $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
+			\State $\bm{K} \gets \bm{X} \bm{W_k} +_{\text{(rows)}} \bm{b_k}$
+			\Comment{Key $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
+			\State $\bm{V} \gets \bm{X} \bm{W_v} +_{\text{(rows)}} \bm{b_v}$
+			\Comment{Value $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$}
+			
+			\State $\bm{S} \gets \frac{1}{\sqrt{d_{\text{attn}}}} (\bm{Q} \bm{K}^\top)$
+			\Comment{Scaled score $\in \mathbb{R}^{\ell_{\text{x}} \times \ell_{\text{x}}}$}
+			
+			\State \Return $\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
+			
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+\begin{frame}{Recap: Basic single-query attention}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{e} \in \mathbb{R}^{d_\text{in}}$, vector representation of the current token
+		
+		Input: $\bm{e}_t \in \mathbb{R}^{d_\text{in}}$, vector representations of the context tokens $t \in [T]$
+		
+		Output: $\bm{\tilde v} \in \mathbb{R}^{d_\text{out}}$, vector representation of the token and context combined
+		
+		Params: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{in} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$,
+		$\bm{W_v} \in \mathbb{R}^{d_\text{in} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
+		
+		\begin{algorithmic}[1]
+			\Function{Basic single-query attention}{}
+			%\KwIn{}
+			%\KwOut{$\v{\tilde v}∈ℝ^{d_\t{out}}$, vector representation of the token and context combined.}
+			%\KwParam{$\m{W_q}, \m{W_k}∈ℝ^{d_\t{attn}×d_\t{in}}$, $ \v{b_q}, \v{b_k}∈ℝ^{d_\t{attn}}$, the query and key linear projections.}
+			%\KwParam{$\m{W_v}∈ℝ^{d_\t{out}×d_\t{in}}$, $ \v{b_v}∈ℝ^{d_\t{out}}$, the value linear projection.}
+			\State $\bm{q} \gets \bm{e} \bm{W_q} + \bm{b_q}$
+			\Comment{Query linear projection}
+			\For{$t \in [T]$}
+			\State $\bm{k_t} \gets \bm{e_t} \bm{W_k} + \bm{b_k}$
+			\Comment{Key linear projection}
+			\State $\alpha_{t} = \frac{
+				\exp(\bm{q} \cdot \bm{k_t} / \sqrt{d_{\text{attn}}})
+			}{
+				\sum_{u = 1}^{T}\exp(\bm{q} \cdot \bm{k_u} / \sqrt{d_{\text{attn}}})
+			}$
+			\Comment{Softmax over scaled dot products, $\alpha_{t} \in (0,1)$}
+			\State $\bm{v_t} \gets \bm{e_t} \bm{W_v} + \bm{b_v}$
+			\Comment{Value linear projection}
+			\EndFor
+			\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+\begin{frame}{Example: Basic single-query unmasked attention}
+
+We are at position 2, our query $\bm{q} = (11, 12)$ and keys
+$\bm{k_1} = (1, 2) \qquad \bm{k_2} = (4, 5) \qquad \bm{k_3} = (7, 8)$
+$$
+\bm{q} = \begin{pmatrix}
+	11 & 12
+\end{pmatrix}
+\quad
+\bm{K}^\top =
+\begin{pmatrix}
+1 & 4 & 7 \\
+2 & 5 & 8 \\
+\end{pmatrix}
+\quad
+$$
+Dot products:
+
+$\bm{q} \cdot \bm{k_1} = (11, 12) \cdot (1, 2) = 11 + 24 = 35$
+$\bm{q} \cdot \bm{k_2} = (11, 12) \cdot (4, 5) = 44 + 60 = 104$
+$\bm{q} \cdot \bm{k_3} = (11, 12) \cdot (7, 8) = 77 + 96 = 173$
+
+Raw scores = $(35, 104, 173)$, after softmax (no scaling) $\bm{\alpha} = (0.000\ldots, 0.000\ldots, 0.999\ldots)$
+
+Value at pos 3 most weight (from the future)
+
+
+
+\end{frame}
+
+
+\begin{frame}{We want to attend only to previous tokens}
+	
+For 4 tokens:
+
+At position 1 we should not attend to token 2, 3, and 4
+
+At position 2 we should not attend to token 2 and 3
+
+At position 3 we should not attend to token 4
+
+At position 4 we can attend to all of them
+$$
+\text{Raw associations } =
+\begin{pmatrix}
+11 & 12 & 13 & 14 \\
+21 & 22 & 23 & 24 \\
+31 & 32 & 33 & 34 \\
+41 & 42 & 43 & 44 \\
+\end{pmatrix}
+$$
+We want to assign zero probability (using softmax) to "future" tokens
+\end{frame}
+
+
+\begin{frame}{We want to attend only to previous tokens}
+\begin{small}
+\vspace{-2em}
+	$$
+	\text{Raw associations } =
+	\begin{pmatrix}
+		11 & 12 & 13 & 14 \\
+		21 & 22 & 23 & 24 \\
+		31 & 32 & 33 & 34 \\
+		41 & 42 & 43 & 44 \\
+	\end{pmatrix}
+	$$
+	Assign zero probability (using softmax) to "future" tokens
+\end{small}
+
+	\begin{algorithmic}[1]
+
+	\For{$t \in [T]$}
+	\State $\bm{k_t} \gets \ldots$
+	\State $\alpha_{t} = \frac{
+		\exp(\bm{q} \cdot \bm{k_t} )
+	}{
+		\sum_{u = 1}^{t}\exp(\bm{q} \cdot \bm{k_u} )
+	}$
+	\Comment{Only until $t$!}
+	\For{$i \in (t+1, T)$}
+	\State $\alpha_i = 0$
+	\Comment{Zero-out rest}
+	\EndFor
+	\State $\bm{v_t} \gets \ldots$
+	\EndFor
+	\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
+
+\end{algorithmic}
+
+
+\end{frame}
+
+
+\begin{frame}{For-loops are bad!}
+For each row $\bm{s}$ from the raw associations
+
+\begin{algorithmic}[1]
+	\State $\alpha_{t} = \frac{
+		\exp(\bm{s}_t )
+	}{
+		\sum_{u = 1}^{t}\exp(\bm{s}_u )
+	}$
+	\For{$i \in (t+1, T)$}
+	\State $\alpha_i = 0$
+	\EndFor	
+\end{algorithmic}
+
+How to vectorize this operation?
+
+\pause
+
+Replace input from  $t + 1$ onwards with $-\infty$
+\begin{small}
+	$$
+	\text{Raw associations "masked" } =
+	\begin{pmatrix}
+		11 & -\infty & -\infty & -\infty \\
+		21 & 22 & -\infty & -\infty \\
+		31 & 32 & 33 & -\infty \\
+		41 & 42 & 43 & 44 \\
+	\end{pmatrix}
+	$$
+	Assigns zero probability (using softmax) to "future" tokens
+\end{small}
+
+
+
+\end{frame}
+
+
+
+
+\begin{frame}{Uni-directional masking}
+
+For $t_z, t_x \in [\ell_x]$
+$$
+\mask[t_x, t_z] =
+ \begin{cases}
+	1       & \quad \text{if } t_z \leq t_x \\
+	0  & \quad \text{otherwise }
+\end{cases}
+$$
+
+Example for $\ell_x = 4$
+
+$$
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 0 \\
+1 & 1 & 1 & 1 \\
+\end{pmatrix}
+$$
+
+\end{frame}
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+	\vspace{-2em}
+	\begin{minipage}[t][10cm][t]{15cm}
+		\begin{algorithmic}[1]
+			\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+			\State $\ell \gets \text{length}(\bm{x})$
+			\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+			\Comment{Token emb. + positional emb.}
+			\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+			\For{$l = 1, 2, \dots, L$}
+			\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
+			\Comment{Multi-head att., residual conn}
+			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
+			\State $\bm{X} \gets \bm{X} + \left(
+			\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
+			\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
+			\Comment{MLP}
+			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
+			\EndFor
+			\State $\bm{X} \gets \textsc{GELU}(\bm{X} \bm{W_f}  +_{\text{(row)}} \bm{b_f} )$
+			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma}_l, \bm{\beta}_l)$
+			\State \Return $\bm{P} = \softmax(\bm{X} \bm{W_u}) $
+			\Comment{Project to vocab., probabilities}
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+
 
 
 
