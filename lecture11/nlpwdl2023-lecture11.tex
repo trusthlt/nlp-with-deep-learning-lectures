@@ -717,6 +717,91 @@ Attention with left-to-right masking (line 7)
 
 
 
+\begin{frame}{Decoder-Transfomer: Training on next token prediction}
+	
+	\vspace{-1em}	
+	\begin{minipage}[t][10cm][t]{15cm}
+		\begin{algorithmic}[1]
+			\Function{DTraining}{$\left\{ \bm{x}_n \right\}_{n = 1}^{N_\text{data}}$ seqs,  $\bm{\theta}$ init.\ params, $N_\text{epochs}$, $\eta$}
+			\For{$i \in [N_{\text{epochs}}]$}
+			\For{$n \in [N_{\text{data}}]$}
+			\State $\ell \gets \text{length}(\bm{x}_n)$
+			\State $\bm{P_{\theta}} \gets \textsc{DTransformer}(\bm{x}_n | \bm{\theta})$
+			\State $\text{loss}_{\bm{\theta}} \gets - \sum_{t = 1}^{\ell - 1} \log \bm{P_{\theta}} [t, \bm{x}_n[t + 1]] $
+			\State $\bm{\theta} \gets \bm{\theta} - \eta \cdot \nabla \text{loss}_{\bm{\theta}}$
+			\EndFor
+			\EndFor
+			\State \Return $\bm{\theta}$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+\begin{frame}{Explaining line 6 (negative log likelihood)}
+	
+	$
+	\begin{pmatrix}
+		\text{The} &
+		\text{cat} &
+		\text{sat}
+	\end{pmatrix}
+	\rightarrow
+	\bm{x}_n =
+	\begin{pmatrix}
+		21 &
+		11987 &
+		5438 
+	\end{pmatrix}
+	$
+	
+	$\bm{P_{\theta}} \gets \textsc{DTransformer}(\bm{x}_n | \bm{\theta})$
+	$$
+	\bm{P_{\theta}} =
+	\begin{pmatrix}
+		0.001 & 0.0007 & \ldots & 0.0003 \\
+		0.0013 & 0.0065 & \ldots & 0.0001 \\
+		0.079 & 0.015 & \ldots & 0.0001 \\
+	\end{pmatrix}
+	$$
+	
+	$\bm{P_{\theta}} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+	
+\end{frame}
+
+
+
+\begin{frame}{Explaining line 6 (negative log likelihood), $t = 1$}
+	
+	\begin{small}
+		$\bm{x}_n = (21, 11987, 5438)$
+		$
+		\bm{P_{\theta}} =
+		\begin{pmatrix}
+			0.001 & \ldots & 0.0041_{11987} & \ldots 0.0003 \\
+			\vdots &  &  &  \\
+		\end{pmatrix}
+		$
+	\end{small}	
+	
+	For $t = 1$, the model should learn to predict "cat" (idx 11987)
+	
+	Gold: $\bm{y} = (0, 0, \ldots, 1_{11987}, \ldots, 0) \in \mathbb{R}^{N_{\text{V}}}$
+	
+	Pred: $\bm{\hat{y}} = \bm{P_{\theta}}[1,:] = (0.001, \ldots, 0.0041_{11987}, \ldots 0.0003) \in \mathbb{R}^{N_{\text{V}}}$
+	
+	\begin{block}{Categorical cross entropy loss (Lec.\ 4)}
+		$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
+		$= - 1 \cdot \log (\bm{\hat{y}}[11987])
+		= - \log(\bm{P_{\theta}}[1, 11987])$ \\
+		$= - \log(\bm{P_{\theta}}[1, \bm{x}_n[1 + 1]]) 
+		= - \log(\bm{P_{\theta}}[t, \bm{x}_n[t + 1]])$	
+	\end{block}
+	
+\end{frame}
+
+
 
 \section{From previous}
 
