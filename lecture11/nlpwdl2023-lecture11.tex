@@ -469,7 +469,7 @@ We want to assign zero probability (using softmax) to "future" tokens
 	}{
 		\sum_{u = 1}^{t}\exp(\bm{q} \cdot \bm{k_u} )
 	}$
-	\Comment{Only until $t$!}
+	\Comment{Only until $t$}
 	\For{$i \in (t+1, T)$}
 	\State $\alpha_i = 0$
 	\Comment{Zero-out rest}
@@ -484,7 +484,7 @@ We want to assign zero probability (using softmax) to "future" tokens
 \end{frame}
 
 
-\begin{frame}{For-loops are bad!}
+\begin{frame}{Avoid for-loops!}
 For each row $\bm{s}$ from the raw associations
 
 \begin{algorithmic}[1]
@@ -523,7 +523,7 @@ Replace input from  $t + 1$ onwards with $-\infty$
 
 
 
-\begin{frame}{Uni-directional masking}
+\begin{frame}{Uni-directional masking for self-attention}
 
 For $t_z, t_x \in [\ell_x]$
 $$
@@ -534,8 +534,8 @@ $$
 \end{cases}
 $$
 
-Example for $\ell_x = 4$
 
+Example for $\ell_x = 4$
 $$
 \begin{pmatrix}
 1 & 0 & 0 & 0 \\
@@ -548,30 +548,36 @@ $$
 \end{frame}
 
 
-\begin{frame}{BERT (encoding-only transformer, forward pass)}
+\begin{frame}{Left-to-right masked self-attention}
 	
-	\vspace{-2em}
 	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{X} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{x}}}$, vector representations of the sequence of length $\ell_{\text{x}}$
+		
+		Output: $\bm{\tilde{V}} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$, updated vector representations of tokens in $\bm{X}$
+		
+		Params $\bm{\mathcal{W}_{qkv}}$: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{x} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
+		
 		\begin{algorithmic}[1]
-			\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
-			\State $\ell \gets \text{length}(\bm{x})$
-			\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
-			\Comment{Token emb. + positional emb.}
-			\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
-			\For{$l = 1, 2, \dots, L$}
-			\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
-			\Comment{Multi-head att., residual conn}
-			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
-			\State $\bm{X} \gets \bm{X} + \left(
-			\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
-			\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
-			\Comment{MLP}
-			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
+			\Function{Attention}{$\bm{X} ; \bm{\mathcal{W}_{qkv}}$}
+			\State $\bm{Q} \gets \bm{X} \bm{W_q} +_{\text{(rows)}} \bm{b_q}$
+			\Comment{Query $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
+			\State $\bm{K} \gets \bm{X} \bm{W_k} +_{\text{(rows)}} \bm{b_k}$
+			\Comment{Key $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
+			\State $\bm{V} \gets \bm{X} \bm{W_v} +_{\text{(rows)}} \bm{b_v}$
+			\Comment{Value $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$}
+			
+			\State $\bm{S} \gets \frac{1}{\sqrt{d_{\text{attn}}}} (\bm{Q} \bm{K}^\top)$
+			\Comment{Scaled score $\in \mathbb{R}^{\ell_{\text{x}} \times \ell_{\text{x}}}$}
+
+			\ForAll{$t_z, t_x \in [T] $}
+			\If{$\neg \mask[t_x, t_z]$}
+				 $\bm{S}[t_x, t_z] \gets - \infty$
+	 			\Comment{Causal masking}
+			\EndIf
 			\EndFor
-			\State $\bm{X} \gets \textsc{GELU}(\bm{X} \bm{W_f}  +_{\text{(row)}} \bm{b_f} )$
-			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma}_l, \bm{\beta}_l)$
-			\State \Return $\bm{P} = \softmax(\bm{X} \bm{W_u}) $
-			\Comment{Project to vocab., probabilities}
+			\State \Return $\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
+			
 			\EndFunction
 		\end{algorithmic}
 		
@@ -580,9 +586,139 @@ $$
 
 
 
+\begin{frame}{Single masked self-attention head (GPT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (query) [param, right of=X, text centered, text width=2.2cm, xshift=1.7cm, yshift=1.6cm] {Linear layer (query)};
+		
+		\node (key) [param, right of=X, text centered, text width=2.2cm, xshift=1.7cm, yshift=0cm] {Linear layer (key)};
+		
+		\node (value) [param, right of=X, text centered, text width=2.2cm, xshift=1.7cm, yshift=-1.6cm] {Linear layer (value)};
+		
+		\node (scaled) [neuron, right of=key, text centered, text width=1.5cm, xshift=2cm, yshift=1cm] {Scaled dot product};
+		
+		\node (mask) [neuron, right of=scaled, text centered, text width=1.5cm, xshift=1.3cm] {Masked};
+		
+		\node (softmax) [neuron, right of=mask, text centered, text width=1.8cm, xshift=1.4cm] {Softmax (row)};
+		
+		\node (matmul) [neuron, right of=softmax, text centered, text width=1.5cm, xshift=1.5cm] {Matmul $\bm{\tilde{S}}\bm{V}$};
+		
+		\node (out) [right of=matmul, xshift=1cm] {$\bm{Y}^h$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (query);
+			\draw (x) edge[out=0,in=180] (key);
+			\draw (x) edge[out=0,in=180] (value);
+			%			\draw (x) -- (sum1);
+			\draw (query) edge[out=0,in=170] (scaled) node [right of=query, xshift=0.5cm, yshift=0.4cm] {$\bm{Q}$};
+			\draw (key) edge[out=0,in=190] (scaled) node [right of=key, xshift=0.5cm, yshift=0.4cm] {$\bm{K}$};
+			\draw (value) edge[out=0,in=210] (matmul) node [right of=value, xshift=0.5cm, yshift=0.6cm] {$\bm{V}$};
+			\draw (scaled) -- (mask) node [midway, above] {$\bm{S}$};
+			\draw (mask) -- (softmax) node [midway, above] {$\bm{S}$};
+			\draw (softmax) -- (matmul) node [midway, above] {$\bm{\tilde{S}}$};
+			
+			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			%			\draw (norm1) edge[out=0,in=180] (mlp);
+			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (matmul) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Left-to-right masked self-attention}
+		
+$\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
+
+The output $\bm{\tilde V}[1:t, :]$ only depends on $\bm{X}[1:t, :]$, so it can be used to ``predict" $\bm{X}[t + 1, :]$
+
+\end{frame}
 
 
 
+\begin{frame}{GPT (decoding-only transformer, forward pass)}
+	
+	\begin{minipage}[t][3em][t]{15cm}
+		\begin{algorithmic}[1]
+			\Function{DTransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+			\State $\ldots$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+	
+	Input: $\bm{x}$ --- $\bm{x} \in V^*$, a sequence of token IDs, 	
+	$\bm{\mathcal{W}}$ --- all trainable parameters
+	
+	Output: 
+	$\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary conditioned on previous tokens
+	$
+	\bm{\hat{P}}(x[t + 1] | \bm{x}[1:t])
+	$
+	
+\end{frame}
+
+
+
+\begin{frame}{GPT (decoding-only transformer, forward pass)}
+	
+\vspace{-2em}
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{DTransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\For{$l = 1, 2, \dots, L$}
+\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
+\Comment{Normalization first}
+\State $\bm{X} \gets \bm{X} + \textsc{MHAttentionMask}(\bm{X} | \bm{\mathcal{W}}_l)$
+\Comment{Just added masking}
+\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
+\State $\bm{X} \gets \bm{X} + \left(
+\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
+\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
+\Comment{MLP}
+\EndFor
+\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma}_l, \bm{\beta}_l)$
+\State \Return $\bm{P} = \softmax(\bm{X} \bm{W_u}) $
+\Comment{Project to vocab., probabilities}
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+\begin{frame}{GPT (decoding-only transformer, forward pass)}
+
+Differences from BERT forward-pass:
+
+Switched the ordering of layer normalization (line 6 and 8)
+
+No final layer projection
+
+Attention with left-to-right masking (line 7)
+
+\end{frame}
+
+
+
+
+
+\section{Training}
+
+
+
+
+
+\section{From previous}
 
 
 \section{BERT --- Encoder architecture in detail}
