@@ -130,6 +130,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture10/pdf/nlpwdl2023-lecture10-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=squ4NM0sGTY)
 
+### Lecture 11: Text generation 4: Decoder-only models and GPT
+
+2023-12-22
+
+* [Slides as PDF](/lecture11/pdf/nlpwdl2023-lecture11-handout.pdf)
+* TBD [YouTube recording](https://www.youtube.com/watch?v=)
+
+
 ## FAQ
 
 * What are some essential pre-requisites?
