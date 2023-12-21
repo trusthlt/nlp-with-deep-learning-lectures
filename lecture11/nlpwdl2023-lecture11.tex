@@ -240,39 +240,6 @@ Can we use a transformer as a `true' language model, aka.\ to conditionally gene
 	
 \end{frame}
 
-\begin{frame}{misc}
-
-Bottom-up masking
-
-
-Recap single-query attention with softmax
-
-Show what needs to happen if you want to predict the last token
-
-The last two tokens
-
-On the full matrix
-
-
-
-\begin{tikzpicture}[overlay, remember picture] 
-	\node at (current page.north east)[ref] {\fullcite{Radford.et.al.2018.GPT1.report} \par};
-\end{tikzpicture}
-
-\end{frame}
-
-
-
-\begin{frame}{Rel works}
-	
-Liu et al. Transformer (referred from GPT1 paper)
-
-\begin{tikzpicture}[overlay, remember picture]
-	\node at (current page.north east)[ref] {\fullcite{Liu.et.al.2018.ICLR} \par};
-\end{tikzpicture}
-
-	
-\end{frame}
 
 
 
@@ -544,7 +511,7 @@ $$
 1 & 1 & 1 & 1 \\
 \end{pmatrix}
 $$
-
+Creating the mask and indexing tensor by this mask very easy in pytorch
 \end{frame}
 
 
@@ -652,7 +619,7 @@ The output $\bm{\tilde V}[1:t, :]$ only depends on $\bm{X}[1:t, :]$, so it can b
 		
 	\end{minipage}
 	
-	Input: $\bm{x}$ --- $\bm{x} \in V^*$, a sequence of token IDs, 	
+	Input: --- $\bm{x} \in V^*$, a sequence of token IDs,
 	$\bm{\mathcal{W}}$ --- all trainable parameters
 	
 	Output: 
@@ -904,13 +871,70 @@ Output: $\bm{y} \in V^*$, continuation
 
 
 
-
+\section{Evolution of GPT}
 	
 
+\begin{frame}{Towards GPT-1}
+	
+Decoder part of the Transformer Encoder-Decoder model for MT \citep{Vaswani.et.al.2017}
+
+Dropping encoder and using only decoder that consumes input and produces output trained as a standard language model for writing Wikipedia pages as summarization task \citep{Liu.et.al.2018.ICLR}
 
 
+	
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Vaswani.et.al.2017} \newline
+\fullcite{Liu.et.al.2018.ICLR} \par};
+\end{tikzpicture}
 
 
+\end{frame}
+
+
+\begin{frame}{GPT-1}
+
+GPT-1 \citep{Radford.et.al.2018.GPT1.report} adapted decoder only transformer
+
+\begin{itemize}
+\item pre-training as LM
+\item fine-tuning with an extra final layer for the given task
+\item pre-trained on BooksCorpus (7k unique unpublished books)
+\item 12 decoder layers, 12 attention heads, 768 embedding size
+\end{itemize}
+
+
+\emph{``improving the state of the art on 9 of the 12 datasets we study"}	
+	
+	
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Radford.et.al.2018.GPT1.report} \par};
+\end{tikzpicture}
+	
+	
+\end{frame}
+
+
+\begin{frame}{GPT-2}
+	
+Larger GPT-1
+	
+	\begin{itemize}
+		\item pre-training as LM
+		\item pre-trained on custom web scrape (all outbounds links from Reddit with at least 3 karma points, for quality reasons), 8 million documents total
+		\item 48 decoder layers, 1600 embedding size (1.542 billion params)
+	\end{itemize}
+
+Representing inputs, prompting, etc. --- next lectures
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Radford.et.al.2019.GPT2.report} \par};
+	\end{tikzpicture}
+	
+	
+\end{frame}
 
 
 \begin{frame}{License and credits}
