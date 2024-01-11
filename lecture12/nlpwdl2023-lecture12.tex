@@ -466,7 +466,34 @@ resulting text is not natural language."
 \end{frame}
 
 
-\subsection{"Alignment", instruction-tuning, RLHF}
+\begin{frame}{Why does in-context learning work?}
+	
+Active area of research!
+
+"we show that ground truth demonstrations are in fact not required—randomly replacing labels in the demonstrations barely hurts performance on a range of classification and multi-choce tasks, consistently over 12 different models including GPT-3."
+
+"Instead, we find that other aspects of the demonstrations are the key drivers of end task performance, including the fact that they provide a few examples of (1) the label space, (2) the distribution of the input text, and (3) the overall format of the sequence."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Min.et.al.2022.EMNLP} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{Why does in-context learning work?}
+	
+"we explain language models as metaoptimizers and understand in-context learning as implicit finetuning. Theoretically, we figure out that Transformer attention has a dual form of gradient descent."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Dai.et.al.2023.ACLFindings} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\section{"Alignment", instruction-tuning, RLHF}
 
 
 \begin{frame}{Llama2}

@@ -138,6 +138,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [YouTube recording](https://www.youtube.com/watch?v=clltK2E2xs8)
 
 
+### Lecture 12: Text generation 5: Transformers and contemporary LLMs
+
+2024-01-12
+
+* [Slides as PDF](/lecture12/pdf/nlpwdl2023-lecture12-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=)
+
 ## FAQ
 
 * What are some essential pre-requisites?
