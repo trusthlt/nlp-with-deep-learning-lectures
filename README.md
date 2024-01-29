@@ -145,6 +145,26 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lecture12/pdf/nlpwdl2023-lecture12-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=xOatNObLA0I)
 
+### Lecture 13: "Guest lecture" on privacy in NLP
+
+2024-01-19
+
+* [YouTube recording](https://www.youtube.com/watch?v=KRVXpTlUt44)
+
+### Lecture 14: Presenting and discussing homework solutions
+
+* by Julius Broermann
+	* https://github.com/JuliusBroermann/neural_machine_translation-nlp_with_deep_learning_course-paderborn_university
+
+
+### Lecture 15: "Guest lecture" on ethics of generative AI (Dr. Thomas Arnold, TU Darmstadt)
+
+2024-02-02
+
+* [YouTube recording](https://www.youtube.com/watch?v=lO2-W5l2y40)
+
+
+
 ## FAQ
 
 * What are some essential pre-requisites?
