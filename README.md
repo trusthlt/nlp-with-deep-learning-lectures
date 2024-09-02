@@ -1,6 +1,6 @@
-# Natural Language Processing with Deep Learning 2023/2024
+# Natural Language Processing with Deep Learning 2024/2025
 
-This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "L.079.05551 Natural Language Processing with Deep Learning" (Paderborn University, winter term 2023/2024).
+This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "Natural Language Processing with Deep Learning" (Ruhr University Bochum, winter term 2024/2025).
 
 This course is lectured by [Prof. Dr. Ivan Habernal](https://www.trusthlt.org).
 
@@ -12,156 +12,26 @@ The content is licensed under [Creative Commons CC BY-SA 4.0](https://creativeco
 
 **Note:** The following content is continuously updated as the winter term progresses.
 
+To see the previous full **2023/24** course content, checkout the [latest 2024 commit](https://github.com/trusthlt/nlp-with-deep-learning-lectures/tree/ae2364ac136e9852a6992f17a90771f0a5474bfb).
+
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcB00apoxMtj7WSUOlpm2Xvl
+Subscribe the YouTube playlist to get updates on new lectures: (TO BE DECIDED/UPDATED)
 
 ## Lectures and exercises
 
-### Lecture 01: NLP tasks and evaluation
+### Lecture 01: NLP tasks and evaluation (TO BE UPDATED)
 
-2023-10-13
+2024-MM-DD
 
-* [Slides as PDF](/lecture01/pdf/nlpwdl2023-lecture01-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=QQwJdUeONCI)
+* [Slides as PDF TBD](/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
+* [YouTube recording TBD](https://www.youtube.com/watch?v=QQwJdUeONCI)
 
-### Exercise 01: Classification evaluation, text generation evaluation
+### Exercise 01: Classification evaluation, text generation evaluation (TO BE UPDATED)
 
-2023-10-19
+2024-MM-DD
 
 * See the PDF (including LaTeX source) and Python code under [exercises/ex01](exercises/ex01)
-
-### Lecture 02: Mathematical foundations of deep learning
-
-2023-10-20
-
-* [Slides as PDF](/lecture02/pdf/nlpwdl2023-lecture02-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=viej0VnvwMY)
-
-### Exercise 02: Computational graph and backpropagation from scratch
-
-2023-10-26
-
-* See the README.md and Python code under [exercises/ex02](exercises/ex02)
-
-### Lecture 03: Text classification 1: Log-linear models
-
-2023-10-27
-
-* [Slides as PDF](/lecture03/pdf/nlpwdl2023-lecture03-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=BqvDHdOwCY4)
- 
-### Exercise 03: Gradient of a log-linear model, logistic loss, and parameter update
-
-2023-11-02
-
-* See the README.md and Python code under [exercises/ex03](exercises/ex03)
-
-### Lecture 04: Text classification 2: Towards deep neural networks
-
-2023-11-03
-
-* [Slides as PDF](/lecture04/pdf/nlpwdl2023-lecture04-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=xOoJX_RXu50)
-
-### Exercise 04: Linear layer, online gradient descent, training with data
-
-2023-11-09
-
-* See the README.md and Python code under [exercises/ex04](exercises/ex04)
-
-### Lecture 05: Text generation 1: Language models and word embeddings
-
-2023-11-10
-
-* [Slides as PDF](/lecture05/pdf/nlpwdl2023-lecture05-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=NhL916qhdWs)
-
-### Exercise 05: ReLU and SoftMax
-
-2023-11-16
-
-* See the README.md and Python code under [exercises/ex05](exercises/ex05)
-
-### Lecture 06: Text classification 3: Learning word embeddings
-
-2023-11-17
-
-* [Slides as PDF](/lecture06/pdf/nlpwdl2023-lecture06-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=3dVJX1vT4cw)
-
-### Exercise 06: PyTorch 101
-
-2023-11-23
-
-* See the README.md and Python code under [exercises/ex06](exercises/ex06)
-
-### Lecture 07: Text classification 4: Recurrent neural networks
-
-2023-11-24
-
-* [Slides as PDF](/lecture07/pdf/nlpwdl2023-lecture07-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=-83Fsl9csKA)
-
-### Lecture 08: Text generation 2: Autoregressive encoder-decoder with RNNs and attention
-
-2023-12-01
-
-* [Slides as PDF](/lecture08/pdf/nlpwdl2023-lecture08-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=94bA72X8lDo)
-
-### Lecture 09: Text classification 5: Introduction to transformers with BERT
-
-2023-12-08
-
-* [Slides as PDF](/lecture09/pdf/nlpwdl2023-lecture09-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=pTHlQXnr024)
-
-### Exercise 09: Language modeling from scratch
-
-2023-12-14
-
-* See the README.md and Python code under [exercises/ex09](exercises/ex09)
-
-### Lecture 10: Text classification 6: BERT part two
-
-2023-12-15
-
-* [Slides as PDF](/lecture10/pdf/nlpwdl2023-lecture10-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=squ4NM0sGTY)
-
-### Lecture 11: Text generation 4: Decoder-only models and GPT
-
-2023-12-22
-
-* [Slides as PDF](/lecture11/pdf/nlpwdl2023-lecture11-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=clltK2E2xs8)
-
-
-### Lecture 12: Text generation 5: Transformers and contemporary LLMs
-
-2024-01-12
-
-* [Slides as PDF](/lecture12/pdf/nlpwdl2023-lecture12-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=xOatNObLA0I)
-
-### Lecture 13: "Guest lecture" on privacy in NLP
-
-2024-01-19
-
-* [YouTube recording](https://www.youtube.com/watch?v=KRVXpTlUt44)
-
-### Lecture 14: Presenting and discussing homework solutions
-
-* by Julius Broermann
-	* https://github.com/JuliusBroermann/neural_machine_translation-nlp_with_deep_learning_course-paderborn_university
-
-
-### Lecture 15: "Guest lecture" on ethics of generative AI (Dr. Thomas Arnold, TU Darmstadt)
-
-2024-02-02
-
-* [YouTube recording](https://www.youtube.com/watch?v=lO2-W5l2y40)
 
 
 
@@ -174,7 +44,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * Where do I find the code for plotting the functions?
   * Most of the plots are generated in Python/Jupyter (in Colab). The links are included as comments in the respective LaTeX sources for the slides.
 
-## Compiling slides to PDF
+## Compiling slides to PDF (UPDATE TO RUB)
 
 If you run a linux distribution (e.g., Ubuntu 20.04 and newer), all packages are provided as part of `texlive`. Install the following packages
 
