@@ -44,9 +44,9 @@ Subscribe the YouTube playlist to get updates on new lectures: (TO BE DECIDED/UP
 * Where do I find the code for plotting the functions?
   * Most of the plots are generated in Python/Jupyter (in Colab). The links are included as comments in the respective LaTeX sources for the slides.
 
-## Compiling slides to PDF (UPDATE TO RUB)
+## Compiling slides to PDF
 
-If you run a linux distribution (e.g., Ubuntu 20.04 and newer), all packages are provided as part of `texlive`. Install the following packages
+If you run a linux distribution (e.g., Ubuntu 22.04 and newer), all packages are provided as part of `texlive`. Install the following packages
 
 ```plain
 $ sudo apt-get install texlive-latex-recommended texlive-pictures texlive-latex-extra \
@@ -54,7 +54,13 @@ texlive-fonts-extra texlive-bibtex-extra texlive-humanities texlive-science \
 texlive-luatex biber wget -y
 ```
 
-To install MS Segoe UI fonts required by the beamer template locally, run the following script (works also similarly on Mac OS): https://gist.github.com/habernal/ad1085ce5dc5e8cb3fbead354d8f4190
+* Install RUB fonts
+  * I've prepared a shell script which downloads the TTF files and installs them
+
+```bash
+$ chmod +x install-rub-fonts.sh
+$ ./install-rub-fonts.sh
+```
 
 Run the script `compile-pdf.sh` in each lecture's folder to produce both handouts as well as unfolding PDFs used in the lecture.
 
@@ -66,11 +72,11 @@ Install Docker ( https://docs.docker.com/engine/install/ )
 
 Create a folder to which you clone this repository (for example, `$ mkdir -p /tmp/slides`)
 
-Run Docker with Ubuntu 20.04 interactively; mount your slides directory under `/mnt` in this Docker container
+Run Docker with Ubuntu 22.04 interactively; mount your slides directory under `/mnt` in this Docker container
 
 ```plain
 $ docker run -it --rm --mount type=bind,source=/tmp/slides,target=/mnt \
-ubuntu:20.04 /bin/bash
+ubuntu:22.04 /bin/bash
 ```
 
 Once the container is running, update, install packages and fonts as above
@@ -81,7 +87,7 @@ texlive-pictures texlive-latex-extra texlive-fonts-extra texlive-bibtex-extra \
 texlive-humanities texlive-science texlive-luatex biber wget -y
 ```
 
-Install fonts as above: https://gist.github.com/habernal/ad1085ce5dc5e8cb3fbead354d8f4190
+Install RUB fonts as above
 
 Run the script `compile-pdf.sh` in each lecture's folder to produce both handouts as well as unfolding PDFs used in the lecture, which generates the PDFs in your local folder (e.g, `/tmp/slides`).
 
