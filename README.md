@@ -20,12 +20,12 @@ Subscribe the YouTube playlist to get updates on new lectures: (TO BE DECIDED/UP
 
 ## Lectures and exercises
 
-### Lecture 01: NLP tasks and evaluation (TO BE UPDATED)
+### Lecture 01: NLP tasks and evaluation
 
-2024-MM-DD
+2024-10-17
 
-* [Slides as PDF TBD](/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
-* [YouTube recording TBD](https://www.youtube.com/watch?v=QQwJdUeONCI)
+* [Slides as PDF](/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
+* [YouTube recording TBD](https://www.youtube.com/watch?v=xxxx)
 
 ### Exercise 01: Classification evaluation, text generation evaluation (TO BE UPDATED)
 

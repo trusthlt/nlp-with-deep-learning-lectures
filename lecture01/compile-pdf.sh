@@ -3,7 +3,7 @@
 # Inspired by: https://tex.stackexchange.com/a/1501
 
 # current lecture file name
-lecture_filename="nlpwdl2023-lecture01"
+lecture_filename="nlpwdl2024-lecture01"
 
 # create the output folder (might already exist)
 mkdir -p pdf
