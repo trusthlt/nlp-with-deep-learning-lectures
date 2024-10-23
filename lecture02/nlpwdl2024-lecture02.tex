@@ -255,6 +255,323 @@ Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
 \maketitle
 
 
+\section{Evaluation}
+
+
+\begin{frame}{ Train/Dev/Test data splits}
+
+Training and Test data
+
+Development (Validation) set used for optimizing hyper-parameters
+
+\tikzstyle{box} = [rectangle, draw, black, text width=3cm]
+\tikzstyle{train} = [fill=blue!10]
+\tikzstyle{dev} = [fill=yellow!10]
+\tikzstyle{test} = [fill=red!10]
+
+\begin{figure}
+
+\begin{tikzpicture}[node distance=0.8cm]
+	\node (f13) [box, train] {Train};
+	\node (f14) [box, dev, below of=f13] {Validation};
+	\node (f15) [box, test, below of=f14] {Test};
+	
+\end{tikzpicture}
+
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}{Cross validation}
+
+\textbf{K-fold cross-validation} partitions the data into $K$ chunks
+
+$K - 1$ of which form the training set $\mathcal{R}$
+
+The last chunk serves as the test set $\mathcal{V}$ (or validation)
+
+\bigskip
+
+\tikzstyle{box} = [rectangle, draw, black, text width=1.5cm]
+\tikzstyle{train} = [fill=blue!10]
+\tikzstyle{test} = [fill=red!10]
+
+\begin{figure}
+	\begin{scriptsize}
+		\begin{tikzpicture}[node distance=0.5cm]
+			\node (f10) [] {Fold 1};
+			\node (f11) [box, train, below of=f10] {Train};
+			\node (f12) [box, train, below of=f11] {Train};
+			\node (f13) [box, train, below of=f12] {Train};
+			\node (f14) [box, train, below of=f13] {Train};
+			\node (f15) [box, test, below of=f14] {Test};
+			
+			\node (f20) [right=1.6cm, right of=f10] {Fold 2};
+			\node (f21) [box, train, below of=f20] {Train};
+			\node (f22) [box, train, below of=f21] {Train};
+			\node (f23) [box, train, below of=f22] {Train};
+			\node (f24) [box, test, below of=f23] {Test};
+			\node (f25) [box, train, below of=f24] {Train};
+			
+			\node (f30) [right=1.6cm, right of=f20] {Fold 3};
+			\node (f31) [box, train, below of=f30] {Train};
+			\node (f32) [box, train, below of=f31] {Train};
+			\node (f33) [box, test, below of=f32] {Test};
+			\node (f34) [box, train, below of=f33] {Train};
+			\node (f35) [box, train, below of=f34] {Train};
+			
+			\node (f40) [right=1.6cm, right of=f30] {Fold 4};
+			\node (f41) [box, train, below of=f40] {Train};
+			\node (f42) [box, test, below of=f41] {Test};
+			\node (f43) [box, train, below of=f42] {Train};
+			\node (f44) [box, train, below of=f43] {Train};
+			\node (f45) [box, train, below of=f44] {Train};
+			
+			\node (f50) [right=1.6cm, right of=f40] {Fold 5};
+			\node (f51) [box, test, below of=f50] {Test};
+			\node (f52) [box, train, below of=f51] {Train};
+			\node (f53) [box, train, below of=f52] {Train};
+			\node (f54) [box, train, below of=f53] {Train};
+			\node (f55) [box, train, below of=f54] {Train};
+		\end{tikzpicture}
+	\end{scriptsize}
+	\caption{Example of 5-fold CV}
+\end{figure}
+
+\end{frame}
+
+\subsection{Evaluation of text classification}
+
+
+\begin{frame}{Confusion matrix (binary case)}
+
+Two classes: Positive and Negative
+
+\begin{block}{Confusion matrix}
+\begin{tabular}{l|cc}
+& Pred. Negative & Pred. Positive \\ \toprule
+Act. Negative & True negative (TN) & False positive (FP) \\
+Act. Positive & False negative (FN) & True positive (TP) \\
+\end{tabular}
+\end{block}
+
+\bigskip
+
+Act. Negative = Actually negative = Gold label
+
+Ordering of columns and rows is \textbf{arbitrary}!
+
+\end{frame}
+
+
+\begin{frame}{Accuracy}
+
+Accuracy of classifier $f$ on test set $T$:
+$$
+\mathrm{Acc}_T(f) = \frac{1}{|T|} \sum_{i = 1}^{|T|} I (f(x_i) = y_i)
+$$
+	
+\begin{example}[Disease detection]
+	\begin{tabular}{l|rr}
+		& Pred. Negative & Pred. Positive \\ \toprule
+		Act. Negative & 168 & 33 \\
+		Act. Positive & 48 & 37 \\
+	\end{tabular}
+\end{example}
+
+$37 + 48 + 33 + 168 = 286$ $\to$ Test set size $|T| = 286$
+$\mathrm{Acc}_T(f) = \frac{1}{286} (37 + 168) = 0.7186$
+
+\begin{tikzpicture}[overlay, remember picture] 
+\node at (current page.north east)[ref] {\fullcite{Japkowicz.Shah.2011} \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Precision, recall, F-1 score}
+	
+\begin{block}{Confusion matrix}
+	\begin{tabular}{l|cc}
+		& Pred. Negative & Pred. Positive \\ \toprule
+		Act. Negative & True negative (TN) & False positive (FP) \\
+		Act. Positive & False negative (FN) & True positive (TP) \\
+	\end{tabular}
+\end{block}
+	
+Precision (for class positive) = TP / (TP + FP)
+
+Recall (for class positive) = TP / (TP + FN)
+
+F-1 score (for class positive) = 2PR / (P + R)
+	
+\end{frame}
+
+
+\begin{frame}{Confusion matrix -- multi-class}
+	
+\begin{tabular}{r|rrrrrrr}
+	& prediction: &\rotatebox{90}{\emph{money-fx}}&\rotatebox{90}{\emph{trade}}&\rotatebox{90}{\emph{interest}}&\rotatebox{90}{\emph{wheat}}&\rotatebox{90}{\emph{corn}}&\rotatebox{90}{\emph{grain}}\\
+	true class:&&&&&&&\\\hline
+	\emph{money-fx} && 95 & 0 & 10 & 0 & 0 & 0\\
+	\emph{trade} && 1 & 1 & 90 & 0 & 1 & 0\\
+	\emph{interest} && 13 & 0 & 0 & 0 & 0 & 0\\
+	\emph{wheat} && 0 & 0 & 1 & 34 & 3 & 7\\
+	\emph{corn} && 1 & 0 & 2 & 13 & 26 & 5\\
+	\emph{grain} && 0 & 0 & 2 & 14 & 5 & 10
+\end{tabular}
+	
+\end{frame}
+
+
+\begin{frame}{Confusion matrix --- multi-class}
+
+\begin{itemize}
+\item We can unambiguously compute Precision and Recall for each class
+\item How to get the F-1 score for the complete test set across classes?
+\begin{itemize}
+\item Macro-averaging (average of F-1 scores), or micro-averaging
+\item These details might get tricky so always report exactly what you do!
+\end{itemize}
+
+\end{itemize}
+\begin{tikzpicture}[overlay, remember picture] 
+\node at (current page.north east)[ref] {\fullcite{Sokolova.Lapalme.2009} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Evaluation of text generation}
+
+
+\begin{frame}{More text generation tasks}
+
+\includegraphics[width=\linewidth]{img/nlg1.png}
+
+\begin{tikzpicture}[overlay, remember picture] 
+\node at (current page.north east)[ref] {\fullcite{Sai.et.al.2023.CSUR} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Evaluating text generation is hard}
+	
+\includegraphics[trim={0 12.2cm 0 0},clip,width=1.2\linewidth]{img/nlg2.png}
+	
+\end{frame}
+
+
+\begin{frame}{BLEU (Bilingual Evaluation Understudy)}
+
+Almost first and most popular metric for MT
+
+\begin{itemize}
+	\item Precision-based metric that computes the n-gram overlap between the reference and the hypothesis
+	\item In particular, BLEU is the ratio of the number of overlapping n-grams to the total number of n-grams in the hypothesis.
+\end{itemize}
+
+
+Corpus-level metric, i.e., BLEU gives a score over the entire corpus (as opposed to scoring individual sentences)
+
+Major drawbacks of BLEU: (i) it does not take recall into account and (ii) it only allows exact n-gram matching
+
+\begin{tikzpicture}[overlay, remember picture] 
+\node at (current page.north east)[ref] {\fullcite{Papineni.et.al.2002.ACL} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{ROUGE (Recall-Oriented Understudy\\ for Gisting Evaluation)}
+	
+ROUGE metric includes a set of variants: ROUGE-N, ROUGE-L, ROUGE-W, and ROUGE-S
+
+\begin{itemize}
+	\item ROUGE-N is similar to BLEU-N in counting the n-gram matches between the hypothesis and reference, however, it is a recall-based measure unlike BLEU which is precision-based
+	\item ROUGE-L measures the longest common subsequence (LCS) between a pair of sentences	
+\end{itemize}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Lin.2004} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+\subsection{Caveats of NLP benchmarking}
+
+
+\begin{frame}{The `gold' data paradigm might not always fit}
+
+The assumption of a ground truth makes sense when humans highly agree on the answer
+
+\begin{itemize}
+	\item ``Does this image contain a bird?"
+	\item ``Is `learn' a verb?"
+	\item ``What is the capital of Italy?"
+\end{itemize}
+
+This assumption often does not make sense, especially when language is involved
+
+\begin{itemize}
+	\item ``Is this comment toxic?"
+\end{itemize}
+
+\emph{Human label variation impacts all steps of the traditional ML pipeline, and is an opportunity, not a problem}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Plank.2022.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}{ Human annotators are biased}
+
+Datasets are often constructed using a small number of annotators, and humans are biased
+
+\begin{itemize}
+	\item Concerns about data diversity, especially when workers freely generate sentences
+	\item Models do not generalize well to examples from annotators that did not contribute to the training set
+\end{itemize}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Geva.et.al.2019.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame} \begin{frame}{Artifacts in datasets}
+
+Datasets have artifacts (spurious statistics) that can be exploited
+
+\includegraphics[width=8cm]{img/arct.png}
+
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Habernal.et.al.2018.NAACL.ARCT} 
+		\bigskip \newline	
+		\fullcite{Niven.Kao.2019.ACL} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
 
 \section{Motivation}
 
