@@ -25,9 +25,24 @@ Subscribe the YouTube playlist to get updates on new lectures: (TO BE DECIDED/UP
 2024-10-17
 
 * [Slides as PDF](/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
-* [YouTube recording TBD](https://www.youtube.com/watch?v=xxxx)
+* No YouTube recording of the first lecture
+* We did not cover evaluation
 
-### Exercise 01: Classification evaluation, text generation evaluation (TO BE UPDATED)
+### Exercise 01: PyTorch basics (tensors and basic operations)
+
+2024-10-17
+
+* Python code under [exercises/ex01](exercises/ex01)
+
+### Lecture 02: Evaluation and machine learning basics
+
+2024-10-24
+
+* [Slides as PDF](/lecture01/pdf/nlpwdl2024-lecture02-handout.pdf)
+* YouTube TBD
+
+
+### Exercise 02: Classification evaluation, text generation evaluation (TO BE UPDATED)
 
 2024-MM-DD
 
