@@ -255,6 +255,442 @@ Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
 \maketitle
 
 
+
+
+
+\begin{frame}{This lecture}
+	
+Basics on supervised machine learning
+
+\begin{itemize}
+	\item Train/dev/test split
+	\item Evaluation
+	\item Loss functions
+\end{itemize}
+
+Learning goals
+
+\begin{itemize}
+	\item Understand ML/DL foundations
+\end{itemize}
+
+\end{frame}
+
+\section{Notation}
+
+\begin{frame}{Notation}
+	Vectors in linear algebra are columns, for example $\mathbf{x} \in \mathbb{R}^3$
+	
+$$
+\mathbf{x} = 
+\begin{pmatrix}
+x_1 \\
+x_2 \\
+x_3
+\end{pmatrix} \qquad \text{(bold face, lower case)}
+$$
+
+We treat them as a row vector by transposing, for example $\mathbf{x}^\intercal = (x_1, x_2, x_3)$ --- which is a matrix $\mathbb{R}^{1 \times 3}$
+
+\emph{Caveat:} 1-D array (a list of numbers) is sometimes considered a vector, so dealing with dimensions might be quite messy
+	
+\end{frame}
+
+\begin{frame}{Notation}
+Matrices are upper-case bold, for example $\mathbf{Z} \in \mathbb{R}^{2 \times 3}$
+
+$$
+\mathbf{Z} =
+\begin{pmatrix}
+z_{1,1} & z_{1,2} & z_{1,3} \\
+z_{2,1} & z_{2,2} & z_{2,3} \\
+\end{pmatrix}
+$$
+
+Scalars are ordinary lower case letters, for example
+
+$$
+a, b, c \in \mathbb{R}
+$$
+
+\end{frame}
+
+\begin{frame}{Notation ambiguity}
+A dot $\cdot$ means multiple things, depending on context
+	
+Simple scalar multiplication, for example $a \cdot b$
+$$\cdot : \mathbb{R} \times \mathbb{R} \to \mathbb{R}$$
+
+Dot product $\mathbf{x} \cdot \mathbf{y} = \sum_{i = 1}^{n} x_i y_i$
+$$\cdot : \mathbb{R}^n \times \mathbb{R}^n \to \mathbb{R}$$
+
+Matrix-matrix (matrix-vector/vector-matrix) multiplication, for example $\mathbf{x} \cdot \mathbf{W}$ or $\mathbf{Y} \cdot \mathbf{Z}$
+$$\cdot : \mathbb{R}^{m \times n} \times \mathbb{R}^{n \times p} \to \mathbb{R}^{m \times p}$$
+	
+\end{frame}
+
+%\begin{frame}{Derivatives}
+%	
+%Derivative of function $f(x)$ is denoted as $\dv{f}{x}$ (rarely as $f'$)
+%
+%Partial derivates of a function of several real variables $f(x_1, \dots, x_n)$ we use
+%$$
+%\pdv{f}{x_i}
+%$$
+%
+%The gradient is then a row vector of partial derivatives
+%$$
+%\nabla f = \left( \pdv{f}{x_1}, \dots, \pdv{f}{x_n}  \right)
+%$$
+%	
+%\end{frame}
+
+
+
+\section{Supervised Machine Learning basics}
+
+\begin{frame}{Problem setup}
+	
+We have $N$ labeled \textbf{data points} (or examples) as tuples
+$$
+(\mathbf{x}_1, y_1), (\mathbf{x}_2, y_2), \dots, (\mathbf{x}_N, y_N)
+$$
+
+where $y_n$ is the "truth" or "gold label" of $\mathbf{x}_n$.
+
+We have a \textbf{model} parametrized by $\theta$ that outputs $\hat{y}$
+$$
+\hat{y} = f_{\theta}(\mathbf{x})
+$$
+	
+We specify a \textbf{loss function}, for example
+$$
+\frac{1}{N} \sum_{i = 1}^{N} \left( y_i - f_{\theta}(\mathbf{x}_i) \right)^2
+$$
+	
+\end{frame}
+
+\begin{frame}{Learning}
+	
+Our goal is to find such parameters $\theta$ that minimize the loss
+
+\begin{itemize}
+\item In other words, our model ``fits" the training data ``better"
+\end{itemize}
+
+
+\metroset{block=fill}
+\begin{block}{Overfitting}
+If our model is sufficiently "rich" (huge number of parameters), it could minimize the loss by \textbf{remembering} our training data perfectly $\to$ Not the goal of learning!
+\end{block}
+
+	
+\end{frame}
+
+
+\begin{frame}{Generalization}
+The actual goal of machine learning is to \textbf{generalize} well on previously unseen data
+
+\bigskip
+
+Evaluating generalization?
+
+\begin{itemize}
+\item Split dataset into training and test
+\item Models must perform well on test data (hidden during learning)
+\end{itemize}
+
+
+\end{frame}
+
+
+%\begin{frame}{Regularization and hyperparameters}
+%
+%Regularization for preventing overfitting by putting constraints on $\theta$ (e.g., penalizing large parameter values)
+%
+%\bigskip
+%
+%Hyperparameters?
+%
+%- Learning rate, early stopping, batch size, etc.
+%
+%- Hyperparameter tuning: Split training data into training and development
+%	
+%\end{frame}
+
+
+\begin{frame}{ML Basics}
+	
+Three major components of a machine learning system
+
+\begin{enumerate}
+\item Data
+\item Models
+\item Learning
+\end{enumerate}	
+	
+\end{frame}
+
+\subsection{Data}
+
+\begin{frame}{Supervised learning problem: Data}
+
+Dataset is a set of input-label tuples (labeled examples)
+
+$$
+\{(\mathbf{x}_1, y_1), \dots,  (\mathbf{x}_n, y_n), \dots,  (\mathbf{x}_N, y_N)\}
+$$
+
+%- $N$ denotes the number of examples in a dataset, we index the examples with lowercase $n = 1, \dots, N$.
+
+\begin{itemize}
+\item Each input $\mathbf{x}_n$ is a $D$-dimensional vector of real numbers, which are called features, attributes, or covariates
+\item Label $y_n$ associated with input vector $\mathbf{x}_n$
+\end{itemize}
+
+%Compact representation of the dataset inputs: $\mathbf{X} \in \mathbb{R}^{N \times D}$
+	
+\end{frame}
+
+\begin{frame}{Independent and identically distributed}
+
+Assumption: Our dataset  $\{(\mathbf{x}_1, y_1), \dots,  (\mathbf{x}_N, y_N)\}$ is \textbf{Independent and identically distributed (I.I.D)}
+
+\begin{itemize}
+\item Two data points $(\mathbf{x}_i, y_i)$ and $(\mathbf{x}_j, y_j)$ do not statistically depend on each other
+\end{itemize}
+
+%- Implication: We can use the \textbf{empirical mean} of the loss on the training data ("empirical risk")
+%
+%$$
+%\mathbf{R}_{\mathrm{emp}} (f, \mathbf{X}, \mathbf{y}) = 
+%\frac{1}{N} \left[ \ell(y_1, \hat{y_1}) + \dots + \ell(y_N, \hat{y_N}) \right] =
+%\frac{1}{N} \sum_{i = 1}^{N} \ell(y_i, \hat{y_i}) 
+%$$
+
+\end{frame}
+
+\subsection{Model}
+
+\begin{frame}{Models as functions}
+
+\emph{Predictor}: a function from features to output
+$$
+f: \mathbb{R}^{D} \to \mathbb{R}
+$$
+In classification we typically predict a probability distribution over categories, e.g.,
+$$
+f: \mathbb{R}^{D} \to \mathbb{R}^{|C|}
+$$
+
+$|C|$ --- number of classes and arbitrary mapping, e.g.
+$$
+C =
+\begin{cases}
+0  & \quad \text{Sport}\\
+1  & \quad \text{Politics}\\
+2  & \quad \text{Business}
+\end{cases}
+$$
+
+\end{frame}
+
+
+\begin{frame}{Models as functions}
+
+For example	
+$$
+C =
+\begin{cases}
+0  & \quad \text{Sport}\\
+1  & \quad \text{Politics}\\
+2  & \quad \text{Business}
+\end{cases}
+$$
+	
+$$
+f(\mathbf{x}) \to \underbrace{(0.01, 0.82, 0.17)}_{\sum = 1.0}
+$$
+
+	
+\end{frame}
+
+
+\begin{frame}{Learning is finding `the best' parameters}
+
+\metroset{block=fill}
+\begin{block}{The goal of learning is to}
+\begin{itemize}
+\item find a model and its corresponding parameters
+\item the resulting predictor should perform well on unseen data
+\end{itemize}
+\end{block}
+
+Conceptually three distinct phases
+
+\begin{enumerate}
+\item Prediction or inference
+\item Training or parameter estimation
+\item Hyperparameter tuning or model selection	
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Hypothesis class of functions}
+
+Supervised learning on dataset $\{(\mathbf{x}_1, y_1), \dots,  (\mathbf{x}_N, y_N)\}$; $x_n \in \mathbb{R}^D$
+
+Estimate a predictor parametrized by $\theta$
+$$
+f(\cdot, \theta): \mathbb{R}^D \to \mathbb{R}
+$$
+
+We hope to "find" "good" parameters $\theta^*$ so that we "fit" the data well
+$$
+f(\mathbf{x}_n, \theta^*) \approx y_n \qquad \text{for all } n = 1, \dots, N
+$$
+
+Notation: let $\hat{y_n} = f(\mathbf{x}_n, \theta^*)$ represent predictor's output
+
+\end{frame}
+
+\begin{frame}{Loss function for training}
+
+What does it mean to fit the data "well"?
+
+We need to specify a \textbf{loss function}
+$$
+\ell(\underbrace{y_n}_{\text{True label}}, \underbrace{\hat{y_n}}_{\text{Predictor's output}}) \to \underbrace{\mathbb{R}^{+}}_{\text{"Loss"}}
+$$
+representing `how big' an error we made on this particular prediction
+
+Our goal for finding a good parameter vector $\theta^*$ is to \textbf{minimize the average loss} on the set of $N$ training examples
+
+
+\end{frame}
+
+
+\begin{frame}{Loss example: Squared Loss}
+
+$$
+\ell(y_n, \hat{y_n}) = (y_n - \hat{y_n})^2
+$$
+
+Minimizing so-called `empirical risk'
+
+$$
+\min_{\theta} \frac{1}{N} \sum_{i = 1}^{N} (y_i - f(\mathbf{x}, \theta))^2
+$$
+
+
+\end{frame}
+
+%\begin{frame}{Expected risk}
+%	
+%Not interested in a predictor that only performs well on the training data
+%
+%We seek a predictor that performs well (has low risk) on unseen test data.
+%
+%That is, finding a predictor $f$ (with parameters fixed) that minimizes the \textbf{expected risk}
+%$$
+%\mathbf{R}_{\mathrm{true}} (f) = \mathbb{E}_{\mathbf{x}, y}
+%\left[ \ell (y, f(\mathbf{x}))   \right]
+%$$
+%
+%$y$ is the label; $f(\mathbf{x})$ is the prediction based on example $x$
+%
+%
+%The expectation is over the (infinite) set of all possible data and labels
+%
+%\end{frame}
+
+
+%\begin{frame}{Expected risk}
+%	
+%Minimizing the \textbf{expected risk}
+%$$
+%\mathbf{R}_{\mathrm{true}} (f) = \mathbb{E}_{(\mathbf{x}, y) \sim P} \left[ \ell (y, f(\mathbf{x}))   \right] = 
+%\int_{\mathcal{X} \times \mathcal{Y}}  \ell (y, f(\mathbf{x})) P(\mathbf{x},y) \mathrm{ d}\mathbf{x} \mathrm{d}y
+%$$
+%	
+%
+%\emph{The expectation is over the (infinite) set of all possible data and labels.}
+%
+%\begin{itemize}
+%	\item How to estimate expected risk from (finite) data?
+%	\item How to change training to generalize well?
+%\end{itemize}
+%
+%	
+%
+%
+%
+%Empirical risk minimization = Approximately minimizing expected risk
+%
+%Simulate unseen data: hold out a proportion of the whole dataset
+%	
+%\end{frame}
+
+
+
+
+
+\begin{frame}{Generalization}
+
+We're interested in generalization performance, not how predictor works on training data
+
+We always split our data:
+
+\begin{itemize}
+\item The \textbf{training set} is used to fit the model
+\item The \textbf{test set} is used to evaluate generalization performance
+\end{itemize}
+
+\begin{alertblock}{Warning: Hazard!! Test data leakage!!}
+\textbf{Test set} not seen by the machine learning algorithm during training
+\end{alertblock}
+	
+
+	
+\end{frame}
+
+
+%\begin{frame}{Overfitting}
+%
+%Empirical risk minimization can lead to \textbf{overfitting}
+%
+%\emph{The predictor fits too closely to the training data and does not generalize well to new data}
+%
+%- Having very small average loss on the training set but large average loss on
+%the test set?
+%
+%- Tends to occur when we have little data and a complex hypothesis class
+%	
+%
+%\end{frame}
+
+%\begin{frame}{Overfitting}
+%
+%Predictor $f$ (with parameters fixed); overfitting occurs when the risk estimate from the training data 
+%
+%$$
+%\mathbf{R}_{\mathrm{emp}} (f, \mathbf{X}_{\mathrm{train}}, \mathbf{y}_{\mathrm{train}})
+%$$
+%
+%\textbf{underestimates} the expected risk  $\mathbf{R}_{\mathrm{true}} (f)$.
+% 
+%Since we estimate the expected risk  $\mathbf{R}_{\mathrm{true}} (f)$ by using the empirical risk on the test set 
+%
+%
+%$$
+%\mathbf{R}_{\mathrm{emp}} (f, \mathbf{X}_{\mathrm{test}}, \mathbf{y}_{\mathrm{test}})
+%$$
+%
+%if the test risk is much larger than the training risk, this is an indication of overfitting.
+%	
+%\end{frame}
+
+
 \section{Evaluation}
 
 
@@ -340,6 +776,13 @@ The last chunk serves as the test set $\mathcal{V}$ (or validation)
 \end{figure}
 
 \end{frame}
+
+
+
+
+
+
+
 
 \subsection{Evaluation of text classification}
 
@@ -571,787 +1014,6 @@ Datasets have artifacts (spurious statistics) that can be exploited
 
 
 \end{frame}
-
-
-\section{Motivation}
-
-\begin{frame}{Quick poll}
-	
-	\begin{enumerate}
-		\item Who of you knows stochastic gradient descent and backpropagation?
-		\pause
-		\item Who of you ever implemented it from scratch?
-		\pause
-	\end{enumerate}
-	
-	How does this lecture relate to the previous one and to entire course?
-\end{frame}
-
-
-\begin{frame}{How deep will we go?}
-	
-	We won't cover
-	
-	\begin{itemize}
-		\item Set theory: The assembler of mathematics
-		\begin{itemize}
-			\item Sets $A = \{a, b, c\}$, $a \in A$, no ordering
-			\item Ordered tuples $(a, b) \neq (b, a)$
-		\end{itemize}
-		\pause
-		\item Number theory
-		\begin{itemize}
-			\item Set of natural numbers $\mathbb{N}_0 = \{0, 1, \ldots\}$
-			\item Set of real numbers $\mathbb{R}$, infinity
-		\end{itemize}
-		\pause
-		\item Sequences and limits
-	\end{itemize}
-	
-	$\mathbb{R}^2 = \mathbb{R} \times \mathbb{R}$ --- tuples of reals, e.g., $(1.3, -44.67)$, also a two-dimensional vector
-	
-	
-\end{frame}
-
-
-\section{Problem 1: Minimize functions}
-
-\begin{frame}{Why is it important?}
-
-In supervised machine learning ...
-	
-\pause
-
-	\begin{itemize}
-		\item We have some training data (e.g., for classification)
-		\item We have a learning algorithm
-		\item We want to minimize some kind of error (e.g., misclassification) of the learning algorithm on training data
-	\end{itemize}
-	
-\end{frame}
-
-
-\begin{frame}{Problem: Find minimum of any function}
-	
-	\includegraphics[width=0.7\linewidth]{img/desmos-graph1.pdf}
-	
-	\begin{itemize}
-		\item For "easy" functions, closed-form solution (high school math)
-		\item For complicated functions not trivial and cumbersome
-	\end{itemize}
-	
-	
-	
-\end{frame}
-
-
-
-
-
-
-
-\begin{frame}{Function of single variable}
-	
-	We typically use Euler's notation with arbitrary but somehow standard naming conventions ($x, y, f$)
-	
-	$y = f (x) \qquad f: \mathbb{R} \to \mathbb{R}$
-	
-	$f : A \to B$ where $A$ is domain, $B$ is co-domain
-	
-	\bigskip
-	
-	\begin{block}{Function composition}
-		$f: \mathbb{R} \to \mathbb{R} \quad g: \mathbb{R} \to \mathbb{R}$
-		
-		$h = g \circ f$
-		
-		$h(x) = g(f(x))$ or $(g \circ f)(x)= g(f(x))$
-	\end{block}
-	
-\end{frame}
-
-
-\begin{frame}{Lines in two dimensions}
-	
-	Lines in a Cartesian plane are characterized by linear equations.
-	
-	Every line $L$ (including vertical lines) is the set of all points whose coordinates $(x, y)$ satisfy a linear equation:
-	
-	$L=\{(x,y)\mid w_1 x+ w_2 y= w_3\}$
-	
-	where $w_1$, $w_2$ and $w_3$ are fixed real numbers (called coefficients) such that $w_1$ and $w_2$ are not both zero.
-	
-\end{frame}
-
-
-\begin{frame}{Linear function in two dimensions}
-	
-	Usually we use \textbf{slope-intercept} form $y= a x + b$
-	
-	
-	\begin{tikzpicture}
-		
-		\draw[->] (0,0)--(3,0) node[below]{$x$};
-		\draw[->] (0,0)--(0,3) node[left]{$y$};
-		\draw[-, thick] (1,0)--(2.5,2.5) node[left]{$y = ax + b$};
-		
-		
-		\draw
-		(2,1.666) coordinate (a)
-		-- (1,0) coordinate (b)
-		-- (2,0) coordinate (c)
-		pic["$\theta$", draw=black!40, thick, -, angle eccentricity=0.7, angle radius=1cm]
-		{angle=c--b--a};
-		
-		\begin{scope}[on background layer]
-			\path [fill=green!20] (1,0) -- (2.5,2.5) -- (2.5,0) -- cycle;
-		\end{scope}
-		
-	\end{tikzpicture}
-	
-	$\theta = \arctan (a) \qquad a = \tan (\theta)$
-	
-\end{frame}
-
-
-
-\begin{frame}{Approximate function by a line at point}
-	
-	%\includegraphics[width=0.5\linewidth]{img/f2.png}
-	
-	\includegraphics[width=0.7\linewidth]{img/desmos-graph1.pdf}
-	
-	
-	%3-\frac{\sin\left(2x\right)}{x}
-	
-	
-	"Steepness" at $c$?
-	$$f'(c) = \lim_{x \to c} \frac{f(x) - f(c)}{x - c}$$
-	The derivative of $f$ at $c$
-	
-	
-	
-	
-	
-\end{frame}
-
-
-\begin{frame}{Derivative-computing function}
-	
-	We want a function $D$ which, when given a differentiable function $f : \mathbb{R} \to \mathbb{R}$ as input, produces another function $g : \mathbb{R} \to \mathbb{R}$ output, such that $g(c) = f'(c)$ for every $c$.
-	
-	\bigskip
-	\pause
-	This derivative-computing function $D$ is often written as 
-	$$\frac{d}{dx}$$
-	but this causes inconsistent notation like
-	$$\frac{d}{dx}(f), \qquad \frac{df}{dx}, \qquad \frac{dy}{dx}$$
-	and forces one to choose a variable name $x$ or $y$
-	
-\end{frame}
-
-\begin{frame}{Derivative of nested functions: The chain rule hammer}
-	
-	%We "know" derivatives for trivial functions, e.g.
-	%$f: y =  x^2 \qquad \frac{dy}{dx} = 2 x$
-	
-	\begin{block}{Variant 1 (Lagrange's notation)}
-		Let $f, g : \mathbb{R} \to \mathbb{R}$ be two functions which have derivatives. Then the derivative of $g (f(x))$ is $g' (f(x)) \cdot f' (x)$
-	\end{block}
-	\pause
-	
-	\begin{block}{Variant 2 (Function composition operator $\circ$)}
-		Let $f, g : \mathbb{R} \to \mathbb{R}$ be two functions which have derivatives. Let $h = g \circ f$. The derivative of $h$ is $h'=(g \circ f)'=(g'\circ f)\cdot f'$
-	\end{block}
-	\pause
-	
-	\begin{block}{Variant 3 (Leibnitz's notation)}
-		Call $h(x) = g(f(x))$. Then using $\frac{dh}{dx}$ for the derivative of $h$, the chain rule for this would be $\frac{dh}{dx} = \frac{dh}{df} \frac{df}{dx}$
-	\end{block}
-	
-\end{frame}
-
-
-\begin{frame}{Chain rule example}
-	
-	Consider $y=e^{\sin(x^{2})}$. Composite of three functions:
-	$$
-	\begin{aligned}
-		y &= f(u) = e^u \\
-		u &= g(v) = \sin v = \sin (x^2) \\
-		v &= h(x) = x^2
-	\end{aligned}
-	$$
-	\pause
-	Their derivatives are
-	$$
-	\begin{aligned}
-		\frac{dy}{du} &= f'(u) = e^u = e^{\sin(x^{2})} \\
-		\frac{du}{dv} &= g'(v) = \cos v = \cos (x^2) \\
-		\frac{dv}{dx} &= h'(x) = 2x
-	\end{aligned}
-	$$
-\end{frame}
-
-
-\begin{frame}{Chain rule example (cont.)}
-	
-	Consider $y=e^{\sin(x^{2})}$. Composite of three functions:
-	$$y = f(u) = e^u, u = g(v) = \sin v = \sin (x^2), v = h(x) = x^2$$
-	Their derivatives are
-	$$\frac{dy}{du} = e^{\sin(x^{2})}, \frac{du}{dv} = \cos (x^2), \frac{dv}{dx} = 2x$$
-	
-	\pause
-	
-	Derivative of their composite at the point $x = a$ is (in Leibniz notation)
-	$$
-	{\frac {dy}{dx}}=\left.{\frac {dy}{du}}\right|_{u=g(h(a))}\cdot \left.{\frac {du}{dv}}\right|_{v=h(a)}\cdot \left.{\frac {dv}{dx}}\right|_{x=a}
-	$$
-	
-\end{frame}
-
-
-\begin{frame}{Gradient-based optimization: Find minimum\\ of a function}
-	
-	We want $\hat{x} = \argmin_x f(x)$
-	
-	Pre-requisites:
-	
-	\begin{itemize}
-		\item We can evaluate $y = f(x)$ for any $x$
-		\item We can evaluate its derivative $f'(c)$ (or $\frac{dy}{dx}(c)$) for any $c$
-	\end{itemize}
-	
-	\begin{figure}
-		\includegraphics[width=0.4\linewidth]{img/desmos-graph1.pdf}	
-		\caption{$3-\frac{\sin\left(2x\right)}{x}$}
-	\end{figure}
-	
-\end{frame}
-
-
-\begin{frame}{Gradient-based optimization: Find minimum\\ of a function}
-	
-	\includegraphics[width=0.4\linewidth]{img/desmos-graph1.pdf}
-	
-	
-	\begin{enumerate}
-		\item Start with initial random value $x_i$
-		\item $u = f'(x_i)$ --- direction and strength of change at $x_i$
-		\item Next value $x_{i + 1} \gets x_i - \eta \cdot u$
-		\item With small enough $\eta$ (eta), $f(x_{i+1}) < f(x_i)$
-	\end{enumerate}
-	Repeating 2 + 3 (with properly decreasing values of $\eta$) will find minimum point $x_i$
-	
-	
-	
-\end{frame}
-
-
-\begin{frame}{Gradient-based optimization: Workout example}
-	
-	\includegraphics[width=0.99\linewidth]{img/desmos-graph1.pdf}
-	
-	
-\end{frame}
-
-
-\section{Problem 2: Minimize multivariate functions}
-
-
-\begin{frame}{Multivariate functions}
-	
-	$f: \mathbb{R}^n \to \mathbb{R}$
-	
-	\pause
-	
-	\begin{figure}
-		\centering
-		\includegraphics[width=0.55\linewidth]{img/rosenbrock.pdf}
-		\caption{$f(x,y)=(a-x)^{2}+b(y-x^{2})^{2}, a = 1, b = 100$}
-		%https://colab.research.google.com/drive/1mlZtxPXuk3mls56CQArmDzjdp5bLbrJC?usp=sharing
-	\end{figure}
-\end{frame}
-
-
-
-
-\begin{frame}{Partial derivatives}
-	
-	Partial derivative: the directional derivative wrt.\ a single variable
-	
-	\bigskip
-	
-	$\pdv{f}{x_2}$ --- "the partial derivative of $f$ with respect to $x_2$"
-	
-	\bigskip
-	
-	\begin{block}{Example: $f(x_1, x_2, x_3) = (x_1)^2 x_2 + \cos(x_3)$}
-		$$
-		\pdv{f}{x_1} = 2 x_2 x_1 \qquad \pdv{f}{x_2} = (x_1)^2 \qquad \pdv{f}{x_3} = - \sin (x_3)
-		$$
-	\end{block}
-	
-	
-\end{frame}
-
-
-\begin{frame}{Gradient}
-	
-	\begin{block}{Example: $f(x_1, x_2, x_3) = (x_1)^2 x_2 + \cos(x_3)$}
-		$$
-		\pdv{f}{x_1} = 2 x_2 x_1 \qquad \pdv{f}{x_2} = (x_1)^2 \qquad \pdv{f}{x_3} = - \sin (x_3)
-		$$
-	\end{block}
-	
-	
-	The resulting total derivative matrix $Df$ is called the \textbf{gradient} of $f$, denoted $\nabla f$
-	
-	\begin{block}{Example: $f(x_1, x_2, x_3) = (x_1)^2 x_2 + \cos(x_3)$}
-		$$
-		\nabla f = \left( \pdv{f}{x_1} \quad \pdv{f}{x_2} \quad \pdv{f}{x_3} \right) = 
-		\left(
-		2 x_2 x_1  \quad (x_1)^2  \quad - \sin (x_3)
-		\right)
-		$$
-	\end{block}
-	
-	
-\end{frame}
-
-\begin{frame}{Gradient properties}
-	
-	\begin{block}{Example: $f(x_1, x_2, x_3) = (x_1)^2 x_2 + \cos(x_3)$}
-		$\nabla f = \left( \pdv{f}{x_1} \quad \pdv{f}{x_2} \quad \pdv{f}{x_3} \right) = 
-		\left(
-		2 x_2 x_1  \quad (x_1)^2  \quad - \sin (x_3)
-		\right)$
-	\end{block}
-	
-	For every differentiable function $f : \mathbb{R}^n \to \mathbb{R}$ and every point $\bm{x} \in \mathbb{R}^n$, the gradient $\nabla f(\bm{x})$ points in the direction of steepest ascent of $f$ at $\bm{x}$.
-	
-	\bigskip
-	
-	\begin{block}{Warning!}
-		Sometimes we call gradient the function for computing concrete values for a given input (as above), sometimes the vector of concrete numbers computed for the given input
-	\end{block}
-	
-	
-	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[ref] {\fullcite[p.~252]{Kun.2020} \par};
-	\end{tikzpicture}
-	
-\end{frame}
-
-\begin{frame}{Gradient descent for minimizing multivariate functions}
-	
-	Given $f: \mathbb{R}^n \to \mathbb{R}$ we want to find
-	$$\hat{\bm{x}} = \argmin_{\bm{x}} f(\bm{x})$$
-	
-	\begin{enumerate}
-		\item Start at some random position with a random value vector $\bm{x}_i = (x_1, \ldots, x_n)$
-		\item Compute the gradient and update the position
-		$$
-		\bm{x}_{i + 1} \gets \bm{x}_i - \eta \cdot \nabla f (\bm{x}_i)
-		$$
-		\item After enough iterations or some stopping criterion we have $\hat{\bm{x}}$
-	\end{enumerate}
-	
-	
-	
-\end{frame}
-
-\begin{frame}{Gradient descent for minimizing multivariate functions}
-	
-	\begin{figure}
-		\centering
-		\includegraphics[width=0.40\linewidth]{img/rosenbrock.pdf}
-		\caption{$f(x,y)=(a-x)^{2}+b(y-x^{2})^{2}, a = 1, b = 100$}
-		%https://colab.research.google.com/drive/1mlZtxPXuk3mls56CQArmDzjdp5bLbrJC?usp=sharing
-	\end{figure}
-	$$\nabla f = \left(-400xy+400x^3+2x-2; \quad 200y-200x^2 \right)$$
-	
-\end{frame}
-
-\begin{frame}{Gradient for minimizing multivariate functions}
-	
-	\includegraphics[width=0.99\linewidth]{img/gradient1.pdf}
-	
-	% https://colab.research.google.com/drive/1pTGjtbiQg3q08NGNkA7XgPMIQXf7uT76?usp=sharing	
-	
-	Random starting point $(-1.8; 1.5)$, minimum at $(1; 1)$
-	
-\end{frame}
-
-\section{Problem 3: When functions become heavily nested}
-
-
-\begin{frame}{In reality we work with deeply composed functions}
-	
-	\begin{example}
-		Minimize function $e$ wrt.\ $w_0, w_1, \ldots, w_K$
-		$$
-		e = - \frac{1}{N} \sum_{i = 1}^{N} y_{[i]} \log
-		\left(
-		\frac{1}{1 +
-			\exp\left( w_0 + \sum_{j=1}^{K} w_k \cdot \bm{x}_{[i][k]} \right)
-		}
-		\right)
-		$$
-		Where $\bm{x}_{[1]}, \ldots, \bm{x}_{[N]},$ and $y_{[1]}, \ldots, y_{[N]}$ are constants
-	\end{example}
-	
-	\pause
-	
-	$$
-	\nabla f = \left( \pdv{e}{w_0}; \pdv{e}{w_1}; \ldots; \pdv{e}{w_K} \right)
-	$$
-	
-	$\pdv{e}{w_1} = \ldots$ \pause Good luck!
-	
-\end{frame}
-
-
-\begin{frame}{Chain Rule for Multivariable Functions}
-	
-	
-	Suppose that $x=g(t)$ and $y=h(t)$ are differentiable functions of $t$ and $z=f(x,y)$ is a differentiable function of $x$ and $y$. Then $z=f(x(t),y(t))$ is a differentiable function of $t$ and
-	$$
-	\pdv{z}{t} =  \pdv{z}{x} \cdot \frac{dx}{dt} + \pdv{z}{y} \cdot \frac{dy}{dt}
-	$$
-	where the ordinary derivatives are evaluated at $t$ and the partial derivatives are evaluated at $(x,y)$.
-	
-	\pause
-	
-	\begin{block}{Be ready for possible notation madness}
-		$$
-		\pdv{f}{t} =  \pdv{f}{g} \pdv{g}{t} + \pdv{f}{h} \pdv{h}{t}
-		$$
-	\end{block}
-	
-\end{frame}
-
-
-\begin{frame}{Chain rule for multivariable functions \\ (two independent variables)}
-	
-	Suppose $x=g(u,v)$ and $y=h(u,v)$ are differentiable functions of $u$ and $v$, and $z=f(x,y)$ is a differentiable function of $x$ and $y$. Then, $z=f(g(u,v),h(u,v))$ is a differentiable function of $u$ and $v$, and
-	
-	$$
-	\frac{\partial z}{\partial u} = \frac{\partial z}{\partial x} \frac{\partial x}{\partial u} + \frac{\partial z}{\partial y} \frac{\partial y}{\partial u}
-	$$
-	$$
-	\frac{\partial z}{\partial v} = \frac{\partial z}{\partial x} \frac{\partial x}{\partial v} + \frac{\partial z}{\partial y} \frac{\partial y}{\partial v}
-	$$
-	
-\end{frame}
-
-\subsection{Efficient computation of gradient}
-
-\begin{frame}{Working example}
-	
-	$$
-	e = (a + b)(b + 1)
-	$$
-	
-	Compute gradient wrt.\ $a$ and $b$
-	
-	\bigskip
-	
-	\pause
-	
-	\begin{block}{This one is easy by hand, but that's not the point}
-		$$
-		e = (a + b)(b + 1) = ab + a + b^2 + b
-		$$
-		$$
-		\pdv{e}{a} = b + 1 \qquad \pdv{e}{b} = a + 2b + 1
-		$$
-	\end{block}
-	
-\end{frame}
-
-
-
-\begin{frame}{Add some intermediate variables and function names}
-	\includegraphics[width=1.2\linewidth]{img/backprop01.pdf}
-\end{frame}
-
-\begin{frame}{Build computational graph and evaluate (forward step)}
-	\includegraphics[width=1.2\linewidth]{img/backprop02.pdf}
-	
-	
-	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.3cm] {\scriptsize \textbf{Important:} $a, b$ will be some concrete real numbers, therefore $r, s, e$ will be concrete real numbers too! \par};
-	\end{tikzpicture}	
-	
-\end{frame}
-
-
-\begin{frame}{Computational graph}
-	\begin{itemize}
-		\item DAG --- directed acyclic graph (not necessarily a tree!)
-		\item Each node --- a differentiable function with arguments
-		\item Leaves --- variables (e.g., $a, b$) or constants
-		\item Arrows --- Function composition
-	\end{itemize}
-	
-	\begin{figure}
-		\includegraphics[width=0.75\linewidth]{img/parent-child.pdf}
-		\caption{$r, s$ are parents of $b$; $a, b$ are children (arguments) of $r$}
-	\end{figure}
-	
-	
-	
-\end{frame}
-
-\begin{frame}{Goal: $\pdv{e}{a}$ and $\pdv{e}{b}$ (gradient), but let's do $\pdv{e}{\star}$ for every node}
-	\includegraphics[width=1.2\linewidth]{img/backprop03.pdf}
-\end{frame}
-
-\begin{frame}{Since $e = r \cdot s$, par.\ derivatives are easy: $\pdv{e}{r} = s$ and $\pdv{e}{s} = r$}
-	\includegraphics[width=1.2\linewidth]{img/backprop04.pdf}
-	
-	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[anchor = north east, text width=4cm, yshift=-1.7cm] {\scriptsize \textbf{Sanity check:} $r, s$ are some concrete real numbers, therefore $\pdv{e}{r}$ and $\pdv{e}{s}$ will be concrete real numbers too! \par};
-	\end{tikzpicture}
-\end{frame}
-
-\begin{frame}{Proceed to next child $r$ and compute $\pdv{e}{r}$ -- use chain rule!}
-	\includegraphics[width=1.2\linewidth]{img/backprop05.pdf}
-	
-	
-\end{frame}
-
-\begin{frame}{Proceed to next child $s$ and compute $\pdv{e}{s}$ -- use chain rule!}
-	\includegraphics[width=1.2\linewidth]{img/backprop06.pdf}
-\end{frame}
-
-\begin{frame}{Since $r = a + b$, par.\ derivatives are easy: $\pdv{r}{a} = 1$ and $\pdv{r}{b} = 1$}
-	\includegraphics[width=1.2\linewidth]{img/backprop07.pdf}
-\end{frame}
-
-\begin{frame}{Proceed to next child $a$ and compute $\pdv{e}{a}$ -- use chain rule!}
-	\includegraphics[width=1.2\linewidth]{img/backprop08.pdf}
-\end{frame}
-
-\begin{frame}{Since $s = b + 1$, par.\ derivatives are easy: $\pdv{s}{b} = 1$}
-	\includegraphics[width=1.2\linewidth]{img/backprop09.pdf}
-\end{frame}
-
-\begin{frame}{Proceed to $b$ and compute $\pdv{e}{b}$ -- use multivariate chain rule!}
-	\includegraphics[width=1.2\linewidth]{img/backprop10.pdf}
-\end{frame}
-
-
-\begin{frame}{Goal: $\nabla e = \left( \pdv{e}{a}; \pdv{e}{b} \right)$ --- we computed it for concrete $a$ and $b$!}
-	\includegraphics[width=1.2\linewidth]{img/backprop10.pdf}
-\end{frame}
-
-
-\begin{frame}{Generic node in a computational graph}
-	
-	
-	
-	
-	
-	
-	\begin{figure}
-		\begin{tikzpicture}	
-			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
-			\node (a1) [neuron] {$a_1$};
-			\node (a2) [neuron, below of=a1] {$a_2$};
-			\node (dots1) [below of=a2] {$\ldots$};
-			\node (an) [neuron, below of=dots1] {$a_n$};
-			
-			\node (f) [neuron, right of=a2, xshift=1.5cm] {$f$};
-			
-			\node (h2) [neuron, right of=f, xshift=1.5cm] {$h_2$};
-			\node (h1) [neuron, above of=h2] {$h_1$};
-			\node (dots2) [below of=h2] {$\ldots$};
-			\node (hk) [neuron, below of=dots2] {$h_k$};
-			
-			% inputs
-			\node (a1in1) [left of=a1, yshift=0.2cm] {};
-			\node (a1in2) [left of=a1, yshift=-0.2cm] {};
-			
-			\node (a2in1) [left of=a2, yshift=0.2cm] {};
-			\node (a2in2) [left of=a2, yshift=-0.2cm] {};
-			
-			\node (anin1) [left of=an, yshift=0.2cm] {};
-			\node (anin2) [left of=an, yshift=-0.2cm] {};
-			
-			% outputs
-			\node (h1o1) [right of=h1, yshift=0.2cm] {};
-			\node (h1o2) [right of=h1, yshift=-0.2cm] {};
-			
-			\node (h2o1) [right of=h2, yshift=0.2cm] {};
-			\node (h2o2) [right of=h2, yshift=-0.2cm] {};
-			
-			\node (hko1) [right of=hk, yshift=0.2cm] {};
-			\node (hko2) [right of=hk, yshift=-0.2cm] {};
-			
-			
-			\begin{scope}[thick, black, ->, >=latex]
-				\draw (a1) -- (f);
-				\draw (a2) -- (f);
-				\draw (an) -- (f);
-				\draw (f) -- (h1);
-				\draw (f) -- (h2);
-				\draw (f) -- (hk);
-				
-				\draw (a1in1) -- (a1);
-				\draw (a1in2) -- (a1);
-				\draw (a2in1) -- (a2);
-				\draw (a2in2) -- (a2);
-				\draw (anin1) -- (an);
-				\draw (anin2) -- (an);
-				
-				\draw (h1) -- (h1o1);
-				\draw (h1) -- (h1o2);
-				\draw (h2) -- (h2o1);
-				\draw (h2) -- (h2o2);
-				\draw (hk) -- (hko1);
-				\draw (hk) -- (hko2);
-			\end{scope}	
-		\end{tikzpicture}
-		
-		
-		\caption{A generic node of a computation graph. Node $f$ has many inputs, its output
-			feeds into many nodes, and each of its inputs and outputs may also have many inputs
-			and outputs.}
-	\end{figure}
-	
-
-	\begin{tikzpicture}[overlay, remember picture] 
-		\node at (current page.north east)[ref] {Adapted from \fullcite[p.~265]{Kun.2020} \par};
-	\end{tikzpicture}
-	
-\end{frame}
-
-
-\begin{frame}{Generic node in a computational graph $f(a_1, \ldots, a_n)$}
-	
-	\begin{figure}
-		\scalebox{0.6}{%
-			\begin{tikzpicture}
-				%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
-				\node (a1) [neuron] {$a_1$};
-				\node (a2) [neuron, below of=a1] {$a_2$};
-				\node (dots1) [below of=a2] {$\ldots$};
-				\node (an) [neuron, below of=dots1] {$a_n$};
-				
-				\node (f) [neuron, right of=a2, xshift=1.5cm] {$f$};
-				
-				\node (h2) [neuron, right of=f, xshift=1.5cm] {$h_2$};
-				\node (h1) [neuron, above of=h2] {$h_1$};
-				\node (dots2) [below of=h2] {$\ldots$};
-				\node (hk) [neuron, below of=dots2] {$h_k$};
-				
-				% inputs
-				\node (a1in1) [left of=a1, yshift=0.2cm] {};
-				\node (a1in2) [left of=a1, yshift=-0.2cm] {};
-				
-				\node (a2in1) [left of=a2, yshift=0.2cm] {};
-				\node (a2in2) [left of=a2, yshift=-0.2cm] {};
-				
-				\node (anin1) [left of=an, yshift=0.2cm] {};
-				\node (anin2) [left of=an, yshift=-0.2cm] {};
-				
-				% outputs
-				\node (h1o1) [right of=h1, yshift=0.2cm] {};
-				\node (h1o2) [right of=h1, yshift=-0.2cm] {};
-				
-				\node (h2o1) [right of=h2, yshift=0.2cm] {};
-				\node (h2o2) [right of=h2, yshift=-0.2cm] {};
-				
-				\node (hko1) [right of=hk, yshift=0.2cm] {};
-				\node (hko2) [right of=hk, yshift=-0.2cm] {};
-				
-				
-				\begin{scope}[thick, black, ->, >=latex]
-					\draw (a1) -- (f);
-					\draw (a2) -- (f);
-					\draw (an) -- (f);
-					\draw (f) -- (h1);
-					\draw (f) -- (h2);
-					\draw (f) -- (hk);
-					
-					\draw (a1in1) -- (a1);
-					\draw (a1in2) -- (a1);
-					\draw (a2in1) -- (a2);
-					\draw (a2in2) -- (a2);
-					\draw (anin1) -- (an);
-					\draw (anin2) -- (an);
-					
-					\draw (h1) -- (h1o1);
-					\draw (h1) -- (h1o2);
-					\draw (h2) -- (h2o1);
-					\draw (h2) -- (h2o2);
-					\draw (hk) -- (hko1);
-					\draw (hk) -- (hko2);
-				\end{scope}	
-			\end{tikzpicture}
-		}
-	\end{figure}
-	
-	
-	Assuming the graph is a function $e = g(\ldots)$, we compute
-	$$\pdv{e}{f} = \sum_{i = 1}^{k} \pdv{e}{h_i} \cdot \pdv{h_i}{f}$$
-	and
-	$$\pdv{f}{a_i} \quad \text{for } a_i, \ldots, a_n$$
-	
-\end{frame}
-
-\begin{frame}{What each node must implement?}
-	
-	For example a function $s = f(a, b, c, d)$
-	
-	\begin{itemize}
-		\item How to compute the output value $s$ (given the parameters $a, b, c, d$)
-		\item How to compute partial derivatives wrt.\ the parameters, i.e. $\pdv{s}{a}, \pdv{s}{b}, \pdv{s}{c}, \pdv{s}{d}$
-	\end{itemize}
-	
-\end{frame}
-
-\begin{frame}{Backpropagation}
-	
-	\begin{itemize}
-		\item Forward computation: Compute all nodes' output (and cache it)
-		\item Backward computation (Backprop): Compute the overall function's partial derivative with respect to each node
-	\end{itemize}
-	
-	\bigskip
-	
-	Ordering of the computations? Recursively or build a graph's topology upfront and iterate
-	
-\end{frame}
-
-
-\begin{frame}{Backpropagation: Recap}
-	\begin{itemize}
-		\item We can express any arbitrarily complicated function $f: \mathbb{R}^n \to \mathbb{R}$ as a computational graph
-		\item For computing the gradient $\nabla f$ at a concrete point $(x_1, x_2, \ldots, x_n)$ we run the forward pass and backprop
-		\item When caching each node's intermediate output and partial derivatives, we avoid repeating computations $\to$ efficient algorithm
-	\end{itemize}
-\end{frame}
-
-
-\section*{Recap}
-
-\begin{frame}{Take aways}
-	
-	\begin{itemize}
-		
-		\item We can quite efficiently find a minimum of any differentiable nested multivariate function
-		\begin{itemize}
-			\item Iterative gradient descent takes the most promising direction
-			\item Backpropagation utilizes computational graphs and caching $\to$ computes gradients efficiently
-		\end{itemize}
-		\item We have not touched neural networks yet at all!
-	\end{itemize}
-	
-\end{frame}
-
 
 
 \begin{frame}{License and credits}
