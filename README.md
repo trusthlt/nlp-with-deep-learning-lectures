@@ -42,11 +42,11 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [YouTube video](https://www.youtube.com/watch?v=A_oS_7LnfD0)
 
 
-### Exercise 02: Classification evaluation, text generation evaluation (TO BE UPDATED)
+### Exercise 02: Classification evaluation, text generation evaluation
 
-2024-MM-DD
+2024-10-24
 
-* See the PDF (including LaTeX source) and Python code under [exercises/ex01](exercises/ex01)
+* See the PDF (including LaTeX source) and Python code under [exercises/ex02](exercises/ex02)
 
 
 
