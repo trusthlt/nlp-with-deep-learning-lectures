@@ -16,7 +16,7 @@ To see the previous full **2023/24** course content, checkout the [latest 2024 c
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: (TO BE DECIDED/UPDATED)
+Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcBSKkq8jxgUkP5Ted-_KrzI
 
 ## Lectures and exercises
 
@@ -39,7 +39,7 @@ Subscribe the YouTube playlist to get updates on new lectures: (TO BE DECIDED/UP
 2024-10-24
 
 * [Slides as PDF](/lecture01/pdf/nlpwdl2024-lecture02-handout.pdf)
-* YouTube TBD
+* [YouTube video](https://www.youtube.com/watch?v=A_oS_7LnfD0)
 
 
 ### Exercise 02: Classification evaluation, text generation evaluation (TO BE UPDATED)
