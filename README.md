@@ -83,15 +83,15 @@ Run the script `compile-pdf.sh` in each lecture's folder to produce both handout
 
 If you don't run a linux system or don't want to mess up your latex packages, I've tested compiling the slides in a Docker.
 
-Install Docker ( https://docs.docker.com/engine/install/ )
+Install Docker ( https://docs.docker.com/engine/install/ ), e.g. `apt-get install docker.io` and add the user do the `docker` group on Linux
 
 Create a folder to which you clone this repository (for example, `$ mkdir -p /tmp/slides`)
 
-Run Docker with Ubuntu 22.04 interactively; mount your slides directory under `/mnt` in this Docker container
+Run Docker with Ubuntu 24.04 interactively; mount your slides directory under `/mnt` in this Docker container
 
 ```plain
 $ docker run -it --rm --mount type=bind,source=/tmp/slides,target=/mnt \
-ubuntu:22.04 /bin/bash
+ubuntu:24.04 /bin/bash
 ```
 
 Once the container is running, update, install packages and fonts as above
