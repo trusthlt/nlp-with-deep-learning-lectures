@@ -49,6 +49,15 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * See the PDF (including LaTeX source) and Python code under [exercises/ex02](exercises/ex02)
 
 
+### Lecture 03: Mathematical foundations of deep learning
+
+2024-10-31
+
+* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2024-lecture03-handout.pdf)
+* [YouTube video TBD](https://www.youtube.com/watch?v=TBD)
+
+
+
 
 ## FAQ
 
