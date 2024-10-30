@@ -61,12 +61,12 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 ## Compiling slides to PDF
 
-If you run a linux distribution (e.g., Ubuntu 22.04 and newer), all packages are provided as part of `texlive`. Install the following packages
+If you run a linux distribution (e.g., Ubuntu 24.04 and newer), all packages are provided as part of `texlive`. Install the following packages
 
 ```plain
 $ sudo apt-get install texlive-latex-recommended texlive-pictures texlive-latex-extra \
 texlive-fonts-extra texlive-bibtex-extra texlive-humanities texlive-science \
-texlive-luatex biber wget -y
+texlive-luatex biber rubber wget -y
 ```
 
 * Install RUB fonts
@@ -99,10 +99,13 @@ Once the container is running, update, install packages and fonts as above
 ```plain
 # apt-get update && apt-get dist-upgrade -y && apt-get install texlive-latex-recommended \
 texlive-pictures texlive-latex-extra texlive-fonts-extra texlive-bibtex-extra \
-texlive-humanities texlive-science texlive-luatex biber wget -y
+texlive-humanities texlive-science texlive-luatex biber rubber wget -y
 ```
 
 Install RUB fonts as above
 
-Run the script `compile-pdf.sh` in each lecture's folder to produce both handouts as well as unfolding PDFs used in the lecture, which generates the PDFs in your local folder (e.g, `/tmp/slides`).
+Compile the output PDF with `lualatex` and `biber` (using `rubber` for orchestrating re-compilation easily)
 
+```plain
+$ rubber --module lualatex 20XX-XX-XX-who-where.tex
+```
