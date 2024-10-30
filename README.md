@@ -24,7 +24,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2024-10-17
 
-* [Slides as PDF](/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
 * No YouTube recording of the first lecture
 * We did not cover evaluation
 
@@ -38,7 +38,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2024-10-24
 
-* [Slides as PDF](/lecture01/pdf/nlpwdl2024-lecture02-handout.pdf)
+* [Slides as PDF](/lectures/lecture02/pdf/nlpwdl2024-lecture02-handout.pdf)
 * [YouTube video](https://www.youtube.com/watch?v=A_oS_7LnfD0)
 
 
