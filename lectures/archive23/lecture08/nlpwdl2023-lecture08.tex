@@ -650,7 +650,7 @@ This is the initial formulation of \textbf{dot-product} \textbf{encoder-decoder}
 		\begin{column}{0.7\textwidth}
 			\begin{enumerate}
 			\pause
-			\item Given the current decoder state $s^{\text{dec}}_t$ and encoder states $S^{\text{enc}} = \{s_i^{\text{enc}}\}_{i=1}^n$ 
+			\item Given the current decoder state $s^{\text{dec}}_t$ and encoder states $S^{\text{enc}} = \{s_i^{\text{enc}}\}_{i=1}^n$, 
 				compute the output of the attention mechanism $a_t = \sum_i^n \alpha_i s_i^{\text{enc}}$
 			\pause
 			\item \textbf{Concatenate} the output of attention and the current decoder state $\hat{s}_t^{\text{dec}} = [s^{\text{dec}}_t | a_t]$
@@ -689,8 +689,8 @@ This is the initial formulation of \textbf{dot-product} \textbf{encoder-decoder}
 \subsection{Abstracted attention mechanism}
 
 
-\begin{frame}{The attention mechanism: abstraction (Components)}
-
+\begin{frame}{The attention mechanism: abstraction}
+	Components of the attention mechanism
 	\begin{enumerate}
 		\item The \textbf{query} $q = f_q(s^{\text{dec}}_t); \quad q \in \mathbb{R}^{d_q}$
 		\begin{itemize}

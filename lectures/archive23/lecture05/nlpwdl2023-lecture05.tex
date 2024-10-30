@@ -528,7 +528,7 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 \begin{frame}{Simplifications in `classical' language models}
 	Despite factorization, the last term of
 	$
-	\Pr(w_{1:n}) = \Pr(w_1 | \text{<s>}) \Pr (w_2 | \text{<s>}, w_1) \Pr(w_3 | \text{<s>}, w_1, w_2) \cdots \Pr(w_k | \text{<s>}, w_1, w_2, \ldots, w_{n-1})
+\Pr(w_{1:n}) = \Pr(w_1 | \text{<s>}) \Pr (w_2 | \text{<s>}, w_1) \Pr(w_3 | \text{<s>}, w_1, w_2) \cdots \Pr(w_n | \text{<s>}, w_1, w_2, \ldots, w_{n-1})
 	$
 	still depends on all the previous words of the sequence
 	
@@ -551,7 +551,7 @@ We focus on Trustworthy Human Language Technologies \hfill \texttt{www.trusthlt.
 	\hat{P}_{\text{MLE}}(W_i = w | w_{i - k:i - 1}) = \frac{\#(w_{i-k} \quad w_{i-k+1} \quad \ldots \quad w_{i-1} \quad w)}{\#(w_{i-k} \quad w_{i-k+1} \quad \ldots \quad w_{i-1})}
 	$$
 	\begin{block}{What if $\#(w_{i-k} \quad w_{i-k+1} \quad \ldots \quad w_{i-1}) = 0$?}
-		\pause´
+\pause
 		Add-alpha smoothing ($0 \leq \alpha \leq 1$)
 		$$
 		\hat{P}_{\text{add-}\alpha}(W_i = w | w_{i - k:i - 1}) =
