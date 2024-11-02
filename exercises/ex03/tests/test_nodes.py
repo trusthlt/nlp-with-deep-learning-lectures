@@ -8,7 +8,7 @@ class TestNodes(TestCase):
     def test_task1(self):
         value = 2
         # --- TASK_1 ---
-        
+        value = 1
         # --- TASK_1 ---
         self.assertEqual(1, value)
 
@@ -47,7 +47,12 @@ class TestNodes(TestCase):
         # dummy initialization
         a, b, one, r, s, e = [ConstantNode(1)] * 6
         # --- TASK_4 ---
-
+        a = ConstantNode(2)
+        b = ConstantNode(3)
+        one = ConstantNode(1)
+        r = SumNode([a, b])
+        s = SumNode([b, one])
+        e = ProductNode([r, s])
         # --- TASK_4 ---
 
         # test that b has two parents
