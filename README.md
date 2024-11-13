@@ -54,9 +54,12 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2024-10-31
 
 * [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2024-lecture03-handout.pdf)
-* [YouTube video TBD](https://www.youtube.com/watch?v=TBD)
+* [YouTube video from 2023 edition](https://www.youtube.com/watch?v=viej0VnvwMY)
 
+### Lecture 04: Text classification with log-linear models
 
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture04-handout.pdf)
+* [YouTube video TBD](https://www.youtube.com/watch?v=)
 
 
 ## FAQ
