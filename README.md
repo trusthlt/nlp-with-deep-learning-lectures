@@ -56,10 +56,24 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2024-lecture03-handout.pdf)
 * [YouTube video from 2023 edition](https://www.youtube.com/watch?v=viej0VnvwMY)
 
+### Exercise 03: Computational graph and derivatives
+
+2024-10-31
+
+* See the Python project under [exercises/ex03](exercises/ex03)
+
 ### Lecture 04: Text classification with log-linear models
+
+2024-11-14
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture04-handout.pdf)
 * [YouTube video TBD](https://www.youtube.com/watch?v=)
+
+### Exercise 04: Log-linear model and backprop
+
+2024-10-31
+
+* See the Python project under [exercises/ex04](exercises/ex04)
 
 
 ## FAQ
