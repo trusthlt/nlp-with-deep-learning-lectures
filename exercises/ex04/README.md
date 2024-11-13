@@ -1,4 +1,4 @@
-# NLPwDL 2024/26 Exercise 04
+# NLPwDL 2024/25 Exercise 04
 
 Gradient of a log-linear function with input (features), binary output value (gold label), and logistic loss
 
