@@ -4,7 +4,7 @@ Gradient of a log-linear function with input (features), binary output value (go
 
 Note: This repository re-uses our code from Exercise 3, such as the ScalarNode and efficient implementation of backpropagation with caching.
 
-We renamed the unit test file `test_nodes.py` from Exercise 2 to `test_tasks_ex2.py`. These unit tests must keep working!
+We renamed the unit test file `test_nodes.py` from Exercise 3 to `test_tasks_ex3.py`. These unit tests must keep working!
 
 Changes from ex03: I renamed `arguments` in `ScalarNode` to `children`. We will use not only the arguments of a function (e.g., $x$ is an argument of $y = a x + b$) but also the parameters (e.g., $a$ is a parameter in the previous example). Both arguments and parameters are children of a node and thus must smoothly propagate gradients during backpropagation.
 
