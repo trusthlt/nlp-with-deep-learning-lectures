@@ -67,7 +67,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2024-11-14
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture04-handout.pdf)
-* [YouTube video TBD](https://www.youtube.com/watch?v=)
+* [YouTube video](https://www.youtube.com/watch?v=UASyReidhqM)
 
 ### Exercise 04: Log-linear model and backprop
 
