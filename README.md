@@ -75,6 +75,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * See the Python project under [exercises/ex04](exercises/ex04)
 
+### Lecture 05: Feed-forward network and language modeling
+
+2024-11-21
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture05-handout.pdf)
+* [YouTube video TBD]()
+
+
 
 ## FAQ
 
