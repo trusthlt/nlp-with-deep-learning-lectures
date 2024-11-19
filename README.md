@@ -82,6 +82,12 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture05-handout.pdf)
 * [YouTube video TBD]()
 
+### Exercise 05: SGD, layers, softmax, binary classification
+
+2024-11-21
+
+* See the Python project under [exercises/ex05](exercises/ex04)
+
 
 
 ## FAQ
