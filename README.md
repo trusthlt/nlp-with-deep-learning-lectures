@@ -80,7 +80,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2024-11-21
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture05-handout.pdf)
-* [YouTube video TBD]()
+* [YouTube video TBD](https://www.youtube.com/watch?v=0cHYQgOTYFw)
 
 ### Exercise 05: SGD, layers, softmax, binary classification
 
@@ -88,6 +88,12 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * See the Python project under [exercises/ex05](exercises/ex04)
 
+### Lecture 06: Neural language models and learning word embeddings
+
+2024-11-28
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture06-handout.pdf)
+* [YouTube video TBD]()
 
 
 ## FAQ

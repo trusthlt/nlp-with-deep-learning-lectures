@@ -255,364 +255,6 @@ Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
 \maketitle
 
 
-
-\section{Language modeling}
-
-
-\begin{frame}{Recap: What was the task of a language model again?}
-
-\begin{block}{LM as a conditional probability predictor}
-Given a sequence of $k$ words, return a probability distribution over $V$ (the vocabulary) for the next possible word
-\end{block}
-
-In detail, compute
-$$
-\Pr(W_{\text{next}} = v \mid W_1, W_2, \ldots, W_k)
-$$
-for all possible words $v$ from vocabulary $V$
-
-\end{frame}
-
-
-
-\begin{frame}{Example}
-
-\emph{So I was at this party at Joe's place last night, but man I was so tired, so like at about midnight I said, Joe, I'm \_\_}
-
-$\Pr(W_{\text{next}} = v \mid W_1 = \text{`So'}, W_2 = \text{`I'}, \ldots)$
-
-\medskip
-
-\begin{columns}[t]
-\begin{column}{0.5\linewidth}
-Higher $\Pr$:
-\begin{itemize}
-\item leaving
-\item out
-\item calling \emph{(it a night)}
-\item gonna \emph{(head home)}
-\item $\ldots$
-\end{itemize}
-\end{column}
-\begin{column}{0.5\linewidth}
-Lower $\Pr$:
-\begin{itemize}
-\item hungry
-\item in \emph{(love)}
-\item $\ldots$
-\end{itemize}
-\end{column}
-
-\end{columns}
-
-\end{frame}
-
-
-
-\begin{frame}{LM looks like... a text classification task!}
-
-\begin{block}{Text classification}
-Given a text (we know how to turn in into a feature vector), predict \textbf{its label} from a set of arbitrarily ordered categories (\textbf{e.g., \{neg, neu, pos\}}). We typically predict probability for each \textbf{label} by using softmax over the \textbf{categories}.
-\end{block}
-\pause
-
-\begin{block}{LM}
-Given a text (we know how to turn in into a feature vector), predict \textbf{the next word} from a set of arbitrarily ordered categories (\textbf{the vocabulary}). We typically predict probability for each \textbf{word} by using softmax over the \textbf{vocabulary}.
-\end{block}
-
-\end{frame}
-
-
-
-\subsection{Neural language models}
-
-\begin{frame}{Neural LMs}
-
-\begin{block}{LM as `text classification' again}
-Given a text (we know how to turn in into a feature vector), predict \textbf{the next word} from a set of arbitrarily ordered categories (\textbf{the vocabulary}). We typically predict probability for each \textbf{word} by using softmax over the \textbf{vocabulary}.
-\end{block}
-	
-Let's build a neural network to solve this task
-\pause
-	\begin{itemize}
-		\item Input: a $k$-gram of words $w_{1:k}$
-		\item Desired output: a probability distribution over the vocabulary $V$ for the next word $w_{k+1}$
-	\end{itemize}
-	
-\end{frame}
-
-\begin{frame}{Embedding layer}
-	
-	If the input are symbolic \textbf{categorical features}
-	\begin{itemize}
-		\item e.g., words from a closed vocabulary
-	\end{itemize}
-	it is common to associate each possible feature value
-	\begin{itemize}
-		\item i.e., each word in the vocabulary
-	\end{itemize}
-	with a $d$-dimensional vector for some $d$
-	
-	\bigskip
-	
-	These vectors are also \emph{parameters} of the model, and are trained jointly with the other parameters
-	
-\end{frame}
-
-\begin{frame}{Embedding layer: Lookup operation}
-	
-	Mapping from a symbolic feature such as \texttt{word-number-48} to $d$-dimensional vectors is performed by an embedding layer (a lookup layer)
-	
-	The parameters in an embedding layer is a matrix $\bm{E}^{\abs{V} \times d}$, each row corresponds to a different word in the vocabulary
-	
-	The lookup operation is then indexing $v(w)$, e.g.,
-	$$v(w) = v_{48} = \bm{E}_{[48,:]}$$
-	
-	If the symbolic feature is a one-hot vector $\bm{x}$, the lookup operation can be implemented as the multiplication $\bm{x} \bm{E}$
-	
-\end{frame}
-
-
-\begin{frame}{Network concatenating 3 words as embeddings ($d_w = 50$)}
-	\vspace{-1em}
-	%	$$	f(\bm{x}) = g \left(	\bm{x} \bm{W^1} + \bm{b^1}	\right)	\bm{W^2} + \bm{b^2}	$$
-	\begin{figure}
-		\begin{tikzpicture}	
-			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
-			
-			\node (the) {the};
-			\node (black) [below of=the, yshift=-0.5cm]{black};
-			\node (dog) [below of=black, yshift=-0.5cm]{dog};
-			\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
-			
-			\node (lookup1) [neuron, right of=the, xshift=1.5cm] {lookup};
-			\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {lookup};
-			\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {lookup};			
-			\node (concat) [neuron, right of=lookup1, xshift=1cm, yshift=-1cm] {concat};
-			
-			
-			%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
-			\node (w) [param, below of=concat, yshift=-0.2cm] {$\bm{W^1}$};
-			\node (b) [param, below of=w] {$\bm{b^1}$};
-			
-			\node (f1) [neuron, right of=w, xshift=1.5cm] {$g(\bm{x} \bm{W^1} + \bm{b^1})$};
-			
-			\node (f2) [neuron, right of=f1, xshift=3cm] {$\softmax(\bm{h^1} \bm{W^2} + \bm{b^2})$};
-			
-			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
-			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
-			
-			\node (l) [neuron, right of=f2, xshift=2cm] {$L$};
-			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
-			
-			\begin{scope}[thick, black, ->, >=latex]
-				\draw (the) -- (lookup1);
-				\draw (black) -- (lookup2);
-				\draw (dog) -- (lookup3);
-				\draw (e) -- (lookup1);
-				\draw (e) -- (lookup2);
-				\draw (e) -- (lookup3);
-				
-				\draw (lookup1) -- (concat);
-				\draw (lookup2) -- (concat);
-				\draw (lookup3) -- (concat);								
-				
-				\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
-				\draw (w) -- (f1);
-				\draw (b) -- (f1);
-				\draw (f1) -- (f2);
-				\draw (f2) -- (l);
-				\draw (w2) -- (f2);
-				\draw (b2) -- (f2);
-				\draw (y) -- (l);
-			\end{scope}	
-		\end{tikzpicture}
-	\end{figure}	
-	
-	Each word $\in \mathbb{R}^{\abs{V}}$ (one hot), 
-	$\bm{E} \in \mathbb{R}^{\abs{V} \times 50}$, each lookup output $\in \mathbb{R}^{50}$, concat output $\bm{x} \in \mathbb{R}^{150}$
-	
-	
-\end{frame}
-
-
-
-\begin{frame}{Simplify notation: Lookup as $v$, linear layer with params}
-	\vspace{-1em}
-	%	$$	f(\bm{x}) = g \left(	\bm{x} \bm{W^1} + \bm{b^1}	\right)	\bm{W^2} + \bm{b^2}	$$
-	\begin{figure}
-		\begin{tikzpicture}	
-			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
-			
-			\node (the) [constant] {the};
-			\node (black) [constant, below of=the, yshift=-0.5cm]{black};
-			\node (dog) [constant, below of=black, yshift=-0.5cm]{dog};
-			\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
-			
-			\node (lookup1) [neuron, right of=the, xshift=0.7cm] {$v$};
-			\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {$v$};
-			\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {$v$};			
-			\node (concat) [neuron, right of=lookup1, xshift=0.5cm, yshift=-1cm] {concat};
-			
-			
-			%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
-			\node (f1) [param, right of=concat, xshift=1.5cm] {Lin$(\bm{W^1};\bm{b^1})$};
-			
-			\node (g) [neuron, right of=f1, xshift=1cm] {$g$};
-			\node (f2) [param, right of=g, xshift=1cm] {Lin$(\bm{W^2};\bm{b^2})$};
-			
-			\node (softmax) [neuron, right of=f2, xshift=1.5cm] {$\softmax$};
-			
-			\node (l) [neuron, right of=softmax, xshift=1cm] {$L$};
-			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y} =$ barks};
-			
-			\begin{scope}[thick, black, ->, >=latex]
-				\draw (the) -- (lookup1);
-				\draw (black) -- (lookup2);
-				\draw (dog) -- (lookup3);
-				\draw (e) -- (lookup1);
-				\draw (e) -- (lookup2);
-				\draw (e) -- (lookup3);
-				
-				\draw (lookup1) -- (concat);
-				\draw (lookup2) -- (concat);
-				\draw (lookup3) -- (concat);								
-				
-				\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
-				\draw (f1) -- (g);
-				\draw (g) -- (f2);
-				\draw (f2) -- (softmax);
-				\draw (softmax) -- (l);
-				\draw (y) -- (l);
-			\end{scope}	
-		\end{tikzpicture}
-	\end{figure}	
-	
-	the, black, dog, $\bm{y}$ = one-hot encoding, $\mathbb{R}^{\abs{V}}$
-	
-	Loss $L$ and gold label $\bm{y}$ --- only for training
-\end{frame}
-
-\begin{frame}{Neural LMs: Input fix-sized feature vector}
-	
-
-Each input word $w_k$ is associated with an embedding vector $v(w) \in \mathbb{R}^{d_w}$ ($d_w$ --- word embedding dimensionality)
-
-Input vector $\bm{x}$ is a concatenation of $k$ words
-$$
-\bm{x} = \left[ v(w_1); v(w_2); \ldots; v(w_k) \right]
-$$
-	
-\end{frame}
-
-\begin{frame}{Neural LMs}
-	
-	MLP with one (or more) hidden layers
-	
-	$$
-	\begin{aligned}
-		v(w) &= \bm{E}_{w,:} \\
-		\bm{x} &= \left[ v(w_1); v(w_2); \ldots; v(w_k) \right] \\
-		\bm{h} &= g(\bm{x} \bm{W^1} + \bm{b^1}) \\
-		\hat{\bm{y}} = \Pr(W_i \mid w_{1:k}) &= \softmax (\bm{h} \bm{W^2} + \bm{b^2})
-	\end{aligned}
-	$$
-	
-	Output dimension: $\hat{\bm{y}} \in \mathbb{R}^{\abs{V}}$
-	
-\end{frame}
-
-\begin{frame}{Training neural LMs}
-	
-	Where to get training examples?
-	
-	Training examples are simply word $k$-grams from an unlabeled corpus
-	\begin{itemize}
-		\item Identities of the first $k - 1$ words are used as features
-		\item The last word is used as the target label for the classification
-	\end{itemize}
-	
-	The model is trained using cross-entropy loss
-\end{frame}
-
-\begin{frame}{Some advantages of neural LMs}
-	
-$\approx$ linear increase in parameters with $k + 1$ (better than `classical' LMs)
-	
-\end{frame}
-
-\begin{frame}{Generating text with language models}
-	
-	We can generate (``sample") random sentences from the model according to their probability
-	
-	\begin{enumerate}
-		\item Predict a probability distribution over the vocabulary conditioned on the start symbol <s>
-		\item Draw the first word from the predicted distribution
-		\item Predict a probability distribution over the vocabulary conditioned on the start symbol and the first word
-		\item Draw the second word from the predicted distribution
-		\item Repeat until generated \emph{end-of-sentence} symbol </s> (or <EOS>)
-	\end{enumerate}
-	
-	
-\end{frame}
-
-\begin{frame}{Learned word representations as a by-product}
-\vspace{-1em}
-\begin{figure}
-\begin{tikzpicture}	
-	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
-	
-	\node (the) [constant] {the};
-	\node (black) [constant, below of=the, yshift=-0.5cm]{black};
-	\node (dog) [constant, below of=black, yshift=-0.5cm]{dog};
-	\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
-	
-	\node (lookup1) [neuron, right of=the, xshift=0.7cm] {$v$};
-	\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {$v$};
-	\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {$v$};			
-	\node (concat) [neuron, right of=lookup1, xshift=0.5cm, yshift=-1cm] {concat};
-	
-	
-	%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
-	\node (f1) [param, right of=concat, xshift=1.5cm] {Lin$(\bm{W^1};\bm{b^1})$};
-	
-	\node (g) [neuron, right of=f1, xshift=1cm] {$g$};
-	\node (f2) [param, right of=g, xshift=1cm] {Lin$(\bm{W^2};\bm{b^2})$};
-	
-	\node (softmax) [neuron, right of=f2, xshift=1.5cm] {$\softmax$};
-	
-	\node (l) [neuron, right of=softmax, xshift=1cm] {$L$};
-	\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y} =$ barks};
-	
-	\begin{scope}[thick, black, ->, >=latex]
-		\draw (the) -- (lookup1);
-		\draw (black) -- (lookup2);
-		\draw (dog) -- (lookup3);
-		\draw (e) -- (lookup1);
-		\draw (e) -- (lookup2);
-		\draw (e) -- (lookup3);
-		
-		\draw (lookup1) -- (concat);
-		\draw (lookup2) -- (concat);
-		\draw (lookup3) -- (concat);								
-		
-		\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
-		\draw (f1) -- (g);
-		\draw (g) -- (f2);
-		\draw (f2) -- (softmax);
-		\draw (softmax) -- (l);
-		\draw (y) -- (l);
-	\end{scope}	
-\end{tikzpicture}
-\end{figure}
-	
-Each row of $\bm{E}$ learns a word representation
-	
-	
-\end{frame}
-
-\section{Word embeddings}
-
 \begin{frame}{Motivation}
 
 I give you a large corpus of plain text data
@@ -628,8 +270,7 @@ Can you build a model that will answer any of the `word analogy' tasks?
 
 
 
-\section{We need to talk about the dot product}
-
+\section{We need to talk about the dot product first}
 
 
 \begin{frame}{Geometry of dot product}
@@ -858,7 +499,340 @@ $\to$ Minimizing (square) euclidean distance is \emph{proportional} to maximizin
 \end{frame}
 
 
-\section{Distributional hypothesis}
+
+
+
+
+\section{Language modeling revisited}
+
+
+\begin{frame}{Recap: What was the task of a language model again?}
+
+\begin{block}{LM as a conditional probability predictor}
+Given a sequence of $k$ words, return a probability distribution over $V$ (the vocabulary) for the next possible word
+\end{block}
+
+In detail, compute
+$$
+\Pr(W_{k+1} = v \mid W_1, W_2, \ldots, W_k)
+$$
+for all possible words $v$ from vocabulary $V$
+
+\end{frame}
+
+
+
+\begin{frame}{Example}
+
+\emph{So I was at this party at Joe's place last night, but man I was so tired, so like at about midnight I said, Joe, I am \_\_}
+
+$\Pr(W_{k+1} = v \mid W_1 = \text{`So'}, W_2 = \text{`I'}, \ldots, W_k = \text{`am'})$
+
+\medskip
+
+\begin{columns}[t]
+\begin{column}{0.5\linewidth}
+Higher $\Pr$:
+\begin{itemize}
+\item leaving
+\item out
+\item calling \emph{(it a night)}
+\item gonna \emph{(head home)}
+\item $\ldots$
+\end{itemize}
+\end{column}
+\begin{column}{0.5\linewidth}
+Lower $\Pr$:
+\begin{itemize}
+\item hungry
+\item in \emph{(love)}
+\item $\ldots$
+\end{itemize}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+
+\begin{frame}{LM looks like... a text classification task?!}
+
+\begin{block}{Text classification}
+Given a text,$^*$ predict \textbf{its label} from a set of arbitrarily ordered items (\textbf{classes such as \{sports, politics, travel\}}). We model cond.\ probability for each \textbf{label} (a probability distribution over \textbf{all the classes}), for example by softmax.
+\end{block}
+\pause
+
+\begin{block}{LM}
+Given a text,$^*$ predict \textbf{the next word} from a set of arbitrarily ordered items (\textbf{the vocabulary}).
+We model cond.\ probability for each \textbf{word} (a probability distribution over \textbf{the entire vocabulary}), for example by softmax.
+\end{block}
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {$^*$ We already know how to turn text into a feature vector, e.g., by bag of words \par};
+\end{tikzpicture}
+
+
+
+\end{frame}
+
+
+
+\subsection{Neural language models}
+
+\begin{frame}{Neural LMs}
+
+\begin{block}{LM as `text classification' again}
+Given a text,$^*$ predict \textbf{the next word} from a set of arbitrarily ordered items (\textbf{the vocabulary}).
+We model cond.\ probability for each \textbf{word} (a probability distribution over \textbf{the entire vocabulary}), for example by softmax.
+\end{block}
+	
+Let's build a neural network to solve this task
+\pause
+	\begin{itemize}
+		\item Input: a $k$-gram of words $w_{1:k}$
+		\item Desired output: a conditional probability distribution over the vocabulary $V$ for the next word $w_{k+1}$
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}{Embedding layer}
+	
+	If the input are symbolic \textbf{categorical features}
+	\begin{itemize}
+		\item e.g., words from a closed vocabulary
+	\end{itemize}
+	it is common to associate each possible feature value
+	\begin{itemize}
+		\item i.e., each word in the vocabulary
+	\end{itemize}
+	with a $d$-dimensional vector for some $d$
+	
+	\bigskip
+	
+	These vectors are also \emph{parameters} of the model, and are trained jointly with the other parameters
+	
+\end{frame}
+
+\begin{frame}{Embedding layer: Lookup operation}
+	
+	Mapping from a symbolic feature such as \texttt{word-number-48} to $d$-dimensional vectors is performed by an embedding layer (a lookup layer)
+	
+	The parameters in an embedding layer is a matrix $\bm{E}^{\abs{V} \times d}$, each row corresponds to a different word in the vocabulary
+	
+	The lookup operation is then indexing $v(w)$, e.g.,
+	$$v(w) = v_{48} = \bm{E}_{[48,:]}$$
+	
+	If the symbolic feature is a one-hot vector $\bm{x}$, the lookup operation can be implemented as the multiplication $\bm{x} \bm{E}$
+	
+\end{frame}
+
+
+\begin{frame}{Network concatenating 3 words as embeddings ($d_w = 50$)}
+	\vspace{-1em}
+	%	$$	f(\bm{x}) = g \left(	\bm{x} \bm{W^1} + \bm{b^1}	\right)	\bm{W^2} + \bm{b^2}	$$
+	\begin{figure}
+		\begin{tikzpicture}	
+			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+			
+			\node (the) {the};
+			\node (black) [below of=the, yshift=-0.5cm]{black};
+			\node (dog) [below of=black, yshift=-0.5cm]{dog};
+			\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
+			
+			\node (lookup1) [neuron, right of=the, xshift=1.5cm] {lookup};
+			\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {lookup};
+			\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {lookup};			
+			\node (concat) [neuron, right of=lookup1, xshift=1cm, yshift=-1cm] {concat};
+			
+			
+			%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
+			\node (w) [param, below of=concat, yshift=-0.2cm] {$\bm{W^1}$};
+			\node (b) [param, below of=w] {$\bm{b^1}$};
+			
+			\node (f1) [neuron, right of=w, xshift=1.5cm] {$g(\bm{x} \bm{W^1} + \bm{b^1})$};
+			
+			\node (f2) [neuron, right of=f1, xshift=3cm] {$\softmax(\bm{h^1} \bm{W^2} + \bm{b^2})$};
+			
+			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
+			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
+			
+			\node (l) [neuron, right of=f2, xshift=2cm] {$L$};
+			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
+			
+			\begin{scope}[thick, black, ->, >=latex]
+				\draw (the) -- (lookup1);
+				\draw (black) -- (lookup2);
+				\draw (dog) -- (lookup3);
+				\draw (e) -- (lookup1);
+				\draw (e) -- (lookup2);
+				\draw (e) -- (lookup3);
+				
+				\draw (lookup1) -- (concat);
+				\draw (lookup2) -- (concat);
+				\draw (lookup3) -- (concat);								
+				
+				\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
+				\draw (w) -- (f1);
+				\draw (b) -- (f1);
+				\draw (f1) -- (f2);
+				\draw (f2) -- (l);
+				\draw (w2) -- (f2);
+				\draw (b2) -- (f2);
+				\draw (y) -- (l);
+			\end{scope}	
+		\end{tikzpicture}
+	\end{figure}	
+	
+	Each word $\in \mathbb{R}^{\abs{V}}$ (one hot), 
+	$\bm{E} \in \mathbb{R}^{\abs{V} \times 50}$, each lookup output $\in \mathbb{R}^{50}$, concat output $\bm{x} \in \mathbb{R}^{150}$
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Simplify notation: Lookup as $v$, linear layer with params}
+	\vspace{-1em}
+	%	$$	f(\bm{x}) = g \left(	\bm{x} \bm{W^1} + \bm{b^1}	\right)	\bm{W^2} + \bm{b^2}	$$
+	\begin{figure}
+		\begin{tikzpicture}	
+			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+			
+			\node (the) [constant] {the};
+			\node (black) [constant, below of=the, yshift=-0.5cm]{black};
+			\node (dog) [constant, below of=black, yshift=-0.5cm]{dog};
+			\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
+			
+			\node (lookup1) [neuron, right of=the, xshift=0.7cm] {$v$};
+			\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {$v$};
+			\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {$v$};			
+			\node (concat) [neuron, right of=lookup1, xshift=0.5cm, yshift=-1cm] {concat};
+			
+			
+			%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
+			\node (f1) [param, right of=concat, xshift=1.5cm] {Lin$(\bm{W^1};\bm{b^1})$};
+			
+			\node (g) [neuron, right of=f1, xshift=1cm] {$g$};
+			\node (f2) [param, right of=g, xshift=1cm] {Lin$(\bm{W^2};\bm{b^2})$};
+			
+			\node (softmax) [neuron, right of=f2, xshift=1.5cm] {$\softmax$};
+			
+			\node (l) [neuron, right of=softmax, xshift=1cm] {$L$};
+			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y} =$ barks};
+			
+			\begin{scope}[thick, black, ->, >=latex]
+				\draw (the) -- (lookup1);
+				\draw (black) -- (lookup2);
+				\draw (dog) -- (lookup3);
+				\draw (e) -- (lookup1);
+				\draw (e) -- (lookup2);
+				\draw (e) -- (lookup3);
+				
+				\draw (lookup1) -- (concat);
+				\draw (lookup2) -- (concat);
+				\draw (lookup3) -- (concat);								
+				
+				\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
+				\draw (f1) -- (g);
+				\draw (g) -- (f2);
+				\draw (f2) -- (softmax);
+				\draw (softmax) -- (l);
+				\draw (y) -- (l);
+			\end{scope}	
+		\end{tikzpicture}
+	\end{figure}	
+	
+	the, black, dog, $\bm{y}$ = one-hot encoding, $\mathbb{R}^{\abs{V}}$
+	
+	Loss $L$ and gold label $\bm{y}$ --- only for training
+\end{frame}
+
+
+\begin{frame}{Training neural LMs}
+	
+	Where to get training examples?
+	
+	Training examples are simply word $k$-grams from an unlabeled corpus
+	\begin{itemize}
+		\item Identities of the first $k - 1$ words are used as features
+		\item The last word is used as the target label for the classification
+	\end{itemize}
+	
+	The model is trained using cross-entropy loss
+\end{frame}
+
+\begin{frame}{Some advantages of neural LMs}
+	
+$\approx$ linear increase in parameters with $k + 1$ (better than `classical' LMs)
+	
+\end{frame}
+
+
+
+\begin{frame}{Learned word representations as a by-product}
+\vspace{-1em}
+\begin{figure}
+\begin{tikzpicture}	
+	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	
+	\node (the) [constant] {the};
+	\node (black) [constant, below of=the, yshift=-0.5cm]{black};
+	\node (dog) [constant, below of=black, yshift=-0.5cm]{dog};
+	\node (e) [param, below of=dog, yshift=-0.1cm] {$\bm{E}$};
+	
+	\node (lookup1) [neuron, right of=the, xshift=0.7cm] {$v$};
+	\node (lookup2) [neuron, below of=lookup1, yshift=-0.5cm] {$v$};
+	\node (lookup3) [neuron, below of=lookup2, yshift=-0.5cm] {$v$};			
+	\node (concat) [neuron, right of=lookup1, xshift=0.5cm, yshift=-1cm] {concat};
+	
+	
+	%			\node (x) [constant, right of=concat, xshift=1cm] {$\bm{x}$};
+	\node (f1) [param, right of=concat, xshift=1.5cm] {Lin$(\bm{W^1};\bm{b^1})$};
+	
+	\node (g) [neuron, right of=f1, xshift=1cm] {$g$};
+	\node (f2) [param, right of=g, xshift=1cm] {Lin$(\bm{W^2};\bm{b^2})$};
+	
+	\node (softmax) [neuron, right of=f2, xshift=1.5cm] {$\softmax$};
+	
+	\node (l) [neuron, right of=softmax, xshift=1cm] {$L$};
+	\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y} =$ barks};
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (the) -- (lookup1);
+		\draw (black) -- (lookup2);
+		\draw (dog) -- (lookup3);
+		\draw (e) -- (lookup1);
+		\draw (e) -- (lookup2);
+		\draw (e) -- (lookup3);
+		
+		\draw (lookup1) -- (concat);
+		\draw (lookup2) -- (concat);
+		\draw (lookup3) -- (concat);								
+		
+		\draw (concat) -- (f1) node [midway, above] {$\bm{x}$};
+		\draw (f1) -- (g);
+		\draw (g) -- (f2);
+		\draw (f2) -- (softmax);
+		\draw (softmax) -- (l);
+		\draw (y) -- (l);
+	\end{scope}	
+\end{tikzpicture}
+\end{figure}
+	
+Each row of $\bm{E}$ learns a word representation
+	
+	
+\end{frame}
+
+\section{Learning word embeddings}
+
+
+
+
+
+\subsection{Distributional hypothesis}
 
 \begin{frame}{Recall: One-hot encoding of words}
 	
@@ -1452,9 +1426,10 @@ Using a single vector for all forms	is problematic
 \begin{frame}{Take aways}
 	
 \begin{itemize}
+	\item Neural language models
 	\item Self-supervised training of word embeddings
 	\item word2vec trained with negative sampling
-	\item CBOW and skip-gram for context modeling
+	\item CBOW for context modeling
 \end{itemize}
 	
 \end{frame}
@@ -1614,9 +1589,25 @@ Train with skip-gram and negative sampling (same as word2vec)
 \end{tikzpicture}
 
 
+\end{frame}
 
+\begin{frame}{Generating text with language models}
+	
+	We can generate (``sample") random sentences from the model according to their probability
+	
+	\begin{enumerate}
+		\item Predict a probability distribution over the vocabulary conditioned on the start symbol <s>
+		\item Draw a word from the predicted distribution
+		\item Predict a probability distribution over the vocabulary conditioned on the start symbol and the first generated word
+		\item Draw a word from the predicted distribution
+		\item Repeat until generated \emph{end-of-sentence} symbol </s> (or <EOS>)
+	\end{enumerate}
+	
 	
 \end{frame}
+
+	
+
 
 
 
