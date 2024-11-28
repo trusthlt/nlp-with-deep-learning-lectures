@@ -5,4 +5,4 @@ Getting familiar with PyTorch autograd and minimization + various abstraction of
 Tasks:
 
 * Install pytorch locally in your virtualenv
-* Explore, run, try to understand the logic behind `ex5_ver1.py` up until `ex5_ver4.py`
+* Explore, run, try to understand the logic behind `ex6_ver1.py` up until `ex6_ver4.py`
