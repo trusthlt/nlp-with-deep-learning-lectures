@@ -93,6 +93,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2024-11-28
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture06-handout.pdf)
+* [YouTube video](https://www.youtube.com/watch?v=wUey35aN6mI)
+
+
+### Lecture 07: Recurrent neural networks and encoder-decoder architectures
+
+2024-12-05
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture07-handout.pdf)
 * [YouTube video TBD]()
 
 
