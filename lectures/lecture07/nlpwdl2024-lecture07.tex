@@ -1455,6 +1455,187 @@ We also ignored bias terms for each gate
 %
 %* Domain adaptation and multi-task learning (?) - should be somewhere early too
 
+
+
+\section{Encoder-decoder architectures}
+
+\begin{frame}{The problem of variable output sequence length}
+
+
+We have a sequence of $n$ \textbf{input} vectors $\bm{x_{1:n}} = \bm{x_1}, \ldots, \bm{x_n}$
+
+Each input vector has the same dimension $d_{in}: \bm{x_i} \in \mathbb{R}^{d_{in}}$
+
+\bigskip
+
+\pause
+We also have a \textbf{sequence} of $d_{out}$-dimensional vector $\bm{y_{1:\hat{n}}} \in \mathbb{R}^{\hat{n} \times d_{out}}$ \textbf{outputs} 
+
+\bigskip
+
+\pause
+RNNs produce a sequence of outputs % \begin{block}{}
+	$$
+	\bm{y_{1:n}} = \rnn (\bm{x_{1:n}})
+	$$
+	What are we missing?
+	\pause
+	\begin{itemize}
+		\item The input and output sequence: rarely of same length 
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Generating a variable length sequence}
+
+	\textbf{Translate to German}: \textit{I like attending deep learning lectures}
+
+	\pause
+
+	\textbf{Output}: \textit{Ich besuche gerne Deep-Learning-Vorlesungen}
+
+	\pause
+
+	Current approach:
+	\begin{enumerate}
+		\item Tokenize input sequence
+		\item Obtain a word embedding (e.g. word2vec) for each token
+		\item Use a RNN (e.g. LSTM) to encode sequence of tokens
+		\item Generate token sequence in target language
+		\pause
+		\begin{itemize}
+			\item Multi-class classification over target vocabulary
+		\end{itemize}
+	\end{enumerate}
+
+\end{frame}
+
+
+\begin{frame}{Generating a variable length sequence}
+\vspace{-2em}
+\begin{columns}[T] % align columns
+		\begin{column}{.48\textwidth}
+			\begin{figure}[h]
+				\includegraphics[height=7cm]{img/variable_input_output.pdf}
+			\end{figure}
+		\end{column}
+
+		\begin{column}{.48\textwidth}
+			\pause
+			\vspace{1cm}
+			How to solve the issue of varying input/output lengths?
+			\pause
+	
+			\begin{enumerate}
+				\item We \textbf{don't have to} stop generating after the last input
+				\item We can only consider outputs up to a special \textbf{"end token"} 
+			\end{enumerate}
+			\pause
+			Neither ideal
+
+		\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Sequence-to-sequence models}
+\vspace{-2em}
+\begin{columns}[T] % align columns
+	\begin{column}{.59\textwidth}
+	
+		\begin{figure}[h]
+		\includegraphics[height=7cm]{img/sequence_to_sequence_boxed.pdf}
+	\end{figure}
+	
+	\end{column}
+	\pause
+	\begin{column}{.39\textwidth}
+		\vspace{1cm}
+		Two networks
+		\begin{itemize}
+			\item \textbf{Encoder} (reader) RNN
+			\item \textbf{Decoder} (writer) RNN
+		\end{itemize}
+		\pause
+		Note:
+		\begin{itemize}
+			\item Encoder and decoder have \textbf{separate} params
+		\end{itemize}
+	\end{column}
+\end{columns}
+\end{frame}
+	
+	
+
+\begin{frame}[fragile]{The encoder-decoder architecture specifics}
+
+\begin{enumerate}
+\item How to \textbf{initialize} decoder hidden \textbf{state}?
+\pause
+\begin{itemize}
+	\item $h_{0}^{dec} = h_{n}^{enc}$: simply copy the last encoder state
+	\item $h_{0}^{dec} = \text{NN}_{\theta}(h_{n}^{enc})$: transform the last encoder state
+\end{itemize}
+\pause
+\item When do we \textbf{stop generating} with the decoder?
+\pause
+\begin{itemize}
+	\item We use a \textbf{special token} (\verb|<EOS>|, \verb|\n|) to indicate the end-of-sequence
+	\item When the \textbf{maximum generation length} is exceeded
+\end{itemize}
+\pause
+\item What are the \textbf{inputs} of the decoder?
+\pause
+\begin{itemize}
+	\item The \textbf{previous output} of the decoder
+	\begin{itemize}
+		\item Teacher forcing (with probability $p$): use the \textbf{correct output} 
+	\end{itemize}
+	\pause
+	\item What is the \textbf{initial input} $x^{dec}_0$?
+	\pause
+	\begin{itemize}
+		\item A beginning-of-sequence \textbf{special token} (\verb|<BOS>|)
+	\end{itemize}
+\end{itemize}
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{The encoder-decoder architecture}
+\vspace{-2em}
+	\begin{columns}[T] % align columns
+		\begin{column}{.59\textwidth}
+		
+			\begin{figure}[h]
+			\includegraphics[height=7cm]{img/sequence_to_sequence_anno.pdf}
+		\end{figure}
+		
+		\end{column}
+		\pause
+		\begin{column}{.39\textwidth}
+			\vspace{2cm}
+			Decoder inputs
+			\begin{itemize}
+				\item $x_0^{dec} = \text{<BOS>}$
+				\item $x_i^{dec} = y_{i}^{dec}$ \textbf{if} no teacher forcing
+				\item $x_i^{dec} = \hat{y}_{i}$ \textbf{if} we use teacher forcing 
+			\end{itemize}
+		\end{column}
+	\end{columns}
+
+\end{frame}
+
+%\subsection{Text generation: beam search}
+
+%\begin{frame}{Beam search decoding}
+%	why: probability of sequence is low
+%	greedy approach might not be best approach
+%	todo
+%\end{frame}
+
+
 \begin{frame}{Take aways}
 
 \begin{itemize}
@@ -1463,6 +1644,7 @@ We also ignored bias terms for each gate
 	\item Modeling freedom with bi-directional RNNs
 	\item Vanishing gradients in deep nets --- gating mechanism, memory cells
 	\item LSTM a particularly powerful RNN
+	\item Encoder-decoder RNNs for text-to-text tasks
 \end{itemize}
 
 \end{frame}
@@ -1486,7 +1668,7 @@ Credits
 
 \begin{scriptsize}
 	
-	Ivan Habernal
+	Ivan Habernal, Martin Tutek
 	
 	Content from ACL Anthology papers licensed under CC-BY \url{https://www.aclweb.org/anthology}
 	
