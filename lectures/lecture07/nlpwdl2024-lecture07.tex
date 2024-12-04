@@ -278,6 +278,65 @@ What we want to really work with: Sequence of inputs, fixed-size output(s)
 \end{frame}
 
 
+\begin{frame}{Our goal would be to build something like this}
+
+\begin{tikzpicture}	
+	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	
+	\node (s0) [constant]{$\bm{?}$};
+	
+	\node (ro1) [neuron, right of=s0, xshift=0.5cm] {$?$};
+	\node (s1) [state, right of=ro1, xshift=0.5cm] {$\bm{?}$};
+	\node (x1) [constant, below of=ro1, yshift=-0.5cm] {$\bm{x_1}$};
+	\node(y1) [state, above of=ro1, yshift=0.5cm] {$\bm{?}$};
+	
+	\node (ro2) [neuron, right of=s1, xshift=0.5cm] {$?$};
+	\node (s2) [state, right of=ro2, xshift=0.5cm] {$\bm{?}$};
+	\node (x2) [constant, below of=ro2, yshift=-0.5cm] {$\bm{x_2}$};
+	\node(y2) [state, above of=ro2, yshift=0.5cm] {$\bm{?}$};
+	
+	\node (ro3) [neuron, right of=s2, xshift=0.5cm] {$?$};
+	\node (s3) [state, right of=ro3, xshift=0.5cm] {$\bm{?}$};
+	\node (x3) [constant, below of=ro3, yshift=-0.5cm] {$\bm{x_3}$};
+	\node(y3) [state, above of=ro3, yshift=0.5cm] {$\bm{?}$};
+	
+	\node (ro4) [neuron, right of=s3, xshift=0.5cm] {$?$};
+	\node (s4) [state, right of=ro4, xshift=0.5cm] {$\bm{?}$};
+	\node (x4) [constant, below of=ro4, yshift=-0.5cm] {$\bm{x_4}$};
+	\node(y4) [state, above of=ro4, yshift=0.5cm] {$\bm{?}$};
+		
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (s0) -- (ro1);
+		\draw(x1) -- (ro1);
+		\draw(ro1) -- (s1);
+		\draw(ro1) -- (y1);
+		
+		\draw (s1) -- (ro2);
+		\draw(x2) -- (ro2);
+		\draw(ro2) -- (s2);
+		\draw(ro2) -- (y2);
+		
+		\draw (s2) -- (ro3);
+		\draw(x3) -- (ro3);
+		\draw(ro3) -- (s3);
+		\draw(ro3) -- (y3);
+		
+		\draw (s3) -- (ro4);
+		\draw(x4) -- (ro4);
+		\draw(ro4) -- (s4);
+		\draw(ro4) -- (y4);
+		
+	\end{scope}
+	
+\end{tikzpicture}
+Example for 4 input tokens
+
+
+\end{frame}
+
+
+
 \section{Recurrent Neural Networks (RNN) abstraction}
 
 \begin{frame}{RNN abstraction}
@@ -334,6 +393,64 @@ $$
 
 
 
+\begin{frame}{Adding outputs to our sketch}
+
+\begin{tikzpicture}	
+	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	
+	\node (s0) [constant]{$\bm{?}$};
+	
+	\node (ro1) [neuron, right of=s0, xshift=0.5cm] {$?$};
+	\node (s1) [state, right of=ro1, xshift=0.5cm] {$\bm{?}$};
+	\node (x1) [constant, below of=ro1, yshift=-0.5cm] {$\bm{x_1}$};
+	\node(y1) [state, above of=ro1, yshift=0.5cm] {$\bm{y_1}$};
+	
+	\node (ro2) [neuron, right of=s1, xshift=0.5cm] {$?$};
+	\node (s2) [state, right of=ro2, xshift=0.5cm] {$\bm{?}$};
+	\node (x2) [constant, below of=ro2, yshift=-0.5cm] {$\bm{x_2}$};
+	\node(y2) [state, above of=ro2, yshift=0.5cm] {$\bm{y_2}$};
+	
+	\node (ro3) [neuron, right of=s2, xshift=0.5cm] {$?$};
+	\node (s3) [state, right of=ro3, xshift=0.5cm] {$\bm{?}$};
+	\node (x3) [constant, below of=ro3, yshift=-0.5cm] {$\bm{x_3}$};
+	\node(y3) [state, above of=ro3, yshift=0.5cm] {$\bm{y_3}$};
+	
+	\node (ro4) [neuron, right of=s3, xshift=0.5cm] {$?$};
+	\node (s4) [state, right of=ro4, xshift=0.5cm] {$\bm{?}$};
+	\node (x4) [constant, below of=ro4, yshift=-0.5cm] {$\bm{x_4}$};
+	\node(y4) [state, above of=ro4, yshift=0.5cm] {$\bm{y_4}$};
+	
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (s0) -- (ro1);
+		\draw(x1) -- (ro1);
+		\draw(ro1) -- (s1);
+		\draw(ro1) -- (y1);
+		
+		\draw (s1) -- (ro2);
+		\draw(x2) -- (ro2);
+		\draw(ro2) -- (s2);
+		\draw(ro2) -- (y2);
+		
+		\draw (s2) -- (ro3);
+		\draw(x3) -- (ro3);
+		\draw(ro3) -- (s3);
+		\draw(ro3) -- (y3);
+		
+		\draw (s3) -- (ro4);
+		\draw(x4) -- (ro4);
+		\draw(ro4) -- (s4);
+		\draw(ro4) -- (y4);
+		
+	\end{scope}
+	
+\end{tikzpicture}
+
+
+
+\end{frame}
+
+
 \begin{frame}{Recap}
 
 For a sequence of input vectors  $\bm{x_{1:i}}$
@@ -359,6 +476,7 @@ What to do with $\bm{y_n}$ or $\bm{y_{1:n}}$?
 \end{frame}
 
 
+
 \begin{frame}{Underlying mechanism of RNNs --- states}
 For ``passing information'' from one position to the next, i.e.\ from
 $$\bm{y_i} = \rnn (\bm{x_{1:i}})$$
@@ -366,6 +484,65 @@ to
 $$\bm{y_{i+1}} = \rnn (\bm{x_{1:i+1}})$$
 we use a ``state'' vector
 $$\bm{s_i} \in \mathbb{R}^{d_{state}}$$
+\end{frame}
+
+
+\begin{frame}{Adding state vectors}
+
+\begin{tikzpicture}	
+	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	
+	\node (s0) [constant]{$\bm{s_0}$};
+	
+	\node (ro1) [neuron, right of=s0, xshift=0.5cm] {$?$};
+	\node (s1) [state, right of=ro1, xshift=0.5cm] {$\bm{s_1}$};
+	\node (x1) [constant, below of=ro1, yshift=-0.5cm] {$\bm{x_1}$};
+	\node(y1) [state, above of=ro1, yshift=0.5cm] {$\bm{y_1}$};
+	
+	\node (ro2) [neuron, right of=s1, xshift=0.5cm] {$?$};
+	\node (s2) [state, right of=ro2, xshift=0.5cm] {$\bm{s_2}$};
+	\node (x2) [constant, below of=ro2, yshift=-0.5cm] {$\bm{x_2}$};
+	\node(y2) [state, above of=ro2, yshift=0.5cm] {$\bm{y_2}$};
+	
+	\node (ro3) [neuron, right of=s2, xshift=0.5cm] {$?$};
+	\node (s3) [state, right of=ro3, xshift=0.5cm] {$\bm{s_3}$};
+	\node (x3) [constant, below of=ro3, yshift=-0.5cm] {$\bm{x_3}$};
+	\node(y3) [state, above of=ro3, yshift=0.5cm] {$\bm{y_3}$};
+	
+	\node (ro4) [neuron, right of=s3, xshift=0.5cm] {$?$};
+	\node (s4) [state, right of=ro4, xshift=0.5cm] {$\bm{s_4}$};
+	\node (x4) [constant, below of=ro4, yshift=-0.5cm] {$\bm{x_4}$};
+	\node(y4) [state, above of=ro4, yshift=0.5cm] {$\bm{y_4}$};
+	
+	
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (s0) -- (ro1);
+		\draw(x1) -- (ro1);
+		\draw(ro1) -- (s1);
+		\draw(ro1) -- (y1);
+		
+		\draw (s1) -- (ro2);
+		\draw(x2) -- (ro2);
+		\draw(ro2) -- (s2);
+		\draw(ro2) -- (y2);
+		
+		\draw (s2) -- (ro3);
+		\draw(x3) -- (ro3);
+		\draw(ro3) -- (s3);
+		\draw(ro3) -- (y3);
+		
+		\draw (s3) -- (ro4);
+		\draw(x4) -- (ro4);
+		\draw(ro4) -- (s4);
+		\draw(ro4) -- (y4);
+		
+	\end{scope}
+	
+\end{tikzpicture}
+
+
+
 \end{frame}
 
 
@@ -405,6 +582,65 @@ $$
 \end{frame}
 
 
+
+\begin{frame}{Adding $R$ and $O$}
+
+\begin{tikzpicture}	
+	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	
+	\node (s0) [constant]{$\bm{s_0}$};
+	
+	\node (ro1) [neuron, right of=s0, xshift=0.5cm] {$R, O$};
+	\node (s1) [state, right of=ro1, xshift=0.5cm] {$\bm{s_1}$};
+	\node (x1) [constant, below of=ro1, yshift=-0.5cm] {$\bm{x_1}$};
+	\node(y1) [state, above of=ro1, yshift=0.5cm] {$\bm{y_1}$};
+	
+	\node (ro2) [neuron, right of=s1, xshift=0.5cm] {$R, O$};
+	\node (s2) [state, right of=ro2, xshift=0.5cm] {$\bm{s_2}$};
+	\node (x2) [constant, below of=ro2, yshift=-0.5cm] {$\bm{x_2}$};
+	\node(y2) [state, above of=ro2, yshift=0.5cm] {$\bm{y_2}$};
+	
+	\node (ro3) [neuron, right of=s2, xshift=0.5cm] {$R, O$};
+	\node (s3) [state, right of=ro3, xshift=0.5cm] {$\bm{s_3}$};
+	\node (x3) [constant, below of=ro3, yshift=-0.5cm] {$\bm{x_3}$};
+	\node(y3) [state, above of=ro3, yshift=0.5cm] {$\bm{y_3}$};
+	
+	\node (ro4) [neuron, right of=s3, xshift=0.5cm] {$R, O$};
+	\node (s4) [state, right of=ro4, xshift=0.5cm] {$\bm{s_4}$};
+	\node (x4) [constant, below of=ro4, yshift=-0.5cm] {$\bm{x_4}$};
+	\node(y4) [state, above of=ro4, yshift=0.5cm] {$\bm{y_4}$};
+	
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (s0) -- (ro1);
+		\draw(x1) -- (ro1);
+		\draw(ro1) -- (s1);
+		\draw(ro1) -- (y1);
+		
+		\draw (s1) -- (ro2);
+		\draw(x2) -- (ro2);
+		\draw(ro2) -- (s2);
+		\draw(ro2) -- (y2);
+		
+		\draw (s2) -- (ro3);
+		\draw(x3) -- (ro3);
+		\draw(ro3) -- (s3);
+		\draw(ro3) -- (y3);
+		
+		\draw (s3) -- (ro4);
+		\draw(x4) -- (ro4);
+		\draw(ro4) -- (s4);
+		\draw(ro4) -- (y4);
+		
+	\end{scope}
+	
+\end{tikzpicture}
+
+
+
+\end{frame}
+
+
 \begin{frame}{Summary}
 At each step $i \in (1, \ldots, n)$ we have
 \begin{itemize}
@@ -425,35 +661,6 @@ The functions $R$ and $O$ are the same for each position $i$
 	\bm{y_i}  = O(\bm{s_i})$
 \end{block}
 
-
-\end{frame}
-
-
-\begin{frame}{Graphical visualization of abstract RNN (recursive)}
-
-\begin{figure}
-	\begin{tikzpicture}	
-		%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
-		
-		\node (s0) [state]{$\bm{s_{i-1}}$};
-		\node (e) [param, below of=s0, yshift=-0.5cm] {$\theta$};
-		
-		\node (ro) [neuron, right of=s0, xshift=1cm] {$R, O$};
-		\node (si) [state, right of=ro, xshift=1cm] {$\bm{s_{i}}$};
-		\node (xi) [constant, below of=ro, yshift=-0.5cm] {$\bm{x_{i}}$};
-		\node(yi) [state, above of=ro, yshift=0.5cm] {$\bm{y_i}$};
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (s0) -- (ro);
-			\draw(xi) -- (ro);
-			\draw(e) -- (ro);
-			\draw(ro) -- (si);
-			\draw(ro) -- (yi);
-		\end{scope}
-		\draw [thick, dashed, gray, ->, >=latex] (si) to [bend right] (s0);
-		
-	\end{tikzpicture}
-\end{figure}
 
 \end{frame}
 
@@ -523,6 +730,37 @@ Note that $\theta$ (parameters) are ``shared" (the same) for all positions
 
 
 \end{frame}
+
+
+\begin{frame}{Graphical visualization of abstract RNN (recursive)}
+
+\begin{figure}
+	\begin{tikzpicture}	
+		%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+		
+		\node (s0) [state]{$\bm{s_{i-1}}$};
+		\node (e) [param, below of=s0, yshift=-0.5cm] {$\theta$};
+		
+		\node (ro) [neuron, right of=s0, xshift=1cm] {$R, O$};
+		\node (si) [state, right of=ro, xshift=1cm] {$\bm{s_{i}}$};
+		\node (xi) [constant, below of=ro, yshift=-0.5cm] {$\bm{x_{i}}$};
+		\node(yi) [state, above of=ro, yshift=0.5cm] {$\bm{y_i}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (s0) -- (ro);
+			\draw(xi) -- (ro);
+			\draw(e) -- (ro);
+			\draw(ro) -- (si);
+			\draw(ro) -- (yi);
+		\end{scope}
+		\draw [thick, dashed, gray, ->, >=latex] (si) to [bend right] (s0);
+		
+	\end{tikzpicture}
+\end{figure}
+
+\end{frame}
+
+
 
 
 \subsection{RNN as `acceptor' or `encoder'}
@@ -863,10 +1101,10 @@ $g$ --- commonly tanh or ReLU
 	
 \end{tikzpicture}
 
-Gradients might vanish (become exceedingly close to 0) as they propagate back through the computation graph
+Gradients might vanish ($\to 0$) as they propagate back through the computation graph
 
 \begin{itemize}
-	\item Severe in deeper networks, and especially so in recursive and recurrent networks
+	\item Severe in deeper nets, especially in recurrent networks
 	\item Hard for the S-RNN to capture long-range dependencies
 \end{itemize}
 
@@ -984,7 +1222,7 @@ The state at time $j$ is composed of two vectors:
 \end{itemize}
 
 \pause
-At each input state $j$, a gate decides how much of the new input should be written to the memory cell, and how much of the current content of the memory cell should be forgotten
+At each input state $j$, a gate decides how much of the new input should be written to the memory cell, and how much of the memory cell should be forgotten
 
 \pause
 There are three gates
@@ -999,6 +1237,7 @@ There are three gates
 
 \begin{frame}{LSTM architecture}
 \begin{figure}
+\vspace{-2em}
 	\begin{tikzpicture}	
 		
 		\onslide<1->{
