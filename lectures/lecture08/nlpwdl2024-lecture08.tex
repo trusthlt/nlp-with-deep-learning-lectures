@@ -458,147 +458,6 @@ $\bm{\tilde{X}}$ is just a placeholder for \textbf{updated} token embeddings mat
 	
 \end{frame}
 
-\begin{frame}{Basic single-query attention}
-	
-	\begin{minipage}[t][10cm][t]{15cm}
-		
-		Input: $\bm{e} \in \mathbb{R}^{d_\text{in}}$, vector representation of the current token
-		
-		Input: $\bm{e}_t \in \mathbb{R}^{d_\text{in}}$, vector representations of the context tokens $t \in [T]$
-		
-		Output: $\bm{\tilde v} \in \mathbb{R}^{d_\text{out}}$, vector representation of the token and context combined
-		
-		Params: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{in} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, the query and key linear projections
-		
-		$\bm{W_v} \in \mathbb{R}^{d_\text{in} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$, the value linear projection
-		
-		\begin{algorithmic}[1]
-			\Function{Basic single-query attention}{}
-			%\KwIn{}
-			%\KwOut{$\v{\tilde v}∈ℝ^{d_\t{out}}$, vector representation of the token and context combined.}
-			%\KwParam{$\m{W_q}, \m{W_k}∈ℝ^{d_\t{attn}×d_\t{in}}$, $ \v{b_q}, \v{b_k}∈ℝ^{d_\t{attn}}$, the query and key linear projections.}
-			%\KwParam{$\m{W_v}∈ℝ^{d_\t{out}×d_\t{in}}$, $ \v{b_v}∈ℝ^{d_\t{out}}$, the value linear projection.}
-			\State $\bm{q} \gets \bm{e} \bm{W_q} + \bm{b_q}$
-			\Comment{Query linear projection}
-			\For{$t \in [T]$}
-			\State $\bm{k_t} \gets \bm{e_t} \bm{W_k} + \bm{b_k}$
-			\Comment{Key linear projection}
-			\State $\alpha_{t} = \frac{
-				\exp(\bm{q} \cdot \bm{k_t} / \sqrt{d_{\text{attn}}})
-			}{
-				\sum_{u = 1}^{T}\exp(\bm{q} \cdot \bm{k_u} / \sqrt{d_{\text{attn}}})
-			}$
-			\Comment{Softmax over scaled dot products ($\alpha_{t} \in \mathbb{R}$)}
-			\State $\bm{v_t} \gets \bm{e_t} \bm{W_v} + \bm{b_v}$
-			\Comment{Value linear projection}
-			\EndFor
-			\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
-\end{frame}
-
-
-
-\begin{frame}{Some details}
-	
-	Concatenate matrices of the same dimensions along rows
-	$$\bm{Y} = [\bm{X}^1 ; \bm{X}^2 ; \ldots ; \bm{X}^H]
-	\qquad
-	\bm{X}^i \in \mathbb{R}^{m \times n}
-	\qquad
-	\bm{Y} \in \mathbb{R}^{m \times H \cdot n}$$
-	
-	\begin{block}{Example}
-		\begin{small}
-			$$
-			\bm{A} =
-			\begin{pmatrix}
-				1 & 2 \\
-				3 & 4 \\
-				5 & 6
-			\end{pmatrix}
-			,
-			\bm{B} =
-			\begin{pmatrix}
-				11 & 12 \\
-				13 & 14 \\
-				15 & 16
-			\end{pmatrix}
-			\quad
-			\bm{Y} = [\bm{A} ; \bm{B} ] =
-			\begin{pmatrix}
-				1 & 2 & 11 & 12 \\
-				3 & 4 & 13 & 14 \\
-				5 & 6 & 15 & 16
-			\end{pmatrix}
-			$$
-		\end{small}
-	\end{block}
-	
-	
-\end{frame}
-
-
-
-\begin{frame}{Some details}
-	
-	How to add a single vector $\bm{b}$ to each row in a matrix $\bm{W}$ ($\bm{W} \in \mathbb{R}^{m \times n}, \bm{b} \in \mathbb{R}^{n}$)
-	
-	We want $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b}$
-	
-	Let $\bm{1}^{m} = (1, 1, \ldots, 1_m)$, then $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b} = \bm{X} +  (\bm{b}^\top  \bm{1}^{m})^\top$
-	
-	\begin{block}{Example}
-		\begin{scriptsize}
-			$$
-			\bm{X} =
-			\begin{pmatrix}
-				1 & 2 \\
-				3 & 4 \\
-				5 & 6
-			\end{pmatrix}
-			,
-			\bm{b} = \begin{pmatrix}10 & 20\end{pmatrix}
-			$$
-			
-			$$
-			\bm{b}^\top \bm{1}^m = \begin{pmatrix}10 \\ 20\end{pmatrix}
-			\begin{pmatrix}1 & 1 & 1\end{pmatrix} =
-			\begin{pmatrix}10 & 10 & 10 \\ 20 & 20 & 20 \end{pmatrix}
-			\qquad
-			(\bm{b}^\top \bm{1}^m)^\top = 
-			\begin{pmatrix} 10 & 20 \\ 10 & 20 \\ 10 & 20 \end{pmatrix}
-			$$
-		\end{scriptsize}
-	\end{block}
-	
-	
-\end{frame}
-
-
-
-
-\begin{frame}{Some details}
-	
-	Soft-max for matrices row-wise, $\bm{A} \in \mathbb{R}^{m \times n}$
-	
-	$$
-	\softmax_{\text{row}} : \mathbb{R}^{m \times n} \mapsto \mathbb{R}^{m \times n}
-	$$
-	
-	$$
-	\softmax_{\text{row}} (\bm{A}) [i, j] = \frac{
-		\exp( \bm{A}[i, j])
-	}{
-		\sum_{k = 1}^n \exp (\bm{A}[i, k])
-	}
-	$$
-	
-	
-\end{frame}
-
 
 
 
@@ -910,8 +769,48 @@ Let's focus on Multi-Head Self Attention
 \end{frame}
 
 
+\begin{frame}{Some notation details}
+	
+	Concatenate matrices of the same dimensions along rows
+	$$\bm{Y} = [\bm{X}^1 ; \bm{X}^2 ; \ldots ; \bm{X}^H]
+	\qquad
+	\bm{X}^i \in \mathbb{R}^{m \times n}
+	\qquad
+	\bm{Y} \in \mathbb{R}^{m \times H \cdot n}$$
+	
+	\begin{block}{Example}
+		\begin{small}
+			$$
+			\bm{A} =
+			\begin{pmatrix}
+				1 & 2 \\
+				3 & 4 \\
+				5 & 6
+			\end{pmatrix}
+			,
+			\bm{B} =
+			\begin{pmatrix}
+				11 & 12 \\
+				13 & 14 \\
+				15 & 16
+			\end{pmatrix}
+			\quad
+			\bm{Y} = [\bm{A} ; \bm{B} ] =
+			\begin{pmatrix}
+				1 & 2 & 11 & 12 \\
+				3 & 4 & 13 & 14 \\
+				5 & 6 & 15 & 16
+			\end{pmatrix}
+			$$
+		\end{small}
+	\end{block}
+	
+	
+\end{frame}
 
-\begin{frame}{Multi-head bidirectional / unmasked self-attention}
+
+
+\begin{frame}{Multi-head bidirectional unmasked self-attention}
 	
 \begin{minipage}[t][10cm][t]{15cm}
 
@@ -990,6 +889,193 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 	\end{tikzpicture}
 	
 \end{frame}
+
+
+\iffalse
+\begin{frame}{Let's explore the attention for a single token first}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{e} \in \mathbb{R}^{d_\text{in}}$, vector representation of the current token
+		
+		Input: $\bm{e}_t \in \mathbb{R}^{d_\text{in}}$, vector representations of the context tokens $t \in [T]$
+		
+		Output: $\bm{\tilde v} \in \mathbb{R}^{d_\text{out}}$, vector representation of the token and context combined
+		
+		Params: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{in} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, the query and key linear projections
+		
+		$\bm{W_v} \in \mathbb{R}^{d_\text{in} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$, the value linear projection
+		
+		\begin{algorithmic}[1]
+			\Function{Basic single-query attention}{}
+			%\KwIn{}
+			%\KwOut{$\v{\tilde v}∈ℝ^{d_\t{out}}$, vector representation of the token and context combined.}
+			%\KwParam{$\m{W_q}, \m{W_k}∈ℝ^{d_\t{attn}×d_\t{in}}$, $ \v{b_q}, \v{b_k}∈ℝ^{d_\t{attn}}$, the query and key linear projections.}
+			%\KwParam{$\m{W_v}∈ℝ^{d_\t{out}×d_\t{in}}$, $ \v{b_v}∈ℝ^{d_\t{out}}$, the value linear projection.}
+			\State $\bm{q} \gets \bm{e} \bm{W_q} + \bm{b_q}$
+			\Comment{Query linear projection}
+			\For{$t \in [T]$}
+			\State $\bm{k_t} \gets \bm{e_t} \bm{W_k} + \bm{b_k}$
+			\Comment{Key linear projection}
+			\State $\alpha_{t} = \frac{
+				\exp(\bm{q} \cdot \bm{k_t} / \sqrt{d_{\text{attn}}})
+			}{
+				\sum_{u = 1}^{T}\exp(\bm{q} \cdot \bm{k_u} / \sqrt{d_{\text{attn}}})
+			}$
+			\Comment{Softmax over scaled dot products ($\alpha_{t} \in \mathbb{R}$)}
+			\State $\bm{v_t} \gets \bm{e_t} \bm{W_v} + \bm{b_v}$
+			\Comment{Value linear projection}
+			\EndFor
+			\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+\fi
+
+
+
+
+
+
+\begin{frame}{Self-Attention in detailed example}
+
+\begin{figure}
+\scalebox{0.8}{
+\begin{tikzpicture}
+
+\matrix[mtx, ampersand replacement=\&] (X) at (2,2) {
+	\mathrm{The} \\ 
+	\mathrm{cat}\\ 
+	\mathrm{sat}\\ 
+	\mathrm{.} \\
+	\mathrm{PAD} \\ 
+};
+
+\matrix[mtx,  ampersand replacement=\&, right=5ex of X] (matrixh) { 
+   \cdots \& q_1 \&  \cdots \\
+   \cdots \& q_2 \&  \cdots \\
+   \cdots \& q_3 \&  \cdots \\
+   \cdots \& q_4 \&  \cdots \\
+   \cdots \& q_5 \&  \cdots \\
+};
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of matrixh] (matrixhtrans) {
+   \vdots \& \vdots \&  \vdots \& \vdots \& \vdots \\
+   k_1 \& k_2 \& k_3 \& k_4 \& k_5 \\
+   \vdots \& \vdots \&  \vdots \& \vdots \& \vdots \\
+};
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of matrixhtrans] (raw) {
+   11 \& 12 \& 13 \& 14 \& 15 \\
+   21 \& \ddots \& \& \& \vdots  \\
+   31 \&  \& \ddots \&  \& \vdots \\
+   41 \&  \&  \& \ddots \& \vdots \\
+   51 \&  \cdots \& \cdots  \& \cdots  \& 55 \\
+};
+
+
+\node at ($(matrixh.east)!0.5!(matrixhtrans.west)$) {$\times$};%
+\node at ($(matrixhtrans.east)!0.5!(raw.west)$) {$=$};%
+
+
+\begin{scope}[on background layer]
+\foreach \in in {1,2,3,4,5} {
+\node[hltr, fill=green, fit=(matrixh-\in-1)(matrixh-\in-3)] {};
+}
+\foreach \in in {1,2,3,4,5} {
+\node[hltr, fill=green, fit=(matrixhtrans-1-\in)(matrixhtrans-3-\in)] {};
+}
+%\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
+\node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
+\end{scope}
+
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick] (X-\in-1) to[out = 0, in = 180] (matrixh-\in-1);
+}
+
+
+
+\begin{scope}[every node/.style={align=center,text width=3cm}]
+\node[below=0.2cm of X] (inputdsc) {\small Input tokens};
+\node[below=0.2cm of matrixh] (convdesc) {\small Projected to query matrix $\bm{Q}$};
+\node[below=0.5cm of matrixhtrans] (outdesc) {\small Projected to key matrix $\bm{K}$ and transposed};
+\node[below=0.5cm of raw] (outdesc) {\small Scaled dot product (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
+
+\end{scope}
+
+
+\end{tikzpicture}
+		}
+	\end{figure}
+	
+\end{frame}
+
+
+
+\begin{frame}{Some details}
+	
+	How to add a single vector $\bm{b}$ to each row in a matrix $\bm{W}$ ($\bm{W} \in \mathbb{R}^{m \times n}, \bm{b} \in \mathbb{R}^{n}$)
+	
+	We want $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b}$
+	
+	Let $\bm{1}^{m} = (1, 1, \ldots, 1_m)$, then $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b} = \bm{X} +  (\bm{b}^\top  \bm{1}^{m})^\top$
+	
+	\begin{block}{Example}
+		\begin{scriptsize}
+			$$
+			\bm{X} =
+			\begin{pmatrix}
+				1 & 2 \\
+				3 & 4 \\
+				5 & 6
+			\end{pmatrix}
+			,
+			\bm{b} = \begin{pmatrix}10 & 20\end{pmatrix}
+			$$
+			
+			$$
+			\bm{b}^\top \bm{1}^m = \begin{pmatrix}10 \\ 20\end{pmatrix}
+			\begin{pmatrix}1 & 1 & 1\end{pmatrix} =
+			\begin{pmatrix}10 & 10 & 10 \\ 20 & 20 & 20 \end{pmatrix}
+			\qquad
+			(\bm{b}^\top \bm{1}^m)^\top = 
+			\begin{pmatrix} 10 & 20 \\ 10 & 20 \\ 10 & 20 \end{pmatrix}
+			$$
+		\end{scriptsize}
+	\end{block}
+	
+	
+\end{frame}
+
+
+
+
+
+
+
+
+\begin{frame}{Some details}
+	
+	Soft-max for matrices row-wise, $\bm{A} \in \mathbb{R}^{m \times n}$
+	
+	$$
+	\softmax_{\text{row}} : \mathbb{R}^{m \times n} \mapsto \mathbb{R}^{m \times n}
+	$$
+	
+	$$
+	\softmax_{\text{row}} (\bm{A}) [i, j] = \frac{
+		\exp( \bm{A}[i, j])
+	}{
+		\sum_{k = 1}^n \exp (\bm{A}[i, k])
+	}
+	$$
+	
+	
+\end{frame}
+
 
 
 \begin{frame}{Bidirectional / unmasked self-attention (recap from last lecture)}
