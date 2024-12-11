@@ -18,8 +18,8 @@
 
 
 % TODO change "leftfootertext" to your liking
-%\newcommand{\leftfootertext}{\insertsubtitle}  % just the \title{} text by default
-\newcommand{\leftfootertext}{RNNs and encoder-decoder architectures}  % Your name, for instance
+\newcommand{\leftfootertext}{\insertsubtitle}  % just the \title{} text by default
+%\newcommand{\leftfootertext}{RNNs and encoder-decoder architectures}  % Your name, for instance
 
 
 % ------- RUB specifics ----------
@@ -269,6 +269,108 @@ Last time we started with the transformer and BERT, but we
 Let's fix that today!
 
 After this lecture you should be able to build BERT
+	
+\end{frame}
+
+
+
+\section{Multi-task learning}
+
+
+\begin{frame}{Multi-task Learning}
+
+
+\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+\hspace*{-8em}\begin{column}{0.48\textwidth}
+Approach to inductive transfer that improves generalization
+
+\bigskip	
+
+By learning tasks in parallel while using a shared representation
+\end{column}
+\hspace*{-9.5em}\begin{column}{0.48\textwidth}
+\includegraphics[width=\linewidth]{img/multitask.png}
+\end{column}
+\end{columns}
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Caruana.1997} \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+
+
+\begin{frame}{Multi-task learning in NLP}
+
+
+%\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+%\hspace*{-8em}\begin{column}{0.48\textwidth}
+%xxx
+%\end{column}
+%\hspace*{-9.5em}\begin{column}{0.48\textwidth}
+%yyy
+%\end{column}
+%\end{columns}
+
+
+\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+\hspace*{-8em}\begin{column}{0.48\textwidth}
+\begin{small}
+\emph{"In case we suspect the existence of a hierarchy between the different tasks, we show that it is worth-while to incorporate this knowledge in the MTL architecture’s design, by making lower level tasks affect the lower levels of the representation." }
+\end{small}			
+\end{column}
+\hspace*{-9.5em} \begin{column}{0.48\textwidth}
+	\includegraphics[width=\linewidth]{img/multitask-nlp.png}
+\begin{figure}
+
+\end{figure}
+\end{column}
+\end{columns}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Sogaard.Goldberg.2016} \par};
+\end{tikzpicture}
+
+	
+\end{frame}
+
+
+\begin{frame}{Learn a sentence representation on a different task}
+	
+	\begin{figure}
+		\includegraphics[width=\linewidth]{img/transfer.png}
+	\end{figure}
+	
+	\begin{small}
+		\emph{"Models learned on NLI can perform better than models trained in unsupervised conditions or on other supervised tasks."}
+	\end{small}
+	
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Conneau.et.al.2017.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Bottlenecks of RNN for representation learning}
+	Inherently \textbf{sequential} nature
+	
+	\begin{itemize}
+		\item No parallelization
+		\item Long-range dependencies modeling: Distance plays a role!
+	\end{itemize}
+	
+	...but when the goal is to learn a good representation of the input sequence, we might have better/faster architectures
+
+\bigskip
+
+Also recall disadvantages of static word embeddings
 	
 \end{frame}
 
@@ -1040,35 +1142,30 @@ Let's look at the final layers
 
 \begin{frame}{BERT: Self-supervised multi-task pre-training}
 	
-	Prepare two auxiliary tasks that need no labeled data
+Prepare two auxiliary tasks that need no labeled data
 	
-	\bigskip
-	
-	\begin{columns}
-		\begin{column}{0.5\linewidth}
-			\begin{small}
-				Task 1: Cloze-test task
-				\begin{itemize}
-					\item 	Predict the masked WordPiece unit (multi-class, 30k classes)
-				\end{itemize}
-				
-				
-				Task 2: Consecutive segment prediction
-				
-				\begin{itemize}
-					\item Did the second text segment appeared after the first segment? (binary)
-				\end{itemize}
-			\end{small}
-			
-		\end{column}
-		\begin{column}{0.5\linewidth}
-			
-			\begin{figure}
-				\includegraphics[width=\linewidth]{img/bert-pretraining.png}
-			\end{figure}
-		\end{column}
-		
-	\end{columns}
+\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+\hspace*{-9em}\begin{column}{0.48\textwidth}
+\begin{small}
+\noindent Task 1: Cloze-test task
+\begin{itemize}
+	\item 	Predict the masked WordPiece unit (multi-class, 30k classes)
+\end{itemize}
+
+
+Task 2: Consecutive segment prediction
+
+\begin{itemize}
+	\item Did the second text segment appeared after the first segment? (binary)
+\end{itemize}
+\end{small}
+\end{column}
+\hspace*{-9.5em}\begin{column}{0.48\textwidth}
+\includegraphics[width=\linewidth]{img/bert-pretraining.png}
+\end{column}
+\end{columns}
+
 \end{frame}
 
 
