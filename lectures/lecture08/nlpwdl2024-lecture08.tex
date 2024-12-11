@@ -241,7 +241,7 @@
 
 
 \title{Natural Language Processing with Deep Learning}
-\subtitle{Lecture 8 --- TODO}
+\subtitle{Lecture 8 --- BERT as encoder-only transformer}
 \date{December 12, 2024}
 \author{Prof.\ Dr.\ Ivan Habernal}
 \institute{
@@ -464,23 +464,24 @@ $\bm{\tilde{X}}$ is just a placeholder for \textbf{updated} token embeddings mat
 
 
 \begin{frame}{BERT (encoding-only transformer, forward pass)}
+
+\vspace{-1em}	
+\begin{minipage}[t][3em][t]{15cm}
+	\begin{algorithmic}[1]
+		\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+		\State $\ldots$
+		\EndFunction
+	\end{algorithmic}
 	
-	\begin{minipage}[t][3em][t]{15cm}
-		\begin{algorithmic}[1]
-			\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
-			\State $\ldots$
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
+\end{minipage}
 	
-Input:
+\textbf{Input:}
 
 $\bm{x}$ --- $\bm{x} \in V^*$, a sequence of token IDs
 
 $\bm{\mathcal{W}}$ --- all trainable parameters
 
-Output:
+\textbf{Output:}
 
 Typically an embedding vector for each input token
 
@@ -731,7 +732,7 @@ Let's focus on Multi-Head Self Attention
 
 
 
-\begin{frame}{Multi-head unmasked self-attention (BERT)}
+\begin{frame}{Multi-head unmasked self-attention}
 	
 	\begin{tikzpicture}
 		
@@ -849,7 +850,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 \end{frame}
 
 
-\begin{frame}{Single unmasked self-attention head (BERT)}
+\begin{frame}{Single unmasked self-attention head}
 	
 	\begin{tikzpicture}
 		
@@ -939,7 +940,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 
-\begin{frame}{Self-Attention in detailed example}
+\begin{frame}{Self-attention in detail --- query, key, scaled dot product}
 
 \vspace{-2em}
 \begin{figure}
@@ -986,7 +987,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 \node[hltr, fill=green, fit=(matrixh-\in-1)(matrixh-\in-3)] {};
 }
 \foreach \in in {1,2,3,4,5} {
-\node[hltr, fill=green, fit=(matrixhtrans-1-\in)(matrixhtrans-3-\in)] {};
+\node[hltr, fill=orange, fit=(matrixhtrans-1-\in)(matrixhtrans-3-\in)] {};
 }
 %\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
 \node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
@@ -1000,11 +1001,10 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 \begin{scope}[every node/.style={align=center,text width=3cm}]
-\node[below=0.2cm of X] (inputdsc) {\small Token embeddings (input of previous transformer layer)};
-\node[below=0.2cm of matrixh] (convdesc) {\small Projected to query matrix $\bm{Q}$};
-\node[below=0.5cm of matrixhtrans] (outdesc) {\small Projected to key matrix $\bm{K}$ and transposed};
-\node[below=0.5cm of raw] (outdesc) {\small Scaled dot product $\bm{S}$ (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
-
+\node[below=0.2cm of X] (inputdsc) {\small Token embeddings $\bm{X}$ (input or previous transformer layer)};
+\node[below=0.2cm of matrixh] (convdesc) {\small $\bm{X}$ projected to query matrix $\bm{Q}$};
+\node[below=0.5cm of matrixhtrans] (outdesc) {\small $\bm{X}$ projected to key matrix $\bm{K}$ and transposed};
+\node[below=0.5cm of raw, text width=6cm] (outdesc) {\small Scaled dot product $\bm{S}$ (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
 \end{scope}
 
 
@@ -1018,7 +1018,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 
-\begin{frame}{Self-Attention in detailed example}
+\begin{frame}{Self-attention in detail --- softmax over scaled dot product}
 
 \vspace{-2em}
 \begin{figure}
@@ -1083,7 +1083,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 \begin{scope}[every node/.style={align=center,text width=3cm}]
 %\node[below=0.2cm of X] (inputdsc) {\scriptsize Input tokens};
-\node[below=0cm of raw] (outdesc) {\small Scaled dot product (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
+\node[below=0cm of raw, text width=6cm] (outdesc) {\small Scaled dot product (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
 \node[below=0cm of probabilistic] (outdesc) {\small Normalized associations};
 %\node[above=0cm of hidden] (hiddendsc) {\scriptsize Hidden layer};
 %\node[above=0cm of output] (outputdsc) {\scriptsize Output};
@@ -1100,7 +1100,120 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 
-\begin{frame}{Some details}
+
+
+
+
+
+
+\begin{frame}{Self-Attention in detail --- head output by weighting the value}
+
+\vspace{-2em}
+\begin{figure}
+\scalebox{0.8}{
+\begin{tikzpicture}
+
+\matrix[mtx, ampersand replacement=\&] (X) at (2,2) {
+	\mathrm{The} \\ 
+	\mathrm{cat}\\ 
+	\mathrm{sat}\\ 
+	\mathrm{.} \\
+	\mathrm{PAD} \\ 
+};
+
+
+
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of X] (probabilistic) {
+   \tilde{S}_{[1,1]} \& \tilde{S}_{[1,2]} \& \tilde{S}_{[1,3]} \& \tilde{S}_{[1,4]} \& \tilde{S}_{[1,5]} \\
+   \tilde{S}_{[2,1]} \&  \& \& \& \tilde{S}_{[2,5]}   \\
+   \tilde{S}_{[3,1]} \&  \& \ddots \&  \& \tilde{S}_{[3,5]}  \\
+   \tilde{S}_{[4,1]} \&  \&  \&  \& \tilde{S}_{[4,5]}  \\
+   \tilde{S}_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& \tilde{S}_{[5,5]} \\
+};
+
+\matrix[mtx,  ampersand replacement=\&, right=5ex of probabilistic] (matrixh) { 
+   \cdots \& v_1 \&  \cdots \\
+   \cdots \& v_2 \&  \cdots \\
+   \cdots \& v_3 \&  \cdots \\
+   \cdots \& v_4 \&  \cdots \\
+   \cdots \& v_5 \&  \cdots \\
+};
+
+\matrix[mtx,  ampersand replacement=\&, right=5ex of matrixh] (selfattention) { 
+   \cdots \& y_1 \&  \cdots \\
+   \cdots \& y_2 \&  \cdots \\
+   \cdots \& y_3 \&  \cdots \\
+   \cdots \& y_4 \&  \cdots \\
+   \cdots \& y_5 \&  \cdots \\
+};
+
+%\draw[-stealth, color=red] (X-1-1.south west) -| (beta-6-1.south west);
+
+%\node at ($(X.east) !0.5! (matrixh.west)$) {$*$};
+\node at ($(probabilistic.east)!0.5!(matrixh.west)$) {$\times$};%
+\node at ($(matrixh.east)!0.5!(selfattention.west)$) {$=$};%
+%\node at ($(raw.north)!0.5!(probabilistic.north)$) {Softmax (per row)};%
+
+
+\begin{scope}[on background layer]
+%\node[hltr, fill=gray, fit=(beta-1-1)] {};
+%\node[hltr, fill=red, fit=(beta-2-1)(beta-3-1)] {};
+%\node[hltr, fill=green, fit=(beta-4-1)(beta-6-1)] {};
+%\node[hltr, fill=gray, fit=(X-1-1)(X-12-1)] {};
+%\node[hltr, fill=orange, fit=(filterg-1-1)(filterg-3-3)] {};
+
+%\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
+%\node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
+
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=green, fit=(matrixh-\in-1)(matrixh-\in-3)] {};
+}
+
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=yellow, fit=(probabilistic-\in-1)(probabilistic-\in-5)] {};
+}
+
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=red, fit=(selfattention-\in-1)(selfattention-\in-3)] {};
+}
+\end{scope}
+
+
+% \foreach \in in {1,2,3,4,5} {
+% 	\draw[->, lightgray, thick, dashed] (X-\in-1) to[out = 0, in = 180] (raw-\in-1);
+% }
+
+% \foreach \in in {1,2,3,4,5} {
+% 	\draw[->, lightgray, thick] (X-\in-5) to[out = 0, in = 180] (probabilistic-\in-1);
+% }
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick, dashed] (X-\in-1) to[out = 0, in = 180] (probabilistic-\in-1);
+}
+
+
+\begin{scope}[every node/.style={align=center,text width=3cm}]
+%\node[below=0.2cm of X] (inputdsc) {\scriptsize Input tokens};
+\node[below=0.2cm of matrixh] (convdesc) {\small $\bm{X}$ projected to value matrix $\bm{V}$};
+% \node[below=0.5cm of raw] (outdesc) {\scriptsize Dot product (raw associations)};
+\node[below=0cm of probabilistic] (outdesc) {\small Normalized associations};
+\node[below=0cm of selfattention] (outdesc) {\small Output $\bm{Y}^h$ of $y$-th self-attention head};
+%\node[above=0cm of hidden] (hiddendsc) {\scriptsize Hidden layer};
+%\node[above=0cm of output] (outputdsc) {\scriptsize Output};
+
+
+\end{scope}
+
+
+\end{tikzpicture}
+}
+\end{figure}
+	
+\end{frame}
+
+
+\begin{frame}{Some notation details}
 	
 	How to add a single vector $\bm{b}$ to each row in a matrix $\bm{W}$ ($\bm{W} \in \mathbb{R}^{m \times n}, \bm{b} \in \mathbb{R}^{n}$)
 	
@@ -1142,7 +1255,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 
-\begin{frame}{Some details}
+\begin{frame}{Some notation details}
 	
 	Soft-max for matrices row-wise, $\bm{A} \in \mathbb{R}^{m \times n}$
 	
@@ -1163,7 +1276,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 
-\begin{frame}{Bidirectional / unmasked self-attention (recap from last lecture)}
+\begin{frame}{Bidirectional unmasked self-attention precisely}
 	
 	\begin{minipage}[t][10cm][t]{15cm}
 		
@@ -1220,49 +1333,61 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 		\begin{scope}[thick, black, ->, >=latex]
 			\draw (x) edge[out=0,in=180] (mhattention);
 			\draw (x) -- (sum1);
-			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
-			\draw (sum1) -- (norm1) node [midway, above] {$\bm{X}$};
-			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum1) -- (norm1) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{\tilde{X}}$};
 			\draw (norm1) edge[out=0,in=170] (mlp1);
 			\draw (mlp1) -- (gelu);
 			\draw (gelu) -- (mlp2);
-			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum2) -- (norm2) node [midway, above] {$\bm{\tilde{X}}$};
 			\draw (norm2) -- (out);
 		\end{scope}	
 	\end{tikzpicture}
+
 	
-	Let's add Layer Normalization and GELU	
+	Let's look at Layer Normalization and GELU	
 \end{frame}
 
 
+\begin{frame}{Layer normalization}
+	
+Input: $\bm{e} \in \mathbb{R}^{d}$, output of a layer
+
+Input: $\bm{\hat e} \in \mathbb{R}^{d}$, normalized output of a layer
+
+Parameters: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, element-wise scale and offset
+
+\bigskip
+
+\begin{algorithmic}[1]
+	\Function{LayerNorm}{$\bm{e} ; \bm{\gamma}, \bm{\beta}$}
+	\State $m \gets \frac{1}{d} \sum_{i = 1}^{d} \bm{e}[i]$
+	\Comment{`Sample mean' of $\bm{e}$}
+	\State $v \gets \frac{1}{d} \sum_{i = 1}^{d} (\bm{e}[i] - m)^2$
+	\Comment{`Sample variance' of $\bm{e}$}
+	\State \Return $\bm{\hat e} = \frac{\bm{e} - m}{\sqrt{v}} \odot \bm{\gamma} + \bm{\beta}$
+	\Comment{$\odot$ element-wise product}
+	\EndFunction
+\end{algorithmic}	
+
+\begin{small}
+(some transformers use $m = \beta = 0$)
+\end{small}
+	
+\end{frame}
+
 \begin{frame}{Simplifying notation: Perform \textsc{LayerNorm} on each row}
 	
-	\begin{block}{Recall: LayerNorm}
-		Input: $\bm{e} \in \mathbb{R}^{d}$ (output of a layer), Output: $\bm{\hat e} \in \mathbb{R}^{d}$ \\
-		Params: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, trainable element-wise scale and offset
-		
-		\begin{algorithmic}[1]
-			\Function{LayerNorm}{$\bm{e} | \bm{\gamma}, \bm{\beta}$}
-			\State $m \gets \frac{1}{d} \sum_{i = 1}^{d} \bm{e}[i]$
-			\Comment{`Sample mean' of $\bm{e}$}
-			\State $v \gets \frac{1}{d} \sum_{i = 1}^{d} (\bm{e}[i] - m)^2$
-			\Comment{`Sample variance' of $\bm{e}$}
-			\State \Return $\bm{\hat e} = \frac{\bm{e} - m}{\sqrt{v}} \odot \bm{\gamma} + \bm{\beta}$
-			\Comment{Offset and scale}
-			\EndFunction
-		\end{algorithmic}
-	\end{block}
 	
-	
-	\begin{algorithmic}[1]
-		\Function{LayerNormEachRow}{$\bm{X} \in \mathbb{R}^{m \times n} | \bm{\gamma}, \bm{\beta}$}
-		\For{$t \in [m]$}
-		\State $˝\bm{X}[t,:] \gets \textsc{LayerNorm}(\bm{X}{[t,:]} | \bm{\gamma}, \bm{\beta})$
-		\EndFor
-		\State \Return $\bm{X}$
-		\EndFunction
-	\end{algorithmic}
+\begin{algorithmic}[1]
+	\Function{LayerNormEachRow}{$\bm{X} \in \mathbb{R}^{m \times n} | \bm{\gamma}, \bm{\beta}$}
+	\For{$t \in [m]$}
+	\State $˝\bm{X}[t,:] \gets \textsc{LayerNorm}(\bm{X}{[t,:]} | \bm{\gamma}, \bm{\beta})$
+	\EndFor
+	\State \Return $\bm{X}$
+	\EndFunction
+\end{algorithmic}
 	
 	
 \end{frame}
@@ -1271,17 +1396,17 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 \begin{frame}{GELU --- Gaussian Error Linear Units}
 	
-	\begin{block}{Recall: CDF $\Phi(x)$ of standard normal $X \sim \mathcal{N}(0; 1)$}
-		$\Phi(x) = \Pr(X \leq x) = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{x} \exp \left(
-		\frac{-t^2}{2} \right) \mathrm{d}t$
-	\end{block}
+\begin{block}{Recall: CDF $\Phi(x)$ of standard normal $X \sim \mathcal{N}(0; 1)$}
+	$\Phi(x) = \Pr(X \leq x) = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{x} \exp \left(
+	\frac{-t^2}{2} \right) \mathrm{d}t$
+\end{block}
+\vspace{-2em}
 	$$
 	\begin{aligned}
 		\textsc{GELU}(x) &= x \cdot \Phi(x) \\
 		&\approx x \cdot \sigma(1.702 x) \qquad \text{(if speed $>$ exactness)}
 	\end{aligned}
 	$$
-	
 	\begin{figure}
 		\begin{tikzpicture}
 			
@@ -1611,7 +1736,7 @@ Task 2: Consecutive segment prediction
 
 \begin{frame}{BERT: pre-training by masked language modeling}
 	
-	\vspace{-1em}	
+	\vspace{-2em}	
 	\begin{minipage}[t][10cm][t]{15cm}
 		\begin{algorithmic}[1]
 			\Function{ETraining}{$\left\{ \bm{x}_n \right\}_{n = 1}^{N_\text{data}}$ seqs,  $\bm{\theta}$ init.\ params; $p_{\text{mask}} \in (0, 1)$, $N_\text{epochs}$, $\eta$}
@@ -1736,7 +1861,7 @@ Task 2: Consecutive segment prediction
 	
 	Pred: $\bm{\hat{y}} = \bm{P_{\theta}}[1,:] = (0.001, \ldots, 0.0041_{21}, \ldots 0.0003) \in \mathbb{R}^{N_{\text{V}}}$
 	
-	\begin{block}{Categorical cross entropy loss (Lec.\ 4)}
+	\begin{block}{Recall: Categorical cross entropy loss}
 		$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
 		$= - 1 \cdot \log (\bm{\hat{y}}[21])
 		= - \log(\bm{P_{\theta}}[1, 21])$ \\
@@ -1786,7 +1911,7 @@ Task 2: Consecutive segment prediction
 \begin{frame}{BERT: Representing various NLP tasks}
 	
 	\begin{figure}
-		\includegraphics[width=0.6\linewidth]{img/task1.png}
+		\includegraphics[width=0.5\linewidth]{img/task1.png}
 	\end{figure}
 
 
