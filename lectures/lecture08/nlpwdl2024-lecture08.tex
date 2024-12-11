@@ -941,6 +941,7 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 \begin{frame}{Self-Attention in detailed example}
 
+\vspace{-2em}
 \begin{figure}
 \scalebox{0.8}{
 \begin{tikzpicture}
@@ -968,11 +969,11 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 };
 
 \matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of matrixhtrans] (raw) {
-   11 \& 12 \& 13 \& 14 \& 15 \\
-   21 \& \ddots \& \& \& \vdots  \\
-   31 \&  \& \ddots \&  \& \vdots \\
-   41 \&  \&  \& \ddots \& \vdots \\
-   51 \&  \cdots \& \cdots  \& \cdots  \& 55 \\
+   S_{[1,1]} \& S_{[1,2]} \& S_{[1,3]} \& S_{[1,4]} \& S_{[1,5]} \\
+   S_{[2,1]} \&  \& \& \& \vdots  \\
+   S_{[3,1]} \&  \& \ddots \&  \& \vdots \\
+   S_{[4,1]} \&  \&  \&  \& \vdots \\
+   S_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& S_{[5,5]} \\
 };
 
 
@@ -999,19 +1000,103 @@ $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \math
 
 
 \begin{scope}[every node/.style={align=center,text width=3cm}]
-\node[below=0.2cm of X] (inputdsc) {\small Input tokens};
+\node[below=0.2cm of X] (inputdsc) {\small Token embeddings (input of previous transformer layer)};
 \node[below=0.2cm of matrixh] (convdesc) {\small Projected to query matrix $\bm{Q}$};
 \node[below=0.5cm of matrixhtrans] (outdesc) {\small Projected to key matrix $\bm{K}$ and transposed};
-\node[below=0.5cm of raw] (outdesc) {\small Scaled dot product (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
+\node[below=0.5cm of raw] (outdesc) {\small Scaled dot product $\bm{S}$ (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
 
 \end{scope}
 
 
 \end{tikzpicture}
-		}
-	\end{figure}
+}
+\end{figure}
 	
 \end{frame}
+
+
+
+
+
+\begin{frame}{Self-Attention in detailed example}
+
+\vspace{-2em}
+\begin{figure}
+\scalebox{0.8}{
+\begin{tikzpicture}
+
+\matrix[mtx, ampersand replacement=\&] (X) at (2,2) {
+	\mathrm{The} \\ 
+	\mathrm{cat}\\ 
+	\mathrm{sat}\\ 
+	\mathrm{.} \\
+	\mathrm{PAD} \\ 
+};
+
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of X] (raw) {
+   S_{[1,1]} \& S_{[1,2]} \& S_{[1,3]} \& S_{[1,4]} \& S_{[1,5]} \\
+   S_{[2,1]} \&  \& \& \& \vdots  \\
+   S_{[3,1]} \&  \& \ddots \&  \& \vdots \\
+   S_{[4,1]} \&  \&  \&  \& \vdots \\
+   S_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& S_{[5,5]} \\
+};
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=4cm of raw] (probabilistic) {
+   \tilde{S}_{[1,1]} \& \tilde{S}_{[1,2]} \& \tilde{S}_{[1,3]} \& \tilde{S}_{[1,4]} \& \tilde{S}_{[1,5]} \\
+   \tilde{S}_{[2,1]} \&  \& \& \& \tilde{S}_{[2,5]}   \\
+   \tilde{S}_{[3,1]} \&  \& \ddots \&  \& \tilde{S}_{[3,5]}  \\
+   \tilde{S}_{[4,1]} \&  \&  \&  \& \tilde{S}_{[4,5]}  \\
+   \tilde{S}_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& \tilde{S}_{[5,5]} \\
+};
+
+%\draw[-stealth, color=red] (X-1-1.south west) -| (beta-6-1.south west);
+
+%\node at ($(X.east) !0.5! (matrixh.west)$) {$*$};
+%\node at ($(matrixh.east)!0.5!(matrixhtrans.west)$) {$\times$};%
+\node at ($(raw.north)!0.5!(probabilistic.north)$) {\small Softmax (per row)};%
+
+
+\begin{scope}[on background layer]
+%\node[hltr, fill=gray, fit=(beta-1-1)] {};
+%\node[hltr, fill=red, fit=(beta-2-1)(beta-3-1)] {};
+%\node[hltr, fill=green, fit=(beta-4-1)(beta-6-1)] {};
+%\node[hltr, fill=gray, fit=(X-1-1)(X-12-1)] {};
+%\node[hltr, fill=orange, fit=(filterg-1-1)(filterg-3-3)] {};
+
+%\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
+\node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=yellow, fit=(probabilistic-\in-1)(probabilistic-\in-5)] {};
+}
+\end{scope}
+
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick, dashed] (X-\in-1) to[out = 0, in = 180] (raw-\in-1);
+}
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick] (raw-\in-5) to[out = 0, in = 180] (probabilistic-\in-1);
+}
+
+
+\begin{scope}[every node/.style={align=center,text width=3cm}]
+%\node[below=0.2cm of X] (inputdsc) {\scriptsize Input tokens};
+\node[below=0cm of raw] (outdesc) {\small Scaled dot product (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
+\node[below=0cm of probabilistic] (outdesc) {\small Normalized associations};
+%\node[above=0cm of hidden] (hiddendsc) {\scriptsize Hidden layer};
+%\node[above=0cm of output] (outputdsc) {\scriptsize Output};
+
+
+\end{scope}
+
+\end{tikzpicture}
+}
+\end{figure}
+	
+\end{frame}
+
 
 
 
