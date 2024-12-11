@@ -255,26 +255,12 @@ Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
 
 \maketitle
 
-
-\begin{frame}{Motivation}
-
-Last time we started with the transformer and BERT, but we
-
-\begin{itemize}
-\item skipped some important architectural details
-\item were unprecise with some graphical representation
-\item did not talk about pre-training and fine-tuning
-\end{itemize}
-
-Let's fix that today!
-
-After this lecture you should be able to build BERT
-	
-\end{frame}
+\section{Motivation}
 
 
 
-\section{Multi-task learning}
+
+\subsection{Multi-task learning}
 
 
 \begin{frame}{Multi-task Learning}
@@ -370,17 +356,53 @@ By learning tasks in parallel while using a shared representation
 
 \bigskip
 
-Also recall disadvantages of static word embeddings
+Also recall disadvantages of \textbf{static word embeddings}
 	
 \end{frame}
+
+
+\begin{frame}{Today: Transformers and the BERT architecture}
+
+\textbf{B}idirectional \textbf{E}ncoder \textbf{R}epresentations from \textbf{T}ransformers
+
+BERT was a game-changer in NLP:
+
+\begin{small}
+``BERT is conceptually simple and empirically powerful. It obtains new \textbf{state-of-the-art results on eleven natural language processing tasks}, including pushing the GLUE score to 80.5\% (\textbf{7.7\% point absolute improvement}), MultiNLI accuracy to 86.7\% (\textbf{4.6\% absolute improvement}), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (\textbf{5.1 point absolute improvement})."
+\end{small}
+
+After this lecture you should be able to build BERT
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Devlin.et.al.2019.NAACL} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
 
 
 \section{BERT --- Encoder architecture in detail}
 
 
+\begin{frame}{BERT: Very abstract view}
+	
+\begin{figure}
+\includegraphics[width=\linewidth]{img/bert1.png}
+\end{figure}
 
+\begin{itemize}
+\item BERT produces contextualized token embeddings
+\item BERT can learn them in a `clever' way
+\item BERT can be applied to many downstream tasks
+\end{itemize}
+
+	
+\end{frame}
 \begin{frame}{Transformer encoder (BERT)}
 	
+
 	\begin{tikzpicture}
 		
 		\node (x) {$\bm{x}_n$};
@@ -400,16 +422,185 @@ Also recall disadvantages of static word embeddings
 		\begin{scope}[thick, black, ->, >=latex]
 			\draw (x) -- (emblayer);
 			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
-			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
-			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{\tilde{X}}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{\tilde{X}}$};
 			\draw (finallayer) -- (out);
 		\end{scope}	
 	\end{tikzpicture}
 	
+\vspace{4em}
+As usual, green boxes are functions with trainable parameters
+
+$\bm{\tilde{X}}$ is just a placeholder for \textbf{updated} token embeddings matrix $\bm{X}$	
 	\vspace{4em}
-	As usual, green boxes are functions with trainable parameters
+
 	
 \end{frame}	
+
+
+
+
+
+\begin{frame}{Some details (Notation)}
+	
+	Simplify the set notation
+	
+	$\{1, 2, \ldots, N\}$ is a set of integers $1, 2, \ldots, N - 1, N$
+	
+	simplify to $[N]$
+	
+	For example $t \in [N] \equiv t \in \{1, 2, \ldots, N\}$
+	
+	
+	\begin{tikzpicture}[overlay, remember picture] 
+		\node at (current page.north east)[ref] {Notation and formal description of algorithms adopted from \fullcite{Phuong.Hutter.2022} Note that they use column-vector notation while here (and in all lectures) we use row-vector notation. \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{Basic single-query attention}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{e} \in \mathbb{R}^{d_\text{in}}$, vector representation of the current token
+		
+		Input: $\bm{e}_t \in \mathbb{R}^{d_\text{in}}$, vector representations of the context tokens $t \in [T]$
+		
+		Output: $\bm{\tilde v} \in \mathbb{R}^{d_\text{out}}$, vector representation of the token and context combined
+		
+		Params: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{in} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, the query and key linear projections
+		
+		$\bm{W_v} \in \mathbb{R}^{d_\text{in} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$, the value linear projection
+		
+		\begin{algorithmic}[1]
+			\Function{Basic single-query attention}{}
+			%\KwIn{}
+			%\KwOut{$\v{\tilde v}∈ℝ^{d_\t{out}}$, vector representation of the token and context combined.}
+			%\KwParam{$\m{W_q}, \m{W_k}∈ℝ^{d_\t{attn}×d_\t{in}}$, $ \v{b_q}, \v{b_k}∈ℝ^{d_\t{attn}}$, the query and key linear projections.}
+			%\KwParam{$\m{W_v}∈ℝ^{d_\t{out}×d_\t{in}}$, $ \v{b_v}∈ℝ^{d_\t{out}}$, the value linear projection.}
+			\State $\bm{q} \gets \bm{e} \bm{W_q} + \bm{b_q}$
+			\Comment{Query linear projection}
+			\For{$t \in [T]$}
+			\State $\bm{k_t} \gets \bm{e_t} \bm{W_k} + \bm{b_k}$
+			\Comment{Key linear projection}
+			\State $\alpha_{t} = \frac{
+				\exp(\bm{q} \cdot \bm{k_t} / \sqrt{d_{\text{attn}}})
+			}{
+				\sum_{u = 1}^{T}\exp(\bm{q} \cdot \bm{k_u} / \sqrt{d_{\text{attn}}})
+			}$
+			\Comment{Softmax over scaled dot products ($\alpha_{t} \in \mathbb{R}$)}
+			\State $\bm{v_t} \gets \bm{e_t} \bm{W_v} + \bm{b_v}$
+			\Comment{Value linear projection}
+			\EndFor
+			\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+
+\begin{frame}{Some details}
+	
+	Concatenate matrices of the same dimensions along rows
+	$$\bm{Y} = [\bm{X}^1 ; \bm{X}^2 ; \ldots ; \bm{X}^H]
+	\qquad
+	\bm{X}^i \in \mathbb{R}^{m \times n}
+	\qquad
+	\bm{Y} \in \mathbb{R}^{m \times H \cdot n}$$
+	
+	\begin{block}{Example}
+		\begin{small}
+			$$
+			\bm{A} =
+			\begin{pmatrix}
+				1 & 2 \\
+				3 & 4 \\
+				5 & 6
+			\end{pmatrix}
+			,
+			\bm{B} =
+			\begin{pmatrix}
+				11 & 12 \\
+				13 & 14 \\
+				15 & 16
+			\end{pmatrix}
+			\quad
+			\bm{Y} = [\bm{A} ; \bm{B} ] =
+			\begin{pmatrix}
+				1 & 2 & 11 & 12 \\
+				3 & 4 & 13 & 14 \\
+				5 & 6 & 15 & 16
+			\end{pmatrix}
+			$$
+		\end{small}
+	\end{block}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Some details}
+	
+	How to add a single vector $\bm{b}$ to each row in a matrix $\bm{W}$ ($\bm{W} \in \mathbb{R}^{m \times n}, \bm{b} \in \mathbb{R}^{n}$)
+	
+	We want $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b}$
+	
+	Let $\bm{1}^{m} = (1, 1, \ldots, 1_m)$, then $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b} = \bm{X} +  (\bm{b}^\top  \bm{1}^{m})^\top$
+	
+	\begin{block}{Example}
+		\begin{scriptsize}
+			$$
+			\bm{X} =
+			\begin{pmatrix}
+				1 & 2 \\
+				3 & 4 \\
+				5 & 6
+			\end{pmatrix}
+			,
+			\bm{b} = \begin{pmatrix}10 & 20\end{pmatrix}
+			$$
+			
+			$$
+			\bm{b}^\top \bm{1}^m = \begin{pmatrix}10 \\ 20\end{pmatrix}
+			\begin{pmatrix}1 & 1 & 1\end{pmatrix} =
+			\begin{pmatrix}10 & 10 & 10 \\ 20 & 20 & 20 \end{pmatrix}
+			\qquad
+			(\bm{b}^\top \bm{1}^m)^\top = 
+			\begin{pmatrix} 10 & 20 \\ 10 & 20 \\ 10 & 20 \end{pmatrix}
+			$$
+		\end{scriptsize}
+	\end{block}
+	
+	
+\end{frame}
+
+
+
+
+\begin{frame}{Some details}
+	
+	Soft-max for matrices row-wise, $\bm{A} \in \mathbb{R}^{m \times n}$
+	
+	$$
+	\softmax_{\text{row}} : \mathbb{R}^{m \times n} \mapsto \mathbb{R}^{m \times n}
+	$$
+	
+	$$
+	\softmax_{\text{row}} (\bm{A}) [i, j] = \frac{
+		\exp( \bm{A}[i, j])
+	}{
+		\sum_{k = 1}^n \exp (\bm{A}[i, k])
+	}
+	$$
+	
+	
+\end{frame}
+
+
+
 
 
 
@@ -471,8 +662,42 @@ Or: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of 
 			\draw (embfn) -- (embeddings) node [midway, above] {$\bm{X}$};
 		\end{scope}	
 	\end{tikzpicture}
+
 \end{frame}	
 
+
+\begin{frame}{Positional embeddings}
+
+For each input position $t$, we learn (train) an embedding vector $\bm{W_p}[t]$, for example
+$$
+\bm{W_p} =
+\begin{pmatrix}
+\bm{W_p}[1] \\
+\bm{W_p}[2] \\
+\vdots \\
+\bm{W_p}[\ell]
+\end{pmatrix}
+=
+\begin{pmatrix}
+1.12 & -78.6 & \cdots \\
+\vdots & & \vdots \\
+\vdots & & \vdots \\
+-0.1 & 799.7 & \cdots
+\end{pmatrix}
+$$
+
+The model knows with which part of the input/output is dealing with
+
+\begin{small}
+Originally proposed for CNNs for MT, state-of-the-art results and \textbf{9.3--21.3$\times$ faster} than LSTMs on GPU
+\end{small}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Gehring.et.al.2017a.ICML} \par};
+\end{tikzpicture}
+
+
+\end{frame}
 
 
 \begin{frame}{BERT (encoding-only transformer, forward pass)}
@@ -515,15 +740,16 @@ Or: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of 
 		\begin{scope}[thick, black, ->, >=latex]
 			\draw (x) -- (emblayer);
 			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
-			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
-			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{\tilde{X}}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{\tilde{X}}$};
 			\draw (finallayer) -- (out);
 		\end{scope}	
 	\end{tikzpicture}
 	
-	\vspace{4em}
-	The transformer encoder layer is repeated L-times (each with different parameters)
-	
+\vspace{4em}
+The transformer encoder layer is repeated $L$-times (each with \textbf{different} parameters)
+
+
 \end{frame}	
 
 \begin{frame}{BERT (encoding-only transformer, forward pass)}
@@ -566,8 +792,8 @@ Or: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of 
 		\begin{scope}[thick, black, ->, >=latex]
 			\draw (x) -- (emblayer);
 			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
-			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
-			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{\tilde{X}}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{\tilde{X}}$};
 			\draw (finallayer) -- (out);
 		\end{scope}	
 	\end{tikzpicture}
@@ -604,14 +830,14 @@ Or: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of 
 		\begin{scope}[thick, black, ->, >=latex]
 			\draw (x) edge[out=0,in=180] (mhattention);
 			\draw (x) -- (sum1);
-			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
-			\draw (sum1) -- (norm1) node [midway, above] {$\bm{X}$};
-			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum1) -- (norm1) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{\tilde{X}}$};
 			\draw (norm1) edge[out=0,in=170] (mlp1);
 			\draw (mlp1) -- (gelu);
 			\draw (gelu) -- (mlp2);
-			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum2) -- (norm2) node [midway, above] {$\bm{\tilde{X}}$};
 			\draw (norm2) -- (out);
 		\end{scope}	
 	\end{tikzpicture}
@@ -662,7 +888,7 @@ Let's focus on Multi-Head Self Attention
 		
 		\node (linear) [param, right of=stack, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
 		
-		\node (out) [right of=linear, xshift=1cm] {$\bm{X}$};		
+		\node (out) [right of=linear, xshift=1cm] {$\bm{\tilde{V}}$};		
 		
 		\begin{scope}[thick, black, ->, >=latex]
 			\draw (x) edge[out=0,in=180] (ahead1);
