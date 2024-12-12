@@ -108,8 +108,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2024-12-12
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture08-handout.pdf)
-* [YouTube video TBD]()
+* [YouTube video](https://www.youtube.com/watch?v=Iv4frRvYFd8)
 
+### Exercise 08: Neural language model
+
+2024-12-12
+
+* See the Python project under [exercises/ex04](exercises/ex08)
 
 
 ## FAQ
