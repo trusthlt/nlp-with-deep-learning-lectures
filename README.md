@@ -116,6 +116,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * See the Python project under [exercises/ex04](exercises/ex08)
 
+### Lecture 09: BERT part 2
+
+2024-12-12
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture09-handout.pdf)
+* [YouTube video TBD](https://www.youtube.com/watch?v=)
+
+
 
 ## FAQ
 
