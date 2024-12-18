@@ -1,0 +1,2035 @@
+% !TeX program = lualatex
+% !BIB program = biber
+% Lualatex is important to render TTF fonts; with pdflatex it's just the regular one
+% ratio 16:9 -- https://tex.stackexchange.com/questions/14336/
+
+% compile two versions, inspired by https://tex.stackexchange.com/a/1501
+% use the script "compile-pdf.sh"
+\newif\ifhandout
+% if flags.tex does not exist, create an empty file to be able to compile in TeXstudio
+\input{flags}
+
+\ifhandout
+\documentclass[12pt,aspectratio=169,handout]{beamer}
+\else
+\documentclass[12pt,aspectratio=169]{beamer}
+\fi
+
+
+
+% TODO change "leftfootertext" to your liking
+\newcommand{\leftfootertext}{\insertsubtitle}  % just the \title{} text by default
+%\newcommand{\leftfootertext}{RNNs and encoder-decoder architectures}  % Your name, for instance
+
+
+% ------- RUB specifics ----------
+% adjust for 16:9
+% https://tex.stackexchange.com/questions/354022/modifying-the-margins-of-all-slides-in-beamer
+\setbeamersize{text margin left=0.3cm,text margin right=4.5cm} 
+
+
+% use Metropolis as the basis theme
+\usetheme[subsectionpage=progressbar]{metropolis}
+% blocks with background globally
+\metroset{block=fill}
+
+
+\usepackage{fontspec}
+% RUB fonts need to be installed
+% 'UprightFont = * Light' makes sure that the base font is RubFlama Light, which looks
+% lighter than RubFlama Regular (would be too thick for slides)
+\setsansfont[Scale=MatchLowercase, UprightFont = * Light, BoldFont = * Bold]{RubFlama}
+%\setsansfont{Arial} % Open source alternative if you don't have RubFlama
+
+% RUB color scheme
+% Dark blue: 0; 53; 96; #003560
+\definecolor{RUBDarkBlue}{RGB}{0, 53, 96}
+
+% Light yellow (table fill, etc.); 238; 250; 196; #EEFAC4
+\definecolor{RUBLightYellow}{RGB}{238, 250, 196}
+
+%Light green: 141; 174; 16
+\definecolor{RUBLightGreen}{RGB}{141, 174, 16}
+
+
+\setbeamercolor{titlelike}{fg=RUBDarkBlue}
+\setbeamercolor{subtitle}{fg=RUBLightGreen}
+\setbeamercolor{separation line}{fg=RUBLightGreen}
+\setbeamercolor{frametitle}{bg=white, fg=RUBDarkBlue}
+
+% horizontal line on title page and sections
+\setbeamercolor{alerted text}{fg=RUBLightGreen}
+
+
+% Adjust footer bottom (too large by default)
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\textwidth, sep=2ex]{footline}%
+    \usebeamerfont{page number in head/foot}%
+    \usebeamertemplate*{frame footer}
+    \hfill%
+    \usebeamertemplate*{frame numbering}
+  \end{beamercolorbox}%
+}
+
+
+% Lab name, numbering, etc. in footer
+\setbeamertemplate{frame numbering}{TrustHLT --- Prof.\ Dr.\ Ivan Habernal \hspace*{1ex} \includegraphics[width=7em]{img/rub-logo.pdf}\hspace*{1ex}}
+
+\setbeamertemplate{frame footer}{\hspace*{1ex}\insertframenumber \hspace*{2ex} \leftfootertext}
+
+% adjust the background to be completely white
+\setbeamercolor{background canvas}{bg=white}
+
+% logos on the title page
+\titlegraphic{%
+	\begin{picture}(0,0)
+		\put(435,0){\makebox(0,0)[rt]{\includegraphics[width=7em]{img/rub-logo.pdf}}}
+		\put(435,-170){\makebox(0,0)[rt]{\includegraphics[width=4em]{img/logo-trusthlt.pdf}}}
+		\put(435,-196){\makebox(0,0)[rt]{\includegraphics[width=9em]{img/logo-rctrust.pdf}}}
+	\end{picture}%
+}
+
+
+% show TOC at every section start
+\AtBeginSection{
+	\frame{
+		\vspace{2em}
+		\sectionpage
+		\hspace*{2.2em}\begin{minipage}{10cm}
+			\tableofcontents[currentsection]
+		\end{minipage}
+	}
+}
+
+% TOC without subsection
+\setcounter{tocdepth}{1} % only-- part,chapters,sections 
+
+% bullet points: rectangles
+\useinnertheme{rectangles}
+\setbeamercolor{itemize item}{fg=RUBLightGreen}
+\setbeamercolor{itemize subitem}{fg=RUBLightGreen}
+% enumerate: blue background for better readability
+\setbeamercolor{item projected}{bg=RUBDarkBlue}
+
+% make boxes (example, block, etc.) background lighter for readability
+\setbeamercolor{block title}{%
+	use=normal text,
+	fg=normal text.fg,
+	bg=normal text.bg!90!fg % lighter background in block title
+}
+\setbeamercolor{block body}{
+	use={block title, normal text},
+	bg=block title.bg!30!normal text.bg % lighter background in block body
+}
+
+
+% RUB colors in blocks
+\setbeamercolor{block title alerted}{%
+	use={block title, alerted text},
+	bg=RUBDarkBlue,
+	%fg=RUBLightYellow % looks bad
+	fg=white % better contrast
+}
+
+\setbeamercolor{block title example}{%
+	use={block title, example text},
+	fg=RUBLightGreen
+}
+
+
+% ------- end of RUB specifics ----------
+
+% all itemize with pause by default
+%\beamerdefaultoverlayspecification{<+->}
+
+
+% typeset mathematics on serif
+\usefonttheme[onlymath]{serif}
+
+% better bibliography using biber as backend
+\usepackage[natbib=true,backend=biber,style=authoryear-icomp,maxbibnames=30,maxcitenames=9,uniquelist=false,giveninits=true,doi=false,url=false,dashed=false,isbn=false]{biblatex}
+% shared bibliography
+\addbibresource{../../nlpwdl-bibliography.bib}
+% disable "ibid" for repeated citations
+\boolfalse{citetracker}
+
+
+
+\usepackage{xspace}
+
+
+% for derivatives, https://tex.stackexchange.com/a/412442
+\usepackage{physics}
+
+\usepackage{tikz}
+\usetikzlibrary{matrix, positioning}
+\usetikzlibrary{angles,quotes} % for angles
+\usetikzlibrary{backgrounds} % background
+\usetikzlibrary{decorations.pathreplacing} % curly braces
+\usetikzlibrary{calligraphy}
+\usetikzlibrary{calc} % for neural nets
+
+% for plotting functions
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+% sub-figures
+\usepackage{caption}
+\usepackage{subcaption}
+
+% book tabs
+\usepackage{booktabs}
+
+
+% argmin, argmax
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\!\max}
+\DeclareMathOperator*{\argmin}{arg\!\min}
+% softmax
+\DeclareMathOperator*{\softmax}{soft\!\max}
+% Mask
+\DeclareMathOperator*{\mask}{mask}
+
+% bold math
+\usepackage{bm}
+
+% for \mathclap
+\usepackage{mathtools}
+
+% algorithms
+\usepackage[noend]{algpseudocode}
+
+
+% for neurons and layers in tikz
+\tikzset{
+	neuron/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=blue!20},
+	param/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=green!20},
+	constant/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!15},
+	% for citation nodes right top
+	ref/.style={anchor = north east, text width=7.8cm, yshift=-1.3cm, xshift=-0.2cm, scale=0.5},
+	state/.style={rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!5},
+}
+
+% added in lecture 10
+\tikzset{
+	mtx/.style={
+		matrix of math nodes,
+		left delimiter={[}, right delimiter={]}
+	},
+	hlt/.style={opacity=0.1, line width=4 mm, line cap=round},
+	hltr/.style={opacity=0.5, rounded corners=2pt, inner sep=-1pt}
+}
+
+% for strike-through text (added in Lecture 06)
+\usepackage[normalem]{ulem}
+
+% added in Lecture 7
+% RNN
+\DeclareMathOperator*{\rnn}{RNN}
+% RNN star
+\DeclareMathOperator*{\rnnstar}{RNN^{*}}
+% bi-RNN
+\DeclareMathOperator*{\birnn}{biRNN}
+
+
+% added in Lecture 9
+\usetikzlibrary{fit} % for hightligting by calling "fit"
+
+% algorithms
+\usepackage[noend]{algpseudocode}
+
+
+
+\title{Natural Language Processing with Deep Learning}
+\subtitle{Lecture 8 --- BERT part 2}
+\date{December 18, 2024}
+\author{Prof.\ Dr.\ Ivan Habernal}
+\institute{
+\texttt{www.trusthlt.org} \\
+Trustworthy Human Language Technologies Group (TrustHLT) \\
+Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
+
+
+\begin{document}
+
+
+\maketitle
+
+\section{Motivation}
+
+
+
+
+\subsection{Multi-task learning}
+
+
+\begin{frame}{Multi-task Learning}
+
+
+\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+\hspace*{-8em}\begin{column}{0.48\textwidth}
+Approach to inductive transfer that improves generalization
+
+\bigskip	
+
+By learning tasks in parallel while using a shared representation
+\end{column}
+\hspace*{-9.5em}\begin{column}{0.48\textwidth}
+\includegraphics[width=\linewidth]{img/multitask.png}
+\end{column}
+\end{columns}
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Caruana.1997} \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+
+
+\begin{frame}{Multi-task learning in NLP}
+
+
+%\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+%\hspace*{-8em}\begin{column}{0.48\textwidth}
+%xxx
+%\end{column}
+%\hspace*{-9.5em}\begin{column}{0.48\textwidth}
+%yyy
+%\end{column}
+%\end{columns}
+
+
+\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+\hspace*{-8em}\begin{column}{0.48\textwidth}
+\begin{small}
+\emph{"In case we suspect the existence of a hierarchy between the different tasks, we show that it is worth-while to incorporate this knowledge in the MTL architecture’s design, by making lower level tasks affect the lower levels of the representation." }
+\end{small}			
+\end{column}
+\hspace*{-9.5em} \begin{column}{0.48\textwidth}
+	\includegraphics[width=\linewidth]{img/multitask-nlp.png}
+\begin{figure}
+
+\end{figure}
+\end{column}
+\end{columns}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Sogaard.Goldberg.2016} \par};
+\end{tikzpicture}
+
+	
+\end{frame}
+
+
+\begin{frame}{Learn a sentence representation on a different task}
+	
+	\begin{figure}
+		\includegraphics[width=\linewidth]{img/transfer.png}
+	\end{figure}
+	
+	\begin{small}
+		\emph{"Models learned on NLI can perform better than models trained in unsupervised conditions or on other supervised tasks."}
+	\end{small}
+	
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Conneau.et.al.2017.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Bottlenecks of RNN for representation learning}
+	Inherently \textbf{sequential} nature
+	
+	\begin{itemize}
+		\item No parallelization
+		\item Long-range dependencies modeling: Distance plays a role!
+	\end{itemize}
+	
+	...but when the goal is to learn a good representation of the input sequence, we might have better/faster architectures
+
+\bigskip
+
+Also recall disadvantages of \textbf{static word embeddings}
+	
+\end{frame}
+
+
+\begin{frame}{Today: Transformers and the BERT architecture}
+
+\textbf{B}idirectional \textbf{E}ncoder \textbf{R}epresentations from \textbf{T}ransformers
+
+BERT was a game-changer in NLP:
+
+\begin{small}
+``BERT is conceptually simple and empirically powerful. It obtains new \textbf{state-of-the-art results on eleven natural language processing tasks}, including pushing the GLUE score to 80.5\% (\textbf{7.7\% point absolute improvement}), MultiNLI accuracy to 86.7\% (\textbf{4.6\% absolute improvement}), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (\textbf{5.1 point absolute improvement})."
+\end{small}
+
+After this lecture you should be able to build BERT
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Devlin.et.al.2019.NAACL} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Some details (Notation)}
+	
+	Simplify the set notation
+	
+	$\{1, 2, \ldots, N\}$ is a set of integers $1, 2, \ldots, N - 1, N$
+	
+	simplify to $[N]$
+	
+	For example $t \in [N] \equiv t \in \{1, 2, \ldots, N\}$
+	
+	
+	\begin{tikzpicture}[overlay, remember picture] 
+		\node at (current page.north east)[ref] {Notation and formal description of algorithms adopted from \fullcite{Phuong.Hutter.2022} Note that they use column-vector notation while here (and in all lectures) we use row-vector notation. \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+
+\vspace{-1em}	
+\begin{minipage}[t][3em][t]{15cm}
+	\begin{algorithmic}[1]
+		\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+		\State $\ldots$
+		\EndFunction
+	\end{algorithmic}
+	
+\end{minipage}
+	
+\textbf{Input:}
+
+$\bm{x}$ --- $\bm{x} \in V^*$, a sequence of token IDs
+
+$\bm{\mathcal{W}}$ --- all trainable parameters
+
+\textbf{Output:}
+
+Typically an embedding vector for each input token
+
+Or: $\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+
+\end{frame}
+
+
+
+
+\begin{frame}{Input embeddings}
+	
+	The cat sat $\bm{x}_n =
+	\begin{pmatrix}
+		21 &
+		11987 &
+		5438
+	\end{pmatrix}$
+	
+	\begin{tikzpicture}
+		
+		\matrix[mtx, ampersand replacement=\&] (X) at (0,0) {
+			21 \& 11987 \& 5438 \\
+		};
+		
+		\node (embfn) [param, right of=X, xshift=4cm] {Input embeddings};
+		
+		\matrix[mtx,  ampersand replacement=\&, right=of embfn ] (embeddings) { 
+			\cdots \& \bm{e}_1 \&  \cdots \\
+			\cdots \& \bm{e}_2 \&  \cdots \\
+			\cdots \& \bm{e}_3 \&  \cdots \\
+			%		\cdots \& h_4 \&  \cdots \\
+			%		\cdots \& h_5 \&  \cdots \\
+		};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (X) -- (embfn) node [midway, above] {$\bm{x}_n$};
+			\draw (embfn) -- (embeddings) node [midway, above] {$\bm{X}$};
+		\end{scope}	
+	\end{tikzpicture}
+
+\end{frame}	
+
+
+\begin{frame}{Positional embeddings}
+
+For each input position $t$, we learn (train) an embedding vector $\bm{W_p}[t]$, for example
+$$
+\bm{W_p} =
+\begin{pmatrix}
+\bm{W_p}[1] \\
+\bm{W_p}[2] \\
+\vdots \\
+\bm{W_p}[\ell]
+\end{pmatrix}
+=
+\begin{pmatrix}
+1.12 & -78.6 & \cdots \\
+\vdots & & \vdots \\
+\vdots & & \vdots \\
+-0.1 & 799.7 & \cdots
+\end{pmatrix}
+$$
+
+The model knows with which part of the input/output is dealing with
+
+\begin{small}
+Originally proposed for CNNs for MT, state-of-the-art results and \textbf{9.3--21.3$\times$ faster} than LSTMs on GPU
+\end{small}
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Gehring.et.al.2017a.ICML} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\State $\ldots$
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{\tilde{X}}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\vspace{4em}
+The transformer encoder layer is repeated $L$-times (each with \textbf{different} parameters)
+
+
+\end{frame}	
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\For{$l = 1, 2, \dots, L$}
+\State $\ldots$
+\EndFor
+\EndFunction
+\end{algorithmic}
+
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{\tilde{X}}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+	\vspace{4em}
+	Let's look at a single transformer encoder layer
+	
+\end{frame}	
+
+\begin{frame}{Transformer encoder layer (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (mhattention) [param, right of=X, text centered, text width=2cm, xshift=1cm, yshift=-1.6cm] {Multi-Head Self Attention};
+		
+		\node (sum1) [neuron, right of=X, text centered, text width=1.5cm, xshift=2.5cm] {Sum};
+		
+		\node (norm1) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 1};
+		
+		\node (mlp1) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-1.4cm] {Linear layer 1};
+		
+		\node (gelu) [neuron, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-2.6cm] {GELU};
+		
+		\node (mlp2) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-3.8cm] {Linear layer 2};
+		
+		\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.8cm] {Sum};
+		
+		\node (norm2) [param, right of=sum2, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 2};
+		
+		\node (out) [right of=norm2, xshift=1cm] {$\bm{X}$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (mhattention);
+			\draw (x) -- (sum1);
+			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum1) -- (norm1) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{\tilde{X}}$};
+			\draw (norm1) edge[out=0,in=170] (mlp1);
+			\draw (mlp1) -- (gelu);
+			\draw (gelu) -- (mlp2);
+			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum2) -- (norm2) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (norm2) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+
+Let's focus on Multi-Head Self Attention	
+\end{frame}
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+
+\vspace{-2em}
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\For{$l = 1, 2, \dots, L$}
+\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
+\Comment{Multi-head att., residual conn}
+\State $\ldots$
+\EndFor
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Multi-head unmasked self-attention}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (ahead1) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=1.6cm] {Attention head 1};
+		
+		\node (ahead2) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=0cm] {Attention head 2};
+		
+		\node (aheadH) [param, right of=X, text centered, text width=2cm, xshift=2cm, yshift=-1.6cm] {Attention head H};
+		
+		\node (stack) [neuron, right of=ahead2, text centered, text width=1.5cm, xshift=2.5cm] {Stack};
+		
+		\node (linear) [param, right of=stack, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
+		
+		\node (out) [right of=linear, xshift=1cm] {$\bm{\tilde{V}}$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (ahead1);
+			\draw (x) edge[out=0,in=180] (ahead2);
+			\draw (x) edge[out=0,in=180] (aheadH);
+			%			\draw (x) -- (sum1);
+			\draw (ahead1) edge[out=0,in=170] (stack) node [right of=ahead1, xshift=0.5cm, yshift=0.4cm] {$\bm{Y}^1$};
+			\draw (ahead2) edge[out=0,in=180] (stack) node [right of=ahead2, xshift=0.5cm, yshift=0.4cm] {$\bm{Y}^2$};
+			\draw (aheadH) edge[out=0,in=190] (stack) node [right of=aheadH, xshift=0.5cm, yshift=0.7cm] {$\bm{Y}^H$};
+			\draw (stack) -- (linear) node [midway, above] {$\bm{Y}$};
+			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			%			\draw (norm1) edge[out=0,in=180] (mlp);
+			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (linear) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Some notation details}
+	
+	Concatenate matrices of the same dimensions along rows
+	$$\bm{Y} = [\bm{X}^1 ; \bm{X}^2 ; \ldots ; \bm{X}^H]
+	\qquad
+	\bm{X}^i \in \mathbb{R}^{m \times n}
+	\qquad
+	\bm{Y} \in \mathbb{R}^{m \times H \cdot n}$$
+	
+	\begin{block}{Example}
+		\begin{small}
+			$$
+			\bm{A} =
+			\begin{pmatrix}
+				1 & 2 \\
+				3 & 4 \\
+				5 & 6
+			\end{pmatrix}
+			,
+			\bm{B} =
+			\begin{pmatrix}
+				11 & 12 \\
+				13 & 14 \\
+				15 & 16
+			\end{pmatrix}
+			\quad
+			\bm{Y} = [\bm{A} ; \bm{B} ] =
+			\begin{pmatrix}
+				1 & 2 & 11 & 12 \\
+				3 & 4 & 13 & 14 \\
+				5 & 6 & 15 & 16
+			\end{pmatrix}
+			$$
+		\end{small}
+	\end{block}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Multi-head bidirectional unmasked self-attention}
+	
+\begin{minipage}[t][10cm][t]{15cm}
+
+Input: $\bm{X} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{x}}}$, vector representations of the sequence of length $\ell_{\text{x}}$
+
+Output: $\bm{\tilde{V}} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$, updated vector representations of tokens in $\bm{X}$
+
+Hyper-param: $H$, number of attention heads
+
+Params for each $h \in [H]: \bm{\mathcal{W}_{qkv}}^h$:
+\begin{itemize}
+\item $\bm{W_q}^h, \bm{W_k}^h \in \mathbb{R}^{d_\text{x} \times d_\text{attn}}$,
+$\bm{b_q}^h, \bm{b_k}^h \in \mathbb{R}^{d_\text{attn}}$,
+$\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{mid}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{mid}}$
+\item $\bm{W_o} \in \mathbb{R}^{H \cdot d_\text{mid} \times d_\text{out}}$, $\bm{b_o} \in \mathbb{R}^{d_\text{out}}$	
+\end{itemize}
+
+
+\begin{algorithmic}[1]
+\Function{MHAttention}{$\bm{X} ; \bm{\mathcal{W}}$}
+\For{$h \in [H]$}
+\State $\bm{Y}^h \gets \textsc{Attention}(\bm{X}; \bm{\mathcal{W}_{qkv}}^h)$
+\Comment{$\bm{Y}^h \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{mid}}}}$
+\EndFor
+\State{$\bm{Y} \gets [\bm{Y}^1; \bm{Y}^2; \ldots; \bm{Y}^H]$}
+\Comment{$\bm{Y} \in \mathbb{R}^{\ell_{\text{x}} \times H \cdot d_{\text{mid}}}}$
+%\State $\bm{Q} \gets \bm{X} \bm{W_q} +_{\text{(rows)}} \bm{b_q}$
+%\State $\bm{S} \gets \frac{1}{\sqrt{d_{\text{attn}}}} (\bm{Q} \bm{K}^\top)$
+%\Comment{Scaled score $\in \mathbb{R}^{\ell_{\text{x}} \times \ell_{\text{x}}}$}
+\State \Return $\bm{\tilde V} = \bm{Y} \bm{W_o} + \bm{b_o}$
+
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+\begin{frame}{Single unmasked self-attention head}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (query) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=1.6cm] {Linear layer (query)};
+		
+		\node (key) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=0cm] {Linear layer (key)};
+		
+		\node (value) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=-1.6cm] {Linear layer (value)};
+		
+		\node (scaled) [neuron, right of=key, text centered, text width=1.5cm, xshift=2.5cm, yshift=1cm] {Scaled dot product};
+		
+		\node (softmax) [neuron, right of=scaled, text centered, text width=1.8cm, xshift=1.6cm] {Softmax (row)};
+		
+		\node (matmul) [neuron, right of=softmax, text centered, text width=1.5cm, xshift=1.5cm] {Matmul $\bm{\tilde{S}}\bm{V}$};
+		
+		\node (out) [right of=matmul, xshift=1cm] {$\bm{Y}^h$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (query);
+			\draw (x) edge[out=0,in=180] (key);
+			\draw (x) edge[out=0,in=180] (value);
+			%			\draw (x) -- (sum1);
+			\draw (query) edge[out=0,in=170] (scaled) node [right of=query, xshift=0.5cm, yshift=0.4cm] {$\bm{Q}$};
+			\draw (key) edge[out=0,in=190] (scaled) node [right of=key, xshift=0.5cm, yshift=0.4cm] {$\bm{K}$};
+			\draw (value) edge[out=0,in=210] (matmul) node [right of=value, xshift=0.5cm, yshift=0.6cm] {$\bm{V}$};
+			\draw (scaled) -- (softmax) node [midway, above] {$\bm{S}$};
+			\draw (softmax) -- (matmul) node [midway, above] {$\bm{\tilde{S}}$};
+			
+			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
+			%			\draw (norm1) edge[out=0,in=180] (mlp);
+			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
+			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
+			\draw (matmul) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\iffalse
+\begin{frame}{Let's explore the attention for a single token first}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{e} \in \mathbb{R}^{d_\text{in}}$, vector representation of the current token
+		
+		Input: $\bm{e}_t \in \mathbb{R}^{d_\text{in}}$, vector representations of the context tokens $t \in [T]$
+		
+		Output: $\bm{\tilde v} \in \mathbb{R}^{d_\text{out}}$, vector representation of the token and context combined
+		
+		Params: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{in} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, the query and key linear projections
+		
+		$\bm{W_v} \in \mathbb{R}^{d_\text{in} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$, the value linear projection
+		
+		\begin{algorithmic}[1]
+			\Function{Basic single-query attention}{}
+			%\KwIn{}
+			%\KwOut{$\v{\tilde v}∈ℝ^{d_\t{out}}$, vector representation of the token and context combined.}
+			%\KwParam{$\m{W_q}, \m{W_k}∈ℝ^{d_\t{attn}×d_\t{in}}$, $ \v{b_q}, \v{b_k}∈ℝ^{d_\t{attn}}$, the query and key linear projections.}
+			%\KwParam{$\m{W_v}∈ℝ^{d_\t{out}×d_\t{in}}$, $ \v{b_v}∈ℝ^{d_\t{out}}$, the value linear projection.}
+			\State $\bm{q} \gets \bm{e} \bm{W_q} + \bm{b_q}$
+			\Comment{Query linear projection}
+			\For{$t \in [T]$}
+			\State $\bm{k_t} \gets \bm{e_t} \bm{W_k} + \bm{b_k}$
+			\Comment{Key linear projection}
+			\State $\alpha_{t} = \frac{
+				\exp(\bm{q} \cdot \bm{k_t} / \sqrt{d_{\text{attn}}})
+			}{
+				\sum_{u = 1}^{T}\exp(\bm{q} \cdot \bm{k_u} / \sqrt{d_{\text{attn}}})
+			}$
+			\Comment{Softmax over scaled dot products ($\alpha_{t} \in \mathbb{R}$)}
+			\State $\bm{v_t} \gets \bm{e_t} \bm{W_v} + \bm{b_v}$
+			\Comment{Value linear projection}
+			\EndFor
+			\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+\fi
+
+
+
+
+
+
+\begin{frame}{Self-attention in detail --- query, key, scaled dot product}
+
+\vspace{-2em}
+\begin{figure}
+\scalebox{0.8}{
+\begin{tikzpicture}
+
+\matrix[mtx, ampersand replacement=\&] (X) at (2,2) {
+	\mathrm{The} \\ 
+	\mathrm{cat}\\ 
+	\mathrm{sat}\\ 
+	\mathrm{.} \\
+	\mathrm{PAD} \\ 
+};
+
+\matrix[mtx,  ampersand replacement=\&, right=5ex of X] (matrixh) { 
+   \cdots \& q_1 \&  \cdots \\
+   \cdots \& q_2 \&  \cdots \\
+   \cdots \& q_3 \&  \cdots \\
+   \cdots \& q_4 \&  \cdots \\
+   \cdots \& q_5 \&  \cdots \\
+};
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of matrixh] (matrixhtrans) {
+   \vdots \& \vdots \&  \vdots \& \vdots \& \vdots \\
+   k_1 \& k_2 \& k_3 \& k_4 \& k_5 \\
+   \vdots \& \vdots \&  \vdots \& \vdots \& \vdots \\
+};
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of matrixhtrans] (raw) {
+   S_{[1,1]} \& S_{[1,2]} \& S_{[1,3]} \& S_{[1,4]} \& S_{[1,5]} \\
+   S_{[2,1]} \&  \& \& \& \vdots  \\
+   S_{[3,1]} \&  \& \ddots \&  \& \vdots \\
+   S_{[4,1]} \&  \&  \&  \& \vdots \\
+   S_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& S_{[5,5]} \\
+};
+
+
+\node at ($(matrixh.east)!0.5!(matrixhtrans.west)$) {$\times$};%
+\node at ($(matrixhtrans.east)!0.5!(raw.west)$) {$=$};%
+
+
+\begin{scope}[on background layer]
+\foreach \in in {1,2,3,4,5} {
+\node[hltr, fill=green, fit=(matrixh-\in-1)(matrixh-\in-3)] {};
+}
+\foreach \in in {1,2,3,4,5} {
+\node[hltr, fill=orange, fit=(matrixhtrans-1-\in)(matrixhtrans-3-\in)] {};
+}
+%\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
+\node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
+\end{scope}
+
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick] (X-\in-1) to[out = 0, in = 180] (matrixh-\in-1);
+}
+
+
+
+\begin{scope}[every node/.style={align=center,text width=3cm}]
+\node[below=0.2cm of X] (inputdsc) {\small Token embeddings $\bm{X}$ (input or previous transformer layer)};
+\node[below=0.2cm of matrixh] (convdesc) {\small $\bm{X}$ projected to query matrix $\bm{Q}$};
+\node[below=0.5cm of matrixhtrans] (outdesc) {\small $\bm{X}$ projected to key matrix $\bm{K}$ and transposed};
+\node[below=0.5cm of raw, text width=6cm] (outdesc) {\small Scaled dot product $\bm{S}$ (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
+\end{scope}
+
+
+\end{tikzpicture}
+}
+\end{figure}
+	
+\end{frame}
+
+
+
+
+
+\begin{frame}{Self-attention in detail --- softmax over scaled dot product}
+
+\vspace{-2em}
+\begin{figure}
+\scalebox{0.8}{
+\begin{tikzpicture}
+
+\matrix[mtx, ampersand replacement=\&] (X) at (2,2) {
+	\mathrm{The} \\ 
+	\mathrm{cat}\\ 
+	\mathrm{sat}\\ 
+	\mathrm{.} \\
+	\mathrm{PAD} \\ 
+};
+
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of X] (raw) {
+   S_{[1,1]} \& S_{[1,2]} \& S_{[1,3]} \& S_{[1,4]} \& S_{[1,5]} \\
+   S_{[2,1]} \&  \& \& \& \vdots  \\
+   S_{[3,1]} \&  \& \ddots \&  \& \vdots \\
+   S_{[4,1]} \&  \&  \&  \& \vdots \\
+   S_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& S_{[5,5]} \\
+};
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=4cm of raw] (probabilistic) {
+   \tilde{S}_{[1,1]} \& \tilde{S}_{[1,2]} \& \tilde{S}_{[1,3]} \& \tilde{S}_{[1,4]} \& \tilde{S}_{[1,5]} \\
+   \tilde{S}_{[2,1]} \&  \& \& \& \tilde{S}_{[2,5]}   \\
+   \tilde{S}_{[3,1]} \&  \& \ddots \&  \& \tilde{S}_{[3,5]}  \\
+   \tilde{S}_{[4,1]} \&  \&  \&  \& \tilde{S}_{[4,5]}  \\
+   \tilde{S}_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& \tilde{S}_{[5,5]} \\
+};
+
+%\draw[-stealth, color=red] (X-1-1.south west) -| (beta-6-1.south west);
+
+%\node at ($(X.east) !0.5! (matrixh.west)$) {$*$};
+%\node at ($(matrixh.east)!0.5!(matrixhtrans.west)$) {$\times$};%
+\node at ($(raw.north)!0.5!(probabilistic.north)$) {\small Softmax (per row)};%
+
+
+\begin{scope}[on background layer]
+%\node[hltr, fill=gray, fit=(beta-1-1)] {};
+%\node[hltr, fill=red, fit=(beta-2-1)(beta-3-1)] {};
+%\node[hltr, fill=green, fit=(beta-4-1)(beta-6-1)] {};
+%\node[hltr, fill=gray, fit=(X-1-1)(X-12-1)] {};
+%\node[hltr, fill=orange, fit=(filterg-1-1)(filterg-3-3)] {};
+
+%\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
+\node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=yellow, fit=(probabilistic-\in-1)(probabilistic-\in-5)] {};
+}
+\end{scope}
+
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick, dashed] (X-\in-1) to[out = 0, in = 180] (raw-\in-1);
+}
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick] (raw-\in-5) to[out = 0, in = 180] (probabilistic-\in-1);
+}
+
+
+\begin{scope}[every node/.style={align=center,text width=3cm}]
+%\node[below=0.2cm of X] (inputdsc) {\scriptsize Input tokens};
+\node[below=0cm of raw, text width=6cm] (outdesc) {\small Scaled dot product (raw associations) \\ (each entry divided by $\sqrt{d_{\text{attn}}}$ )};
+\node[below=0cm of probabilistic] (outdesc) {\small Normalized associations};
+%\node[above=0cm of hidden] (hiddendsc) {\scriptsize Hidden layer};
+%\node[above=0cm of output] (outputdsc) {\scriptsize Output};
+
+
+\end{scope}
+
+\end{tikzpicture}
+}
+\end{figure}
+	
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+\begin{frame}{Self-Attention in detail --- head output by weighting the value}
+
+\vspace{-2em}
+\begin{figure}
+\scalebox{0.8}{
+\begin{tikzpicture}
+
+\matrix[mtx, ampersand replacement=\&] (X) at (2,2) {
+	\mathrm{The} \\ 
+	\mathrm{cat}\\ 
+	\mathrm{sat}\\ 
+	\mathrm{.} \\
+	\mathrm{PAD} \\ 
+};
+
+
+
+
+\matrix[mtx, ampersand replacement=\&, nodes={anchor=west}, right=of X] (probabilistic) {
+   \tilde{S}_{[1,1]} \& \tilde{S}_{[1,2]} \& \tilde{S}_{[1,3]} \& \tilde{S}_{[1,4]} \& \tilde{S}_{[1,5]} \\
+   \tilde{S}_{[2,1]} \&  \& \& \& \tilde{S}_{[2,5]}   \\
+   \tilde{S}_{[3,1]} \&  \& \ddots \&  \& \tilde{S}_{[3,5]}  \\
+   \tilde{S}_{[4,1]} \&  \&  \&  \& \tilde{S}_{[4,5]}  \\
+   \tilde{S}_{[5,1]} \&  \cdots \& \cdots  \& \cdots  \& \tilde{S}_{[5,5]} \\
+};
+
+\matrix[mtx,  ampersand replacement=\&, right=5ex of probabilistic] (matrixh) { 
+   \cdots \& v_1 \&  \cdots \\
+   \cdots \& v_2 \&  \cdots \\
+   \cdots \& v_3 \&  \cdots \\
+   \cdots \& v_4 \&  \cdots \\
+   \cdots \& v_5 \&  \cdots \\
+};
+
+\matrix[mtx,  ampersand replacement=\&, right=5ex of matrixh] (selfattention) { 
+   \cdots \& y_1 \&  \cdots \\
+   \cdots \& y_2 \&  \cdots \\
+   \cdots \& y_3 \&  \cdots \\
+   \cdots \& y_4 \&  \cdots \\
+   \cdots \& y_5 \&  \cdots \\
+};
+
+%\draw[-stealth, color=red] (X-1-1.south west) -| (beta-6-1.south west);
+
+%\node at ($(X.east) !0.5! (matrixh.west)$) {$*$};
+\node at ($(probabilistic.east)!0.5!(matrixh.west)$) {$\times$};%
+\node at ($(matrixh.east)!0.5!(selfattention.west)$) {$=$};%
+%\node at ($(raw.north)!0.5!(probabilistic.north)$) {Softmax (per row)};%
+
+
+\begin{scope}[on background layer]
+%\node[hltr, fill=gray, fit=(beta-1-1)] {};
+%\node[hltr, fill=red, fit=(beta-2-1)(beta-3-1)] {};
+%\node[hltr, fill=green, fit=(beta-4-1)(beta-6-1)] {};
+%\node[hltr, fill=gray, fit=(X-1-1)(X-12-1)] {};
+%\node[hltr, fill=orange, fit=(filterg-1-1)(filterg-3-3)] {};
+
+%\node[hltr, fill=orange, fit=(mu-1-1)(mu-1-1)] {};
+%\node[hltr, fill=lightgray, fit=(raw-1-1)(raw-5-5)] {};
+
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=green, fit=(matrixh-\in-1)(matrixh-\in-3)] {};
+}
+
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=yellow, fit=(probabilistic-\in-1)(probabilistic-\in-5)] {};
+}
+
+\foreach \in in {1,2,3,4,5} {
+	\node[hltr, fill=red, fit=(selfattention-\in-1)(selfattention-\in-3)] {};
+}
+\end{scope}
+
+
+% \foreach \in in {1,2,3,4,5} {
+% 	\draw[->, lightgray, thick, dashed] (X-\in-1) to[out = 0, in = 180] (raw-\in-1);
+% }
+
+% \foreach \in in {1,2,3,4,5} {
+% 	\draw[->, lightgray, thick] (X-\in-5) to[out = 0, in = 180] (probabilistic-\in-1);
+% }
+
+\foreach \in in {1,2,3,4,5} {
+	\draw[->, lightgray, thick, dashed] (X-\in-1) to[out = 0, in = 180] (probabilistic-\in-1);
+}
+
+
+\begin{scope}[every node/.style={align=center,text width=3cm}]
+%\node[below=0.2cm of X] (inputdsc) {\scriptsize Input tokens};
+\node[below=0.2cm of matrixh] (convdesc) {\small $\bm{X}$ projected to value matrix $\bm{V}$};
+% \node[below=0.5cm of raw] (outdesc) {\scriptsize Dot product (raw associations)};
+\node[below=0cm of probabilistic] (outdesc) {\small Normalized associations};
+\node[below=0cm of selfattention] (outdesc) {\small Output $\bm{Y}^h$ of $y$-th self-attention head};
+%\node[above=0cm of hidden] (hiddendsc) {\scriptsize Hidden layer};
+%\node[above=0cm of output] (outputdsc) {\scriptsize Output};
+
+
+\end{scope}
+
+
+\end{tikzpicture}
+}
+\end{figure}
+	
+\end{frame}
+
+
+\begin{frame}{Some notation details}
+	
+	How to add a single vector $\bm{b}$ to each row in a matrix $\bm{W}$ ($\bm{W} \in \mathbb{R}^{m \times n}, \bm{b} \in \mathbb{R}^{n}$)
+	
+	We want $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b}$
+	
+	Let $\bm{1}^{m} = (1, 1, \ldots, 1_m)$, then $\bm{Z} = \bm{X} +_{\text{(rows)}} \bm{b} = \bm{X} +  (\bm{b}^\top  \bm{1}^{m})^\top$
+	
+	\begin{block}{Example}
+		\begin{scriptsize}
+			$$
+			\bm{X} =
+			\begin{pmatrix}
+				1 & 2 \\
+				3 & 4 \\
+				5 & 6
+			\end{pmatrix}
+			,
+			\bm{b} = \begin{pmatrix}10 & 20\end{pmatrix}
+			$$
+			
+			$$
+			\bm{b}^\top \bm{1}^m = \begin{pmatrix}10 \\ 20\end{pmatrix}
+			\begin{pmatrix}1 & 1 & 1\end{pmatrix} =
+			\begin{pmatrix}10 & 10 & 10 \\ 20 & 20 & 20 \end{pmatrix}
+			\qquad
+			(\bm{b}^\top \bm{1}^m)^\top = 
+			\begin{pmatrix} 10 & 20 \\ 10 & 20 \\ 10 & 20 \end{pmatrix}
+			$$
+		\end{scriptsize}
+	\end{block}
+	
+	
+\end{frame}
+
+
+
+
+
+
+
+
+\begin{frame}{Some notation details}
+	
+	Soft-max for matrices row-wise, $\bm{A} \in \mathbb{R}^{m \times n}$
+	
+	$$
+	\softmax_{\text{row}} : \mathbb{R}^{m \times n} \mapsto \mathbb{R}^{m \times n}
+	$$
+	
+	$$
+	\softmax_{\text{row}} (\bm{A}) [i, j] = \frac{
+		\exp( \bm{A}[i, j])
+	}{
+		\sum_{k = 1}^n \exp (\bm{A}[i, k])
+	}
+	$$
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Bidirectional unmasked self-attention precisely}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+		
+		Input: $\bm{X} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{x}}}$, vector representations of the sequence of length $\ell_{\text{x}}$
+		
+		Output: $\bm{\tilde{V}} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$, updated vector representations of tokens in $\bm{X}$
+		
+		Params $\bm{\mathcal{W}_{qkv}}$: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{x} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
+		
+		\begin{algorithmic}[1]
+			\Function{Attention}{$\bm{X} ; \bm{\mathcal{W}_{qkv}}$}
+			\State $\bm{Q} \gets \bm{X} \bm{W_q} +_{\text{(rows)}} \bm{b_q}$
+			\Comment{Query $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
+			\State $\bm{K} \gets \bm{X} \bm{W_k} +_{\text{(rows)}} \bm{b_k}$
+			\Comment{Key $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
+			\State $\bm{V} \gets \bm{X} \bm{W_v} +_{\text{(rows)}} \bm{b_v}$
+			\Comment{Value $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$}
+			
+			\State $\bm{S} \gets \frac{1}{\sqrt{d_{\text{attn}}}} (\bm{Q} \bm{K}^\top)$
+			\Comment{Scaled score $\in \mathbb{R}^{\ell_{\text{x}} \times \ell_{\text{x}}}$}
+			
+			\State \Return $\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
+			
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+\begin{frame}{Transformer encoder layer (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (mhattention) [param, right of=X, text centered, text width=2cm, xshift=1cm, yshift=-1.6cm] {Multi-Head Self Attention};
+		
+		\node (sum1) [neuron, right of=X, text centered, text width=1.5cm, xshift=2.5cm] {Sum};
+		
+		\node (norm1) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 1};
+		
+		\node (mlp1) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-1.4cm] {Linear layer 1};
+		
+		\node (gelu) [neuron, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-2.6cm] {GELU};
+		
+		\node (mlp2) [param, right of=norm1, text centered, text width=1.6cm, xshift=1.2cm, yshift=-3.8cm] {Linear layer 2};
+		
+		\node (sum2) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.8cm] {Sum};
+		
+		\node (norm2) [param, right of=sum2, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 2};
+		
+		\node (out) [right of=norm2, xshift=1cm] {$\bm{X}$};		
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) edge[out=0,in=180] (mhattention);
+			\draw (x) -- (sum1);
+			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum1) -- (norm1) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{\tilde{X}}$};
+			\draw (norm1) edge[out=0,in=170] (mlp1);
+			\draw (mlp1) -- (gelu);
+			\draw (gelu) -- (mlp2);
+			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{\tilde{X}}$};
+			\draw (sum2) -- (norm2) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (norm2) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+
+	
+	Let's look at Layer Normalization and GELU	
+\end{frame}
+
+
+\begin{frame}{Layer normalization}
+	
+Input: $\bm{e} \in \mathbb{R}^{d}$, output of a layer
+
+Input: $\bm{\hat e} \in \mathbb{R}^{d}$, normalized output of a layer
+
+Parameters: $\bm{\gamma}, \bm{\beta} \in \mathbb{R}^{d}$, element-wise scale and offset
+
+\bigskip
+
+\begin{algorithmic}[1]
+	\Function{LayerNorm}{$\bm{e} ; \bm{\gamma}, \bm{\beta}$}
+	\State $m \gets \frac{1}{d} \sum_{i = 1}^{d} \bm{e}[i]$
+	\Comment{`Sample mean' of $\bm{e}$}
+	\State $v \gets \frac{1}{d} \sum_{i = 1}^{d} (\bm{e}[i] - m)^2$
+	\Comment{`Sample variance' of $\bm{e}$}
+	\State \Return $\bm{\hat e} = \frac{\bm{e} - m}{\sqrt{v}} \odot \bm{\gamma} + \bm{\beta}$
+	\Comment{$\odot$ element-wise product}
+	\EndFunction
+\end{algorithmic}	
+
+\begin{small}
+(some transformers use $m = \beta = 0$)
+\end{small}
+	
+\end{frame}
+
+\begin{frame}{Simplifying notation: Perform \textsc{LayerNorm} on each row}
+	
+	
+\begin{algorithmic}[1]
+	\Function{LayerNormEachRow}{$\bm{X} \in \mathbb{R}^{m \times n} | \bm{\gamma}, \bm{\beta}$}
+	\For{$t \in [m]$}
+	\State $˝\bm{X}[t,:] \gets \textsc{LayerNorm}(\bm{X}{[t,:]} | \bm{\gamma}, \bm{\beta})$
+	\EndFor
+	\State \Return $\bm{X}$
+	\EndFunction
+\end{algorithmic}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{GELU --- Gaussian Error Linear Units}
+	
+\begin{block}{Recall: CDF $\Phi(x)$ of standard normal $X \sim \mathcal{N}(0; 1)$}
+	$\Phi(x) = \Pr(X \leq x) = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^{x} \exp \left(
+	\frac{-t^2}{2} \right) \mathrm{d}t$
+\end{block}
+\vspace{-2em}
+	$$
+	\begin{aligned}
+		\textsc{GELU}(x) &= x \cdot \Phi(x) \\
+		&\approx x \cdot \sigma(1.702 x) \qquad \text{(if speed $>$ exactness)}
+	\end{aligned}
+	$$
+	\begin{figure}
+		\begin{tikzpicture}
+			
+			\begin{axis}[
+				xmin = -4, xmax = 4,
+				ymin = -1, ymax = 4,
+				xtick distance = 2,
+				ytick distance = 2,
+				grid = both,
+				minor tick num = 1,
+				major grid style = {lightgray},
+				minor grid style = {lightgray!25},
+				width = 0.45\textwidth,
+				height = 0.35\textwidth,
+				legend pos = north west
+				]
+				
+				\addplot[
+				domain = -10:10,
+				samples = 200,
+				smooth,
+				thick,
+				blue,
+				] {
+					x * 1/(1 + exp(-1 * 1.702 * x))
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{figure}
+	
+	
+	
+	
+	\begin{tikzpicture}[overlay, remember picture] 
+		\node at (current page.north east)[ref] {\fullcite{Hendrycks.Gimpel.2016.arXiv} \newline \newline
+			For vectors $\bm{x} \in \mathbb{R}^n$, $\textsc{GELU}(\bm{x})$ is applied element-wise
+			\par};
+	\end{tikzpicture}
+	
+	
+\end{frame}
+
+
+
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+
+\vspace{-2em}
+\begin{minipage}[t][10cm][t]{15cm}
+\begin{algorithmic}[1]
+\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+\State $\ell \gets \text{length}(\bm{x})$
+\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+\Comment{Token emb. + positional emb.}
+\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+\For{$l = 1, 2, \dots, L$}
+\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
+\Comment{Multi-head att., residual conn}
+\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
+\State $\bm{X} \gets \bm{X} + \left(
+\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
+\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
+\Comment{MLP}
+\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
+\EndFor
+\State $\ldots$
+\EndFunction
+\end{algorithmic}
+
+\end{minipage}
+\end{frame}
+
+
+
+\begin{frame}{Transformer encoder (BERT)}
+	
+\begin{tikzpicture}
+
+\node (x) {$\bm{x}_n$};
+
+\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+
+%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+
+\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+
+\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+
+\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+
+\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
+
+\begin{scope}[thick, black, ->, >=latex]
+	\draw (x) -- (emblayer);
+	\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+	\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
+	\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
+	\draw (finallayer) -- (out);
+\end{scope}	
+\end{tikzpicture}
+
+\vspace{4em}
+Let's look at the final layers
+
+\end{frame}	
+
+
+
+\begin{frame}{Final layer (BERT)}
+	
+	\begin{tikzpicture}
+		
+		\node (X) {$\bm{X}$};
+		
+		\node (linear) [param, right of=X, text centered, text width=1.5cm, xshift=1.5cm] {Linear layer};
+		
+		\node (gelu) [neuron, right of=linear, text centered, text width=1.5cm, xshift=1.5cm] {GELU};
+		
+		\node (norm) [param, right of=gelu, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm};
+		
+		\node (out) [right of=norm, xshift=1cm] {$\bm{Z}$};
+		
+		\node (linear2) [param, below of=linear, text centered, text width=1.5cm, yshift=-1.5cm] {Linear layer};
+		
+		\node (softmax) [neuron, right of=linear2, text centered, text width=1.8cm, xshift=1.5cm] {Softmax (row)};
+		
+		\node (out2) [right of=softmax, xshift=1cm] {$\bm{P}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (linear);
+			\draw (linear) -- (gelu);
+			\draw (gelu) -- (norm);
+			\draw (norm) -- (out);
+			\draw (out) edge[out=270,in=90, dotted] (linear2) node [right of=linear2, xshift=0.5cm, yshift=1.1cm] {unembedding};
+			\draw (linear2) -- (softmax);
+			\draw (softmax) -- (out2);
+		\end{scope}
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\section{Where we finished last time}
+
+
+
+
+\section{BERT --- Encoder architecture in detail}
+
+
+\begin{frame}{BERT: Very abstract view}
+	
+\begin{figure}
+\includegraphics[width=\linewidth]{img/bert1.png}
+\end{figure}
+
+\begin{itemize}
+\item BERT produces contextualized token embeddings
+\item BERT can learn them in a `clever' way
+\item BERT can be applied to many downstream tasks
+\end{itemize}
+
+	
+\end{frame}
+\begin{frame}{Transformer encoder (BERT)}
+	
+
+	\begin{tikzpicture}
+		
+		\node (x) {$\bm{x}_n$};
+		
+		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
+		
+		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
+		
+		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
+		
+		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
+		
+		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
+		
+		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (emblayer);
+			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
+			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{\tilde{X}}$} node [midway, below] {$\ldots$};
+			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{\tilde{X}}$};
+			\draw (finallayer) -- (out);
+		\end{scope}	
+	\end{tikzpicture}
+	
+\vspace{4em}
+As usual, green boxes are functions with trainable parameters
+
+$\bm{\tilde{X}}$ is just a placeholder for \textbf{updated} token embeddings matrix $\bm{X}$	
+	\vspace{4em}
+
+	
+\end{frame}	
+
+
+
+
+
+
+
+\begin{frame}{BERT (encoding-only transformer, forward pass)}
+	
+	\vspace{-2em}
+	\begin{minipage}[t][10cm][t]{15cm}
+		\begin{algorithmic}[1]
+			\Function{ETransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
+			\State $\ell \gets \text{length}(\bm{x})$
+			\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
+			\Comment{Token emb. + positional emb.}
+			\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
+			\For{$l = 1, 2, \dots, L$}
+			\State $\bm{X} \gets \bm{X} + \textsc{MHAttention}(\bm{X} | \bm{\mathcal{W}}_l)$
+			\Comment{Multi-head att., residual conn}
+			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
+			\State $\bm{X} \gets \bm{X} + \left(
+			\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
+			\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
+			\Comment{MLP}
+			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
+			\EndFor
+			\State $\bm{X} \gets \textsc{GELU}(\bm{X} \bm{W_f}  +_{\text{(row)}} \bm{b_f} )$
+			\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma}_l, \bm{\beta}_l)$
+			\State \Return $\bm{P} = \softmax(\bm{X} \bm{W_u}) $
+			\Comment{Project to vocab., probabilities}
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+\begin{frame}{BERT parameters and hyperparameters}
+	
+	\begin{minipage}[t][10cm][t]{15cm}
+			
+		Hyperparameters: $\ell_{\text{max}}, L, H, d_{\text{e}}, d_{\text{mlp}}, d_{\text{f}} \in \mathbb{N}$
+		
+		Parameters:
+		
+		$\bm{W_e} \in \mathbb{R}^{N_\text{V} \times d_\text{e}}$, $\bm{W_p} \in \mathbb{R}^{\ell_{\text{max}} \times d_\text{e}}$, the token and positional embedding matrices
+		
+		For $l \in [L]: \bm{\mathcal{W}}_l$, multi-head attention parameters for layer $l$:
+		
+		\begin{itemize}
+		\item $\bm{\gamma^1}_l, \bm{\beta^1}_l, \bm{\gamma^2}_l, \bm{\beta^2}_l$, two sets of layer-norm parameters
+		\item $\bm{W}^{\text{mlp1}}_l \in \mathbb{R}^{d_{\text{e}} \times d_\text{mlp}}$, $\bm{b}^{\text{mlp1}}_l \in \mathbb{R}^{d_\text{mlp}}$
+		\item $\bm{W}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{mlp} \times d_{\text{e}}}$, $\bm{b}^{\text{mlp2}}_l \in \mathbb{R}^{d_\text{e}}$
+		\end{itemize}
+		
+		
+		
+		
+		$\bm{W_f} \in \mathbb{R}^{d_\text{e} \times d_\text{f}}, \bm{b_f} \in \mathbb{R}^{d_\text{f}}$, $\bm{\gamma},\bm{\beta} \in \mathbb{R}^{d_\text{f}}$, the final linear projection and layer-norm parameters.
+		
+		
+		$\bm{W_u} \in \mathbb{R}^{d_\text{e} \times N_\text{V}}$, the unembedding matrix
+		
+	\end{minipage}
+\end{frame}
+
+
+
+
+\section{Input and pre-training}
+
+\begin{frame}{BERT: Tokenization}
+	
+	Tokenizing into a multilingual WordPiece inventory
+	
+	\begin{itemize}
+		\item Recall that WordPiece units are sub-word units
+		\item 30,000 WordPiece units (newer models 110k units, 100 languages)
+	\end{itemize}
+	
+	Implications: BERT can "consume" any language
+	
+	
+\end{frame}
+
+
+\begin{frame}{BERT: Input representation}
+	
+	\begin{itemize}
+		\item Each WordPiece token from the input is represented by a \textbf{WordPiece embedding} (randomly initialized)
+		\item Each position from the input is associated with a \textbf{positional embedding} (also randomly initialized)
+		\item Input length limited to \textbf{512} WordPiece tokens, using \texttt{<PAD>}ding
+		\item Special tokens
+		\begin{itemize}
+			\item The fist token is always a special token \textbf{[CLS]}
+			\item If the task involves two sentences (e.g., NLI), these two sentences are separated by a special token \textbf{[SEP]}; also special two \textbf{segment position embeddings} 
+		\end{itemize}
+		
+	\end{itemize}
+	
+\end{frame}
+
+
+
+
+\begin{frame}{BERT: Input representation summary}
+	
+	\begin{figure}
+		\includegraphics[width=\linewidth]{img/bert-input.png}	
+	\end{figure}
+	
+\end{frame}
+
+
+
+\section{Pre-training}
+
+
+\begin{frame}{BERT: Self-supervised multi-task pre-training}
+	
+Prepare two auxiliary tasks that need no labeled data
+	
+\begin{columns}
+% columns tend to stretch over entire slide, add negative to the left
+\hspace*{-9em}\begin{column}{0.48\textwidth}
+\begin{small}
+\noindent Task 1: Cloze-test task
+\begin{itemize}
+	\item 	Predict the masked WordPiece unit (multi-class, 30k classes)
+\end{itemize}
+
+
+Task 2: Consecutive segment prediction
+
+\begin{itemize}
+	\item Did the second text segment appeared after the first segment? (binary)
+\end{itemize}
+\end{small}
+\end{column}
+\hspace*{-9.5em}\begin{column}{0.48\textwidth}
+\includegraphics[width=\linewidth]{img/bert-pretraining.png}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+
+
+
+\begin{frame}{BERT: Pre-training data generation}
+	
+	Take the entire Wikipedia (in 100 languages; 2,5 billion words)
+	
+	To generate a single training instance, sample two segments (max combined length 512 WordPiece tokens)
+	
+	\begin{itemize}
+		\item For Task 2, replace the second segment randomly in 50\% (negative samples)
+		\item For Task 1, choose random 15\% of the tokens, and in 80\% replace with a [MASK] 
+	\end{itemize}
+	
+	
+\end{frame}
+
+
+\begin{frame}{BERT: Pre-training data -- Simplified example}
+	
+	\begin{columns}
+		\begin{column}{0.9\linewidth}
+			\begin{figure}
+				\includegraphics[width=\linewidth]{img/bert-pretraining2.png}
+			\end{figure}
+		\end{column}
+		\begin{column}{0.5\linewidth}
+			\begin{small}
+				
+				\begin{itemize}
+					\item $<$PAD$>$ding is missing
+					\item The actual segments are longer and not necessarily sentences (just spans)
+					\item The WordPiece tokens match full words here
+				\end{itemize}
+			\end{small}
+		\end{column}
+	\end{columns}
+	
+	
+\end{frame}
+
+
+
+
+\begin{frame}{BERT: pre-training by masked language modeling}
+	
+	\vspace{-2em}	
+	\begin{minipage}[t][10cm][t]{15cm}
+		\begin{algorithmic}[1]
+			\Function{ETraining}{$\left\{ \bm{x}_n \right\}_{n = 1}^{N_\text{data}}$ seqs,  $\bm{\theta}$ init.\ params; $p_{\text{mask}} \in (0, 1)$, $N_\text{epochs}$, $\eta$}
+			\For{$i \in [N_{\text{epochs}}]$}
+			\For{$n \in [N_{\text{data}}]$}
+			\State $\ell \gets \text{length}(\bm{x}_n)$
+			\For{$t \in [\ell]$}
+			\State $\tilde{\bm{x}}_n[t] \gets \texttt{<mask\_token>}$ with prob.\ $p_{\text{mask}}$, otherwise $\bm{x}_n[t]$
+			\EndFor
+			\State $\tilde{T} \gets \left\{ t \in [\ell] : \tilde{\bm{x}}_n[t] = \texttt{<mask\_token>} \right\}$
+			\Comment{Indices of masked tokens}
+			\State $\bm{P_{\theta}} \gets \textsc{ETransformer}(\tilde{\bm{x}}_n | \bm{\theta})$
+			\State $\text{loss}_{\bm{\theta}} \gets - \sum_{t \in \tilde{T}} \log \bm{P_{\theta}} [t, \bm{x}_n[t]] $
+			\State $\bm{\theta} \gets \bm{\theta} - \eta \cdot \nabla \text{loss}_{\bm{\theta}}$
+			\EndFor
+			\EndFor
+			\State \Return $\bm{\theta}$
+			\EndFunction
+		\end{algorithmic}
+		
+	\end{minipage}
+\end{frame}
+
+
+
+
+\begin{frame}{Simple example explaining lines 6--7 (masking)}
+	$
+	\begin{pmatrix}
+		\text{The} &
+		\text{cat} &
+		\text{sat}
+	\end{pmatrix}
+	\rightarrow
+	\bm{x}_n =
+	\begin{pmatrix}
+		21 &
+		11987 &
+		5438
+	\end{pmatrix}
+	\quad \text{(Indices in $V$)}
+	$
+	
+	Random masking (index of \texttt{<mask\_token>} = 50001):
+	\begin{enumerate}
+		\item For $t = 1$, the random outcome is "mask"
+		\item For $t = 2$, the random outcome is "keep"
+		\item For $t = 3$, the random outcome is "mask"
+	\end{enumerate}
+	$
+	\bm{\tilde{x}}_n =
+	\begin{pmatrix}
+		50001 &
+		11987 &
+		50001
+	\end{pmatrix},
+	\tilde{T} = \left\{ 1, 3 \right\}
+	$
+	
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Explaining line 9 (negative log likelihood)}
+	
+	$
+	\begin{pmatrix}
+		\text{The} &
+		\text{cat} &
+		\text{sat}
+	\end{pmatrix}
+	\rightarrow
+	\bm{x}_n =
+	\begin{pmatrix}
+		21 &
+		11987 &
+		5438 
+	\end{pmatrix},
+	\bm{\tilde{x}}_n =
+	\begin{pmatrix}
+		50001 &
+		11987 &
+		50001
+	\end{pmatrix},
+	\tilde{T} = \left\{ 1, 3 \right\}
+	$
+	
+	$\bm{P_{\theta}} \gets \textsc{ETransformer}(\tilde{\bm{x}}_n | \bm{\theta})$
+	$$
+	\bm{P_{\theta}} =
+	\begin{pmatrix}
+		0.001 & 0.0007 & \ldots & 0.0003 \\
+		0.0013 & 0.0065 & \ldots & 0.0001 \\
+		0.079 & 0.015 & \ldots & 0.0001 \\
+	\end{pmatrix}
+	$$
+	
+	$\bm{P_{\theta}} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+	
+\end{frame}
+
+
+\begin{frame}{Explaining line 9 (negative log likelihood), $t = 1$}
+	
+	\begin{small}
+		$\bm{x}_n = (21, 11987, 5438), \bm{\tilde{x}}_n = (50001, 11987, 50001), \tilde{T} = \left\{ 1, 3 \right\}$
+		
+		$
+		\bm{P_{\theta}} =
+		\begin{pmatrix}
+			0.001 & \ldots & 0.0041_{21} & \ldots 0.0003 \\
+			\vdots &  &  &  \\
+		\end{pmatrix}
+		$
+	\end{small}	
+	
+	For $t = 1$, the model should learn to predict "The" (index 21)
+	
+	Gold: $\bm{y} = (0, 0, \ldots, 1_{21}, \ldots, 0) \in \mathbb{R}^{N_{\text{V}}}$
+	
+	Pred: $\bm{\hat{y}} = \bm{P_{\theta}}[1,:] = (0.001, \ldots, 0.0041_{21}, \ldots 0.0003) \in \mathbb{R}^{N_{\text{V}}}$
+	
+	\begin{block}{Recall: Categorical cross entropy loss}
+		$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
+		$= - 1 \cdot \log (\bm{\hat{y}}[21])
+		= - \log(\bm{P_{\theta}}[1, 21])$ \\
+		$= - \log(\bm{P_{\theta}}[1, \bm{x}_n[1]]) 
+		= - \log(\bm{P_{\theta}}[t, \bm{x}_n[t]])$	
+	\end{block}
+	
+\end{frame}
+
+
+\begin{frame}{Explaining line 9 (negative log likelihood), $t = 3$}
+	
+	\begin{small}
+		$\bm{x}_n = (21, 11987, 5438), \bm{\tilde{x}}_n = (50001, 11987, 50001), \tilde{T} = \left\{ 1, 3 \right\}$
+		
+		$
+		\bm{P_{\theta}} =
+		\begin{pmatrix}
+			\vdots &  \cdots &  \cdots &  \\
+		\end{pmatrix}
+		$
+	\end{small}	
+	
+	For $t = 3$, the model should learn to predict "sat" (id 5438)
+	
+	\begin{block}{Categorical cross entropy loss}
+		$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
+		$= - 1 \cdot \log (\bm{\hat{y}}[5438])
+		= - \log(\bm{P_{\theta}}[3, 5438])
+		= - \log(\bm{P_{\theta}}[t, \bm{x}_n[t]])$	
+	\end{block}
+	
+	
+	Sum over all masked token positions in $\tilde{T}$ gives us line 9:\\
+	$$\text{loss}_{\bm{\theta}} \gets - \sum_{t \in \tilde{T}} \log \bm{P_{\theta}} [t, \bm{x}_n[t]] $$
+	
+\end{frame}
+
+
+
+
+
+
+
+\section{Downstream tasks and fine-tuning}
+
+\begin{frame}{BERT: Representing various NLP tasks}
+	
+	\begin{figure}
+		\includegraphics[width=0.5\linewidth]{img/task1.png}
+	\end{figure}
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {	That explains the special [CLS] token at sequence start \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+
+\begin{frame}{BERT: Representing various NLP tasks}
+	
+	\begin{figure}
+		\includegraphics[width=0.6\linewidth]{img/task2.png}
+	\end{figure}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{BERT: Representing various NLP tasks}
+	
+	\begin{figure}
+		\includegraphics[width=0.5\linewidth]{img/task3.png}
+	\end{figure}
+	
+	
+	Not conditioned on surrounding predictions	
+	
+\end{frame}
+
+
+
+\begin{frame}{BERT pre-training time}
+		
+	Pretraining BERT took originally 4 days on 64 TPUs\footnote{Can be done more efficiently, see, e.g., \citet{izsak-etal-2021-train}}
+	
+	\bigskip
+	
+	Once pre-trained, transfer and "fine-tune" on your small-data task and get competitive results
+
+
+	
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{izsak-etal-2021-train} \par};
+\end{tikzpicture}
+
+	
+\end{frame}
+
+
+\begin{frame}{Recap}
+	
+	BERT stays on the shoulders of many clever concepts and techniques, mastered into a single model
+	
+\textbf{What do we know about how BERT works?}
+
+	
+\emph{``BERTology has clearly come a long way, but it is fair to say we still have more questions than answers about how BERT works.''} --- \citet{Rogers.et.al.2020.BERT}\footnote{Highly recommended reading!}
+	
+	
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {\fullcite{Rogers.et.al.2020.BERT} \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+\begin{frame}{License and credits}
+
+	\begin{columns}
+		\begin{column}{0.7\textwidth}
+			Licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+		\end{column}
+		\begin{column}{0.2\textwidth}
+			\includegraphics[width=0.9\linewidth]{img/cc-by-sa-icon.pdf}
+		\end{column}
+	\end{columns}
+	
+	\bigskip
+	
+	Credits
+	
+	\begin{scriptsize}
+		
+		Ivan Habernal
+		
+		Content from ACL Anthology papers licensed under CC-BY \url{https://www.aclweb.org/anthology}
+		
+	
+	\end{scriptsize}
+	
+\end{frame}
+
+
+
+
+
+\end{document}
+
