@@ -121,8 +121,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2024-12-12
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture09-handout.pdf)
-* [YouTube video TBD](https://www.youtube.com/watch?v=)
-
+* [YouTube video](https://www.youtube.com/watch?v=bXoMfRRoFaQ)
 
 
 ## FAQ
