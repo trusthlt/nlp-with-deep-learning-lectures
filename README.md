@@ -118,10 +118,16 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 ### Lecture 09: BERT part 2
 
-2024-12-12
+2024-12-19
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture09-handout.pdf)
 * [YouTube video](https://www.youtube.com/watch?v=bXoMfRRoFaQ)
+
+### Lecture 10: Decoder-only models and GPT}
+
+2025-01-16
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture10-handout.pdf)
 
 
 ## FAQ
