@@ -241,12 +241,12 @@
 
 
 \title{Natural Language Processing with Deep Learning}
-\subtitle{Lecture 10 --- Decoder-only models and GPT}
-\date{January 16, 2025}
+\subtitle{Lecture 11 --- Transformers and evolution of LLMs}
+\date{January 23, 2025}
 \author{Prof.\ Dr.\ Ivan Habernal}
 \institute{
 \texttt{www.trusthlt.org} \\
-Trustworthy Human Language Technologies Group (TrustHLT) \\
+Chair of Trustworthy Human Language Technologies (TrustHLT) \\
 Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
 
 
@@ -255,721 +255,201 @@ Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
 
 \maketitle
 
-\begin{frame}{Motivation}
 
-We introduced BERT, a powerful transformer model for learning contextualized token embeddings
-
-BERT can be used for
-
-\pause
-
-\begin{itemize}
-	\item text classification (one sequence, two concatenated sequences)
-	\item sequence labeling (classify each token, e.g., NER, POS)
-\end{itemize}
-
-	
+\begin{frame}{Last lecture}
+Decoder-only models: GPT (General Pre-trained Transformer)
 \end{frame}
-
-
-\begin{frame}{Transformer encoder (BERT)}
-	
-	\begin{tikzpicture}
-		
-		\node (x) {$\bm{x}_n$};
-		
-		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
-		
-		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
-		
-		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer encoder layer 1};
-		
-		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer encoder layer L};
-		
-		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
-		
-		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (x) -- (emblayer);
-			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
-			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
-			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
-			\draw (finallayer) -- (out);
-		\end{scope}	
-	\end{tikzpicture}
-	
-	\vspace{4em}
-	For each input token, BERT produces contextualized word embeddings
-	
-\end{frame}	
 
 
 \begin{frame}{Motivation}
-	
 
-Although BERT is pre-trained with masked-language modeling, it is \textbf{not designed to generate text} by predicting the next token
+Knowing encoder transformer (BERT) and decoder transformer (GPT), let's go back to the origins
 
-Why?
-\pause
 
-We mask random tokens from the sequence and perform self-attention over past and future tokens
+\includegraphics[width=0.7\linewidth]{img/attn1.png}
 
-\bigskip
 
-Can we use a transformer as a `true' language model, aka.\ to conditionally generate text?
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Vaswani.et.al.2017} \par};
+\end{tikzpicture}
+
 	
 \end{frame}
 
 
-
-
-\begin{frame}{Recap: Single unmasked self-attention head (BERT)}
+\begin{frame}
 	
-	\begin{tikzpicture}
-		
-		\node (X) {$\bm{X}$};
-		
-		\node (query) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=1.6cm] {Linear layer (query)};
-		
-		\node (key) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=0cm] {Linear layer (key)};
-		
-		\node (value) [param, right of=X, text centered, text width=2.2cm, xshift=2cm, yshift=-1.6cm] {Linear layer (value)};
-		
-		\node (scaled) [neuron, right of=key, text centered, text width=1.5cm, xshift=2.5cm, yshift=1cm] {Scaled dot product};
-		
-		\node (softmax) [neuron, right of=scaled, text centered, text width=1.8cm, xshift=1.6cm] {Softmax (row)};
-		
-		\node (matmul) [neuron, right of=softmax, text centered, text width=1.5cm, xshift=1.5cm] {Matmul $\bm{\tilde{S}}\bm{V}$};
-		
-		\node (out) [right of=matmul, xshift=1cm] {$\bm{Y}^h$};		
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (x) edge[out=0,in=180] (query);
-			\draw (x) edge[out=0,in=180] (key);
-			\draw (x) edge[out=0,in=180] (value);
-			%			\draw (x) -- (sum1);
-			\draw (query) edge[out=0,in=170] (scaled) node [right of=query, xshift=0.5cm, yshift=0.4cm] {$\bm{Q}$};
-			\draw (key) edge[out=0,in=190] (scaled) node [right of=key, xshift=0.5cm, yshift=0.4cm] {$\bm{K}$};
-			\draw (value) edge[out=0,in=210] (matmul) node [right of=value, xshift=0.5cm, yshift=0.6cm] {$\bm{V}$};
-			\draw (scaled) -- (softmax) node [midway, above] {$\bm{S}$};
-			\draw (softmax) -- (matmul) node [midway, above] {$\bm{\tilde{S}}$};
-			
-			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
-			%			\draw (norm1) edge[out=0,in=180] (mlp);
-			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
-			\draw (matmul) -- (out);
-		\end{scope}	
+	\includegraphics[width=0.50\linewidth]{img/transformer.png}
+	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Vaswani.et.al.2017} \par};
+	\end{tikzpicture}
+	
+	
+\end{frame}
+
+\begin{frame}{Transformer}
+
+The Transformer uses multi-head attention in three different ways:
+
+(1) In "encoder-decoder attention" layers, the queries come from the previous decoder layer,
+and the memory keys and values come from the output of the encoder. This allows every
+position in the decoder to attend over all positions in the input sequence. This mimics the
+typical encoder-decoder attention mechanisms in sequence-to-sequence models
+
+
+\end{frame}
+
+\begin{frame}{Transformer}
+	
+	The Transformer uses multi-head attention in three different ways:
+	
+	
+	(2) The encoder contains self-attention layers. In a self-attention layer all of the keys, values
+	and queries come from the same place, in this case, the output of the previous layer in the
+	encoder. Each position in the encoder can attend to all positions in the previous layer of the
+	encoder.
+
+	
+\end{frame}
+
+\begin{frame}{Transformer}
+	
+	The Transformer uses multi-head attention in three different ways:
+	
+	(3) Similarly, self-attention layers in the decoder allow each position in the decoder to attend to
+	all positions in the decoder up to and including that position. We need to prevent leftward
+	information ﬂow in the decoder to preserve the auto-regressive property. We implement this
+	inside of scaled dot-product attention by masking out (setting to −∞) all values in the input
+	of the softmax which correspond to illegal connections.
+	
+\end{frame}
+
+\begin{frame}{Transformer -- the task}
+
+We trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million
+sentence pairs. Sentences were encoded using byte-pair encoding, which has a shared source-
+target vocabulary of about 37000 tokens. For English-French, we used the signiﬁcantly larger WMT
+2014 English-French dataset consisting of 36M sentences and split tokens into a 32000 word-piece
+vocabulary.
+
+
+\begin{tikzpicture}[overlay, remember picture]
+	\node at (current page.north east)[ref] {
+		\fullcite{Vaswani.et.al.2017} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Transformer -- results}
+	
+\includegraphics[width=\linewidth]{img/wmt1.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Vaswani.et.al.2017} \par};
 	\end{tikzpicture}
 	
 \end{frame}
 
 
-\begin{frame}{Recap: Bidirectional / unmasked self-attention}
+\section{Every task is a text-to-text task}
+
+
+
+\begin{frame}{T5}
+
+"The basic idea underlying our work is to treat every text processing problem as a
+“text-to-text” problem, i.e. taking text as input and producing new text as output."
+
+
+	\includegraphics[width=0.6\linewidth]{img/raffel1.png}	
 	
-	\begin{minipage}[t][10cm][t]{15cm}
-		
-		Input: $\bm{X} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{x}}}$, vector representations of the sequence of length $\ell_{\text{x}}$
-		
-\pause
-
-		Output: $\bm{\tilde{V}} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$, updated vector representations of tokens in $\bm{X}$
-
-\pause		
-		Params $\bm{\mathcal{W}_{qkv}}$: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{x} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
-		
-		\begin{algorithmic}[1]
-			\Function{Attention}{$\bm{X} ; \bm{\mathcal{W}_{qkv}}$}
-			\State $\bm{Q} \gets \bm{X} \bm{W_q} +_{\text{(rows)}} \bm{b_q}$
-			\Comment{Query $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
-			\State $\bm{K} \gets \bm{X} \bm{W_k} +_{\text{(rows)}} \bm{b_k}$
-			\Comment{Key $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
-			\State $\bm{V} \gets \bm{X} \bm{W_v} +_{\text{(rows)}} \bm{b_v}$
-			\Comment{Value $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$}
-			
-			\State $\bm{S} \gets \frac{1}{\sqrt{d_{\text{attn}}}} (\bm{Q} \bm{K}^\top)$
-			\Comment{Scaled score $\in \mathbb{R}^{\ell_{\text{x}} \times \ell_{\text{x}}}$}
-			
-			\State \Return $\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
-			
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
-\end{frame}
-
-
-\begin{frame}{Recap: Basic single-query attention}
-	
-	\begin{minipage}[t][10cm][t]{15cm}
-		
-		Input: $\bm{e} \in \mathbb{R}^{d_\text{in}}$, vector representation of the current token
-		
-		Input: $\bm{e}_t \in \mathbb{R}^{d_\text{in}}$, vector representations of the context tokens $t \in [T]$
-
-\pause
-		
-		Output: $\bm{\tilde v} \in \mathbb{R}^{d_\text{out}}$, vector representation of the token and context combined
-		
-		Params: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{in} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$,
-		$\bm{W_v} \in \mathbb{R}^{d_\text{in} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
-
-\pause
-
-		\begin{algorithmic}[1]
-			\Function{Basic single-query attention}{}
-			%\KwIn{}
-			%\KwOut{$\v{\tilde v}∈ℝ^{d_\t{out}}$, vector representation of the token and context combined.}
-			%\KwParam{$\m{W_q}, \m{W_k}∈ℝ^{d_\t{attn}×d_\t{in}}$, $ \v{b_q}, \v{b_k}∈ℝ^{d_\t{attn}}$, the query and key linear projections.}
-			%\KwParam{$\m{W_v}∈ℝ^{d_\t{out}×d_\t{in}}$, $ \v{b_v}∈ℝ^{d_\t{out}}$, the value linear projection.}
-			\State $\bm{q} \gets \bm{e} \bm{W_q} + \bm{b_q}$
-			\Comment{Query linear projection}
-\pause
-			\For{$t \in [T]$}
-			\State $\bm{k_t} \gets \bm{e_t} \bm{W_k} + \bm{b_k}$
-			\Comment{Key linear projection}
-\pause			
-			\State $\alpha_{t} = \frac{
-				\exp(\bm{q} \cdot \bm{k_t} / \sqrt{d_{\text{attn}}})
-			}{
-				\sum_{u = 1}^{T}\exp(\bm{q} \cdot \bm{k_u} / \sqrt{d_{\text{attn}}})
-			}$
-			\Comment{Softmax over scaled dot products, $\alpha_{t} \in (0,1)$}
-\pause
-			\State $\bm{v_t} \gets \bm{e_t} \bm{W_v} + \bm{b_v}$
-			\Comment{Value linear projection}
-			\EndFor
-			\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
-\end{frame}
-
-
-\begin{frame}{Example: Basic single-query unmasked attention}
-
-We are at position 2, our query $\bm{q} = (11, 12)$ and keys
-$\bm{k_1} = (1, 2) \qquad \bm{k_2} = (4, 5) \qquad \bm{k_3} = (7, 8)$
-\pause $$
-\bm{q} = \begin{pmatrix}
-	11 & 12
-\end{pmatrix}
-\quad
-\bm{K}^\top =
-\begin{pmatrix}
-1 & 4 & 7 \\
-2 & 5 & 8 \\
-\end{pmatrix}
-\quad
-$$
-\pause Dot products:
-
-$\bm{q} \cdot \bm{k_1} = (11, 12) \cdot (1, 2) = 11 + 24 = 35$ \pause
-$\bm{q} \cdot \bm{k_2} = (11, 12) \cdot (4, 5) = 44 + 60 = 104$ \pause
-$\bm{q} \cdot \bm{k_3} = (11, 12) \cdot (7, 8) = 77 + 96 = 173$ \pause
-
-Raw scores = $(35, 104, 173)$, after softmax (no scaling) $\bm{\alpha} = (0.000\ldots, 0.000\ldots, 0.999\ldots)$
-
-\end{frame}
-
-
-\begin{frame}{Example: Basic single-query unmasked attention}
-
-\begin{block}{From previous slide}
-We are at position 2, our query $\bm{q} = (11, 12)$ and keys
-$\bm{k_1} = (1, 2) \qquad \bm{k_2} = (4, 5) \qquad \bm{k_3} = (7, 8)$
-
-Raw scores = $(35, 104, 173)$, after softmax (no scaling)
-$$\bm{\alpha} = (0.000\ldots, 0.000\ldots, 0.999\ldots)$$
-\end{block}
-
-Value at position 3 highest weight
-\begin{itemize}
-\item We are currently at position 2
-\item Position 3 is \textbf{in the future}
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}{We want to attend only to previous tokens (4 token example)}
-	
-At position 1 we should not attend to token 2, 3, and 4
-
-At position 2 we should not attend to token 3 and 4
-
-At position 3 we should not attend to token 4
-
-At position 4 we can attend to all of them
-$$
-\text{Raw associations } =
-\begin{pmatrix}
-11 & 12 & 13 & 14 \\
-21 & 22 & 23 & 24 \\
-31 & 32 & 33 & 34 \\
-41 & 42 & 43 & 44 \\
-\end{pmatrix}
-$$
-We want to assign zero probability (using softmax) to "future" tokens
-\end{frame}
-
-
-\begin{frame}{We want to attend only to previous tokens}
-\begin{small}
-\vspace{-2em}
-	$$
-	\text{Raw associations } =
-	\begin{pmatrix}
-		11 & 12 & 13 & 14 \\
-		21 & 22 & 23 & 24 \\
-		31 & 32 & 33 & 34 \\
-		41 & 42 & 43 & 44 \\
-	\end{pmatrix}
-	$$
-	Assign zero probability (using softmax) to "future" tokens
-\end{small}
-
-	\begin{algorithmic}[1]
-
-	\For{$t \in [T]$}
-	\State $\bm{k_t} \gets \ldots$
-	\State $\alpha_{t} = \frac{
-		\exp(\bm{q} \cdot \bm{k_t} )
-	}{
-		\sum_{u = 1}^{t}\exp(\bm{q} \cdot \bm{k_u} )
-	}$
-	\Comment{Only until $t$}
-	\For{$i \in (t+1, T)$}
-	\State $\alpha_i = 0$
-	\Comment{Zero-out rest}
-	\EndFor
-	\State $\bm{v_t} \gets \ldots$
-	\EndFor
-	\State \Return $\bm{\tilde v} = \sum_{t=1}^T \alpha_t \bm{v}_t$
-
-\end{algorithmic}
-
-
-\end{frame}
-
-
-\begin{frame}{Avoid for-loops! How to vectorize this operation?}
-For each row $\bm{s}$ from the raw associations
-
-\begin{algorithmic}[1]
-	\State $\alpha_{t} = \frac{
-		\exp(\bm{s}_t )
-	}{
-		\sum_{u = 1}^{t}\exp(\bm{s}_u )
-	}$
-	\For{$i \in (t+1, T)$}
-	\State $\alpha_i = 0$
-	\EndFor	
-\end{algorithmic}
-
-\pause
-
-Replace input from  $t + 1$ onwards with $-\infty$
-\begin{small}
-	$$
-	\text{Raw associations "masked" } =
-	\begin{pmatrix}
-		11 & -\infty & -\infty & -\infty \\
-		21 & 22 & -\infty & -\infty \\
-		31 & 32 & 33 & -\infty \\
-		41 & 42 & 43 & 44 \\
-	\end{pmatrix}
-	$$
-\end{small}
-
-Assigns zero probability (using softmax) to "future" tokens
-
-\end{frame}
-
-
-
-
-\begin{frame}{Uni-directional masking for self-attention}
-
-For $t_z, t_x \in [\ell_x]$
-$$
-\mask[t_x, t_z] =
- \begin{cases}
-	1       & \quad \text{if } t_z \leq t_x \\
-	0  & \quad \text{otherwise }
-\end{cases}
-$$
-
-
-Example for $\ell_x = 4$
-$$
-\begin{pmatrix}
-1 & 0 & 0 & 0 \\
-1 & 1 & 0 & 0 \\
-1 & 1 & 1 & 0 \\
-1 & 1 & 1 & 1 \\
-\end{pmatrix}
-$$
-Creating the mask and indexing tensor by this mask very easy in pytorch
-\end{frame}
-
-
-\begin{frame}{Left-to-right masked self-attention}
-	
-	\begin{minipage}[t][10cm][t]{15cm}
-		
-		Input: $\bm{X} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{x}}}$, vector representations of the sequence of length $\ell_{\text{x}}$
-		
-		Output: $\bm{\tilde{V}} \in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$, updated vector representations of tokens in $\bm{X}$
-		
-		Params $\bm{\mathcal{W}_{qkv}}$: $\bm{W_q}, \bm{W_k} \in \mathbb{R}^{d_\text{x} \times d_\text{attn}}$, $\bm{b_q}, \bm{b_k} \in \mathbb{R}^{d_\text{attn}}$, $\bm{W_v} \in \mathbb{R}^{d_\text{x} \times d_\text{out}}$, $ \bm{b_v} \in \mathbb{R}^{d_\text{out}}$
-		
-		\begin{algorithmic}[1]
-			\Function{Attention}{$\bm{X} ; \bm{\mathcal{W}_{qkv}}$}
-			\State $\bm{Q} \gets \bm{X} \bm{W_q} +_{\text{(rows)}} \bm{b_q}$
-			\Comment{Query $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
-			\State $\bm{K} \gets \bm{X} \bm{W_k} +_{\text{(rows)}} \bm{b_k}$
-			\Comment{Key $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{attn}}}$}
-			\State $\bm{V} \gets \bm{X} \bm{W_v} +_{\text{(rows)}} \bm{b_v}$
-			\Comment{Value $\in \mathbb{R}^{\ell_{\text{x}} \times d_{\text{out}}}$}
-			
-			\State $\bm{S} \gets \frac{1}{\sqrt{d_{\text{attn}}}} (\bm{Q} \bm{K}^\top)$
-			\Comment{Scaled score $\in \mathbb{R}^{\ell_{\text{x}} \times \ell_{\text{x}}}$}
-
-			\ForAll{$t_z, t_x \in [T] $}
-			\If{$\neg \mask[t_x, t_z]$}
-				 $\bm{S}[t_x, t_z] \gets - \infty$
-	 			\Comment{Causal masking}
-			\EndIf
-			\EndFor
-			\State \Return $\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
-			
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
-\end{frame}
-
-
-
-\begin{frame}{Single masked self-attention head (GPT)}
-	
-	\begin{tikzpicture}
-		
-		\node (X) {$\bm{X}$};
-		
-		\node (query) [param, right of=X, text centered, text width=2.2cm, xshift=1.7cm, yshift=1.6cm] {Linear layer (query)};
-		
-		\node (key) [param, right of=X, text centered, text width=2.2cm, xshift=1.7cm, yshift=0cm] {Linear layer (key)};
-		
-		\node (value) [param, right of=X, text centered, text width=2.2cm, xshift=1.7cm, yshift=-1.6cm] {Linear layer (value)};
-		
-		\node (scaled) [neuron, right of=key, text centered, text width=1.5cm, xshift=2cm, yshift=1cm] {Scaled dot product};
-		
-		\node (mask) [neuron, right of=scaled, text centered, text width=1.5cm, xshift=1.3cm] {Masked};
-		
-		\node (softmax) [neuron, right of=mask, text centered, text width=1.8cm, xshift=1.4cm] {Softmax (row)};
-		
-		\node (matmul) [neuron, right of=softmax, text centered, text width=1.5cm, xshift=1.5cm] {Matmul $\bm{\tilde{S}}\bm{V}$};
-		
-		\node (out) [right of=matmul, xshift=1cm] {$\bm{Y}^h$};		
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (x) edge[out=0,in=180] (query);
-			\draw (x) edge[out=0,in=180] (key);
-			\draw (x) edge[out=0,in=180] (value);
-			%			\draw (x) -- (sum1);
-			\draw (query) edge[out=0,in=170] (scaled) node [right of=query, xshift=0.5cm, yshift=0.4cm] {$\bm{Q}$};
-			\draw (key) edge[out=0,in=190] (scaled) node [right of=key, xshift=0.5cm, yshift=0.4cm] {$\bm{K}$};
-			\draw (value) edge[out=0,in=210] (matmul) node [right of=value, xshift=0.5cm, yshift=0.6cm] {$\bm{V}$};
-			\draw (scaled) -- (mask) node [midway, above] {$\bm{S}$};
-			\draw (mask) -- (softmax) node [midway, above] {$\bm{S}$};
-			\draw (softmax) -- (matmul) node [midway, above] {$\bm{\tilde{S}}$};
-			
-			%			\draw (norm1) -- (sum2)  node [near start, above] {$\bm{X}$};
-			%			\draw (norm1) edge[out=0,in=180] (mlp);
-			%			\draw (mlp) edge[out=0,in=270] (sum2) node [right of=mlp, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-			%			\draw (sum2) -- (norm2) node [midway, above] {$\bm{X}$};
-			\draw (matmul) -- (out);
-		\end{scope}	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Raffel.et.al.2020.JMLR} \par};
 	\end{tikzpicture}
 	
 \end{frame}
 
 
-\begin{frame}{Left-to-right masked self-attention}
-		
-$\bm{\tilde V} = \softmax_{\text{row}}(\bm{S}) \bm{V}$
-
-The output $\bm{\tilde V}[1:t, :]$ only depends on $\bm{X}[1:t, :]$, so it can be used to ``predict" $\bm{X}[t + 1, :]$
-
-\end{frame}
 
 
-
-\begin{frame}{GPT (decoding-only transformer, forward pass)}
+\begin{frame}{T5}
 	
-	\begin{minipage}[t][3em][t]{15cm}
-		\begin{algorithmic}[1]
-			\Function{DTransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
-			\State $\ldots$
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
+	\includegraphics[width=\linewidth]{img/raffel2.png}	
 	
-	Input: --- $\bm{x} \in V^*$, a sequence of token IDs,
-	$\bm{\mathcal{W}}$ --- all trainable parameters
-	
-	Output: 
-	$\bm{P} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary conditioned on previous tokens
-	$
-	\bm{\hat{P}}(x[t + 1] | \bm{x}[1:t])
-	$
-	
-\end{frame}
-
-
-\begin{frame}{Transformer decoder (GPT)}
-	
-	\begin{tikzpicture}
-		
-		\node (x) {$\bm{x}$};
-		
-		\node (emblayer) [param, right of=x, text centered, text width=2cm, xshift=1cm] {Input embed};
-		
-		%\node (X) [right of=emblayer, xshift=1cm] {$\bm{X}$};
-		
-		\node (trlayer1) [param, right of=emblayer, text centered, text width=2.5cm, xshift=2.5cm] {Transformer decoder layer 1};
-		
-		\node (trlayerN) [param, right of=trlayer1, text centered, text width=2.5cm, xshift=3cm] {Transformer decoder layer L};
-		
-		\node (finallayer) [param, right of=trlayerN, text centered, text width=1.5cm, xshift=2cm] {Final layer};
-		
-		\node (out) [right of=finallayer, xshift=1cm] {$\bm{P}$};
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (x) -- (emblayer);
-			\draw (emblayer) -- (trlayer1) node [midway, above] {$\bm{X}$};
-			\draw (trlayer1) -- (trlayerN) node [midway, above] {$\bm{X}$} node [midway, below] {$\ldots$};
-			\draw (trlayerN) -- (finallayer) node [midway, above] {$\bm{X}$};
-			\draw (finallayer) -- (out);
-		\end{scope}	
-	\end{tikzpicture}
-
-	
-\end{frame}	
-
-
-\begin{frame}{GPT (decoding-only transformer, transformer layer)}
-	
-	\begin{tikzpicture}
-		
-		\node (X) {$\bm{X}$};
-		
-		\node (norm1) [param, right of=X, text centered, text width=1.5cm, xshift=1cm] {Layer Norm 1};
-		
-		\node (mhattention) [param, right of=norm1, text centered, text width=2cm, xshift=1.5cm, yshift=-1.6cm] {Multi-Head Self Attention Masked};
-		
-		\node (sum1) [neuron, right of=norm1, text centered, text width=1.5cm, xshift=2.9cm] {Sum};
-		
-		\node (norm2) [param, right of=sum1, text centered, text width=1.5cm, xshift=1.5cm] {Layer Norm 2};
-		
-		\node (mlp1) [param, right of=norm2, text centered, text width=1.6cm, xshift=1.2cm, yshift=-1.4cm] {Linear layer 1};
-		
-		\node (gelu) [neuron, right of=norm2, text centered, text width=1.6cm, xshift=1.2cm, yshift=-2.6cm] {GELU};
-		
-		\node (mlp2) [param, right of=norm2, text centered, text width=1.6cm, xshift=1.2cm, yshift=-3.8cm] {Linear layer 2};
-		
-		\node (sum2) [neuron, right of=norm2, text centered, text width=1.5cm, xshift=2.8cm] {Sum};
-		
-		\node (out) [right of=sum2, xshift=1cm] {$\bm{X}$};		
-		
-		\begin{scope}[thick, black, ->, >=latex]
-			\draw (x) -- (norm1);
-			\draw (norm1) edge[out=0,in=180] (mhattention);
-			\draw (norm1) -- (sum1) node [midway, above] {$\bm{X}$};
-			\draw (mhattention) edge[out=0,in=270] (sum1) node [right of=mhattention, xshift=0.6cm, yshift=0cm] {$\bm{X}$};
-			\draw (sum1) -- (norm2) node [midway, above] {$\bm{X}$};
-			\draw (norm2) -- (sum2)  node [near start, above] {$\bm{X}$};
-			\draw (norm2) edge[out=0,in=170] (mlp1);
-			\draw (mlp1) -- (gelu);
-			\draw (gelu) -- (mlp2);
-			\draw (mlp2) edge[out=10,in=270] (sum2) node [right of=mlp2, xshift=0.3cm, yshift=0cm] {$\bm{X}$};
-			\draw (sum2) -- (out);
-		\end{scope}	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Raffel.et.al.2020.JMLR} \par};
 	\end{tikzpicture}
 	
 \end{frame}
 
 
-\begin{frame}{GPT (decoding-only transformer, forward pass)}
+\begin{frame}{T5 --- self-supervised pre-training}
 	
-\vspace{-2em}
-\begin{minipage}[t][10cm][t]{15cm}
-\begin{algorithmic}[1]
-\Function{DTransformer}{$\bm{x} ; \bm{\mathcal{W}}$}
-\State $\ell \gets \text{length}(\bm{x})$
-\State for $t \in [\ell]: \bm{e}_t \gets \bm{W_e}[x[t],:] + \bm{W_p}[t,:]$
-\Comment{Token emb. + positional emb.}
-\State $\bm{X} \gets \text{Stack row-wise}[\bm{e}_1, \bm{e}_2, \ldots \bm{e}_{\ell}]$
-\For{$l = 1, 2, \dots, L$}
-\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^1}_l, \bm{\beta^1}_l)$
-\Comment{Normalization first}
-\State $\bm{X} \gets \bm{X} + \textsc{MHAttentionMask}(\bm{X} | \bm{\mathcal{W}}_l)$
-\Comment{Just added masking}
-\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma^2}_l, \bm{\beta^2}_l)$
-\State $\bm{X} \gets \bm{X} + \left(
-\textsc{GELU}(\bm{X} \bm{W}^\text{mlp1}_l +_{\text{(row)}} \bm{b}^\text{mlp1}_l )
-\bm{W}^{\text{mlp2}}_l +_{\text{(row)}} \bm{b}^{\text{mlp2}}_l \right)$
-\Comment{MLP}
-\EndFor
-\State $\bm{X} \gets \textsc{LayerNormPerRow}(\bm{X} | \bm{\gamma}_l, \bm{\beta}_l)$
-\State \Return $\bm{P} = \softmax(\bm{X} \bm{W_u}) $
-\Comment{Project to vocab., probabilities}
-\EndFunction
-\end{algorithmic}
-
-\end{minipage}
-\end{frame}
-
-
-\begin{frame}{GPT (decoding-only transformer, forward pass)}
-
-Differences from BERT forward-pass:
-
-Switched the ordering of layer normalization (line 6 and 8)
-
-No final layer projection
-
-Attention with left-to-right masking (line 7)
-
-\end{frame}
-
-
-
-
-
-\section{Training}
-
-
-
-
-\begin{frame}{Decoder-Transfomer: Training on next token prediction}
+	\includegraphics[width=\linewidth]{img/raffel5.png}	
 	
-	\vspace{-1em}	
-	\begin{minipage}[t][10cm][t]{15cm}
-		\begin{algorithmic}[1]
-			\Function{DTraining}{$\left\{ \bm{x}_n \right\}_{n = 1}^{N_\text{data}}$ seqs,  $\bm{\theta}$ init.\ params, $N_\text{epochs}$, $\eta$}
-			\For{$i \in [N_{\text{epochs}}]$}
-			\For{$n \in [N_{\text{data}}]$}
-			\State $\ell \gets \text{length}(\bm{x}_n)$
-			\State $\bm{P_{\theta}} \gets \textsc{DTransformer}(\bm{x}_n | \bm{\theta})$
-			\State $\text{loss}_{\bm{\theta}} \gets - \sum_{t = 1}^{\ell - 1} \log \bm{P_{\theta}} [t, \bm{x}_n[t + 1]] $
-			\State $\bm{\theta} \gets \bm{\theta} - \eta \cdot \nabla \text{loss}_{\bm{\theta}}$
-			\EndFor
-			\EndFor
-			\State \Return $\bm{\theta}$
-			\EndFunction
-		\end{algorithmic}
-		
-	\end{minipage}
-\end{frame}
-
-
-\begin{frame}{Explaining line 6 (negative log likelihood)}
-	
-	$
-	\begin{pmatrix}
-		\text{The} &
-		\text{cat} &
-		\text{sat}
-	\end{pmatrix}
-	\rightarrow
-	\bm{x}_n =
-	\begin{pmatrix}
-		21 &
-		11987 &
-		5438 
-	\end{pmatrix}
-	$
-	
-	$\bm{P_{\theta}} \gets \textsc{DTransformer}(\bm{x}_n | \bm{\theta})$
-	$$
-	\bm{P_{\theta}} =
-	\begin{pmatrix}
-		0.001 & 0.0007 & \ldots & 0.0003 \\
-		0.0013 & 0.0065 & \ldots & 0.0001 \\
-		0.079 & 0.015 & \ldots & 0.0001 \\
-	\end{pmatrix}
-	$$
-	
-	$\bm{P_{\theta}} \in (0,1)^{\ell_{\text{x}} \times N_{\text{V}}}$, where each row of $\bm{P}$ is a distribution over the vocabulary
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Raffel.et.al.2020.JMLR} \par};
+	\end{tikzpicture}
 	
 \end{frame}
 
 
+\begin{frame}{T5 -- Source data quality matters}
+	
+"Common Crawl is a publicly-available web archive that provides “web extracted text”
+by removing markup and other non-text content from the scraped HTML ﬁles. This process
+produces around 20TB of scraped text data each month. Unfortunately, the majority of the
+resulting text is not natural language."
 
-\begin{frame}{Explaining line 6 (negative log likelihood), $t = 1$}
+
+
+
 	
-	\begin{small}
-		$\bm{x}_n = (21, 11987, 5438)$
-		$
-		\bm{P_{\theta}} =
-		\begin{pmatrix}
-			0.001 & \ldots & 0.0041_{11987} & \ldots 0.0003 \\
-			\vdots &  &  &  \\
-		\end{pmatrix}
-		$
-	\end{small}	
-	
-	For $t = 1$, the model should learn to predict "cat" (idx 11987)
-	
-	Gold: $\bm{y} = (0, 0, \ldots, 1_{11987}, \ldots, 0) \in \mathbb{R}^{N_{\text{V}}}$
-	
-	Pred: $\bm{\hat{y}} = \bm{P_{\theta}}[1,:] = (0.001, \ldots, 0.0041_{11987}, \ldots 0.0003) \in \mathbb{R}^{N_{\text{V}}}$
-	
-	\begin{block}{Categorical cross entropy loss (Lec.\ 4)}
-		$L (\bm{\hat{y}, \bm{y}}) := - \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)$ \\
-		$= - 1 \cdot \log (\bm{\hat{y}}[11987])
-		= - \log(\bm{P_{\theta}}[1, 11987])$ \\
-		$= - \log(\bm{P_{\theta}}[1, \bm{x}_n[1 + 1]]) 
-		= - \log(\bm{P_{\theta}}[t, \bm{x}_n[t + 1]])$	
-	\end{block}
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Raffel.et.al.2020.JMLR} \par};
+	\end{tikzpicture}
 	
 \end{frame}
 
 
-\section{Decoder model prompting}
-
-\begin{frame}{Decoding}
-
-Input: $\bm{x} \in V^*$, a prompt (sequence of token IDs)
-
-Output: $\bm{y} \in V^*$, continuation
-
-\begin{minipage}[t][10cm][t]{15cm}
-	\begin{algorithmic}[1]
-		\Function{DInference}{$\bm{x}, \bm{\theta}, \ell_{\text{gen}}, \tau$}
-		\State $\ell \gets \text{length}(\bm{x})$
-		\For{$i \in [\ell_{\text{gen}}]$}
-		\State $\bm{P} \gets \textsc{DTransformer}(\bm{x} | \bm{\theta})$
-		\State $\bm{p} \gets \bm{P}[\ell + i - 1, :]$
-		\State sample token $y$ from $\bm{q} \propto \bm{p}^{(1 / \tau)}$
-		\State $\bm{x} \gets [\bm{x}, y]$
-		\EndFor
-		\State \Return $\bm{y} = \bm{x}[\ell + 1: \ell + \ell_{\text{gen}}]$
-		\EndFunction
-	\end{algorithmic}
+\begin{frame}{T5 -- Colossal Clean Common Crawl corpus (about 750 GB)}
 	
-\end{minipage}
-
-
-
+\includegraphics[width=0.9\linewidth]{img/raffel3.png}	
+	
+	
+	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Raffel.et.al.2020.JMLR} \par};
+	\end{tikzpicture}
+	
 \end{frame}
 
+\begin{frame}{T5 -- Scale matters the most}
+
+"scaling the model size to 11 billion parameters was the most important ingredient for achieving our best performance."
+	
+\includegraphics[width=0.6\linewidth]{img/raffel4.png}	
+	
+	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Raffel.et.al.2020.JMLR} \par};
+	\end{tikzpicture}
+	
+\end{frame}
 
 
 \section{Evolution of GPT}
@@ -1036,6 +516,259 @@ Representing inputs, prompting, etc. --- next lectures
 	
 	
 \end{frame}
+
+
+\section{In-context learning}
+
+
+
+\begin{frame}{What is in-context-learning}
+
+``In-context learning (ICL) is the ability of a model to \textbf{use inputs} at \textbf{inference time} to \textbf{adapt its behavior}, \textbf{without weight updates}, in order to solve tasks not present during training."
+
+\bigskip
+
+``Brown et al. (2020) first observed that a transformer-based language model, GPT-3, trained auto-regressively at sufficient scale, exhibited ICL without any specific effort of the authors to promote it via the training objective or data."
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Singh.et.al.2023.NeurIPS} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+\begin{frame}
+
+
+\includegraphics[width=0.55\linewidth]{img/gpt1.png}	
+
+
+
+\begin{tikzpicture}[overlay, remember picture]
+	\node at (current page.north east)[ref] {
+		\fullcite{Brown.et.al.2020.GPT3} \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{GPT-3}
+	
+	\includegraphics[width=0.7\linewidth]{img/gpt2.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{GPT-3}
+	
+	\includegraphics[width=0.7\linewidth]{img/gpt3.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{GPT-3}
+	
+	\includegraphics[width=0.7\linewidth]{img/gpt4.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{GPT-3 Pre-training data}
+	
+	\includegraphics[width=1.0\linewidth]{img/gpt5.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{GPT-3 Some results}
+	
+	\includegraphics[width=0.9\linewidth]{img/gpt6.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{GPT-3 Some results}
+	
+	\includegraphics[width=0.6\linewidth]{img/gpt7.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{GPT-3 large model generates plausible new articles}
+	
+	\includegraphics[width=\linewidth]{img/gpt8.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Brown.et.al.2020.GPT3} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Why does in-context learning work?}
+	
+Active area of research!
+
+"we show that ground truth demonstrations are in fact not required—randomly replacing labels in the demonstrations barely hurts performance on a range of classification and multi-choce tasks, consistently over 12 different models including GPT-3."
+
+"Instead, we find that other aspects of the demonstrations are the key drivers of end task performance, including the fact that they provide a few examples of (1) the label space, (2) the distribution of the input text, and (3) the overall format of the sequence."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Min.et.al.2022.EMNLP} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{Why does in-context learning work?}
+	
+"we explain language models as metaoptimizers and understand in-context learning as implicit finetuning. Theoretically, we figure out that Transformer attention has a dual form of gradient descent."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Dai.et.al.2023.ACLFindings} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{In-context learning take-aways}
+
+``GPT3 paper showed that a non-trivial alternative to fine-tuning emerges when the LM is large enough: an LM can be specialized to a downstream NLP task by simply receiving in its input a string composed of concatenated training examples of this task"
+
+\begin{itemize}
+\item While the LM's weights are unchanged in this procedure, some form of learning evidently takes place
+\item The performance significantly improves with the number of concatenated training examples, for a disparate variety of NLP tasks
+\end{itemize}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wies.et.al.2023.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{In-context learning take-aways}
+
+ICL has had a profound practical impact on the applicability of large LMs
+\begin{itemize}
+\item No need to have any access to the model weights in order to specialize the model for a certain task
+\item Instead, a string of training examples provided even via API access to the model is enough
+\item Often not many examples are required
+\end{itemize}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wies.et.al.2023.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\section{"Alignment", instruction-tuning, RLHF}
+
+
+\begin{frame}{Llama2}
+	
+	\includegraphics[width=\linewidth]{img/llama21.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Touvron.et.al.2023.llama2} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+\begin{frame}{Llama2}
+	
+
+"we focused first on collecting several thousand examples of high-quality SFT data, as illustrated in Table 5"
+
+"We found that SFT annotations in the order of tens of thousands was enough to achieve a high-quality result. We stopped annotating SFT after collecting a total of 27,540 annotations."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Touvron.et.al.2023.llama2} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Llama2, Reinforcement Learning with Human Feedback (RLHF)}
+	
+RLHF is a model training procedure that is applied to a fine-tuned language model to further align model behavior with human preferences and instruction following.
+
+"We collect data that represents empirically sampled human preferences, whereby human annotators select which of two model outputs they prefer. This human feedback is subsequently used to train a reward model, which learns patterns in the preferences of the human annotators and can then automate preference decisions."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Touvron.et.al.2023.llama2} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+
+\begin{frame}{Llama2, Reinforcement Learning with Human Feedback (RLHF)}
+	
+"Our annotation procedure proceeds as follows. We ask annotators to first write a prompt, then choose between two sampled model responses, based on provided criteria. In order to maximize the diversity, the two responses to a given prompt are sampled from two different model variants, and varying the temperature hyper-parameter. In addition to giving participants a forced choice, we also ask annotators to label the degree to which they prefer their chosen response over the alternative: either their choice is significantly better, better, slightly better, or negligibly better/ unsure."
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Touvron.et.al.2023.llama2} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+\begin{frame}{Reinforcement Learning with Human Feedback (RLHF)}
+	
+	\includegraphics[width=0.9\linewidth]{img/rlhf.png}	
+	
+	\begin{tikzpicture}[overlay, remember picture]
+		\node at (current page.north east)[ref] {
+			\fullcite{Ouyang.et.al.2022.NeurIPS} \par};
+	\end{tikzpicture}
+	
+\end{frame}
+
+
+
+
+
+
 
 
 \begin{frame}{License and credits}
