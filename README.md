@@ -128,6 +128,15 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2025-01-16
 
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture10-handout.pdf)
+* [YouTube video](https://www.youtube.com/watch?v=7z0aCX3pdNQ)
+
+
+### Lecture 11: Transformers and evolution of LLMs
+
+2025-01-23
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture11-handout.pdf)
+
 
 
 ## FAQ
