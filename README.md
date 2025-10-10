@@ -1,4 +1,4 @@
-# Natural Language Processing with Deep Learning 2024/2025
+# Natural Language Processing with Deep Learning 2025/2026
 
 This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "Natural Language Processing with Deep Learning" (Ruhr University Bochum, winter term 2025/2026).
 
