@@ -1,6 +1,6 @@
 # Natural Language Processing with Deep Learning 2024/2025
 
-This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "Natural Language Processing with Deep Learning" (Ruhr University Bochum, winter term 2024/2025).
+This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "Natural Language Processing with Deep Learning" (Ruhr University Bochum, winter term 2025/2026).
 
 This course is lectured by [Prof. Dr. Ivan Habernal](https://www.trusthlt.org).
 
@@ -12,130 +12,23 @@ The content is licensed under [Creative Commons CC BY-SA 4.0](https://creativeco
 
 **Note:** The following content is continuously updated as the winter term progresses.
 
-To see the previous full **2023/24** course content, checkout the [latest 2024 commit](https://github.com/trusthlt/nlp-with-deep-learning-lectures/tree/ae2364ac136e9852a6992f17a90771f0a5474bfb).
+To see the previous full **2024/25** course content, checkout the [latest 2025 commit](https://github.com/trusthlt/nlp-with-deep-learning-lectures/tree/21220643af8459666e63573143645fae7f4da9b2).
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcBSKkq8jxgUkP5Ted-_KrzI
+Subscribe the YouTube playlist to get updates on new lectures: TBD
 
 ## Lectures and exercises
 
 ### Lecture 01: NLP tasks and evaluation
 
-2024-10-17
+2025-10-16
 
-* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2024-lecture01-handout.pdf)
-* No YouTube recording of the first lecture
-* We did not cover evaluation
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture01-handout.pdf)
 
-### Exercise 01: PyTorch basics (tensors and basic operations)
-
-2024-10-17
+### Exercise 01: TBD
 
 * Python code under [exercises/ex01](exercises/ex01)
-
-### Lecture 02: Evaluation and machine learning basics
-
-2024-10-24
-
-* [Slides as PDF](/lectures/lecture02/pdf/nlpwdl2024-lecture02-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=A_oS_7LnfD0)
-
-
-### Exercise 02: Classification evaluation, text generation evaluation
-
-2024-10-24
-
-* See the PDF (including LaTeX source) and Python code under [exercises/ex02](exercises/ex02)
-
-
-### Lecture 03: Mathematical foundations of deep learning
-
-2024-10-31
-
-* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2024-lecture03-handout.pdf)
-* [YouTube video from 2023 edition](https://www.youtube.com/watch?v=viej0VnvwMY)
-
-### Exercise 03: Computational graph and derivatives
-
-2024-10-31
-
-* See the Python project under [exercises/ex03](exercises/ex03)
-
-### Lecture 04: Text classification with log-linear models
-
-2024-11-14
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture04-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=UASyReidhqM)
-
-### Exercise 04: Log-linear model and backprop
-
-2024-10-31
-
-* See the Python project under [exercises/ex04](exercises/ex04)
-
-### Lecture 05: Feed-forward network and language modeling
-
-2024-11-21
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture05-handout.pdf)
-* [YouTube video TBD](https://www.youtube.com/watch?v=0cHYQgOTYFw)
-
-### Exercise 05: SGD, layers, softmax, binary classification
-
-2024-11-21
-
-* See the Python project under [exercises/ex05](exercises/ex04)
-
-### Lecture 06: Neural language models and learning word embeddings
-
-2024-11-28
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture06-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=wUey35aN6mI)
-
-
-### Lecture 07: Recurrent neural networks and encoder-decoder architectures
-
-2024-12-05
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture07-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=AqR8tMGXHGQ)
-
-### Lecture 08: BERT as encoder-only transformer
-
-2024-12-12
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture08-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=Iv4frRvYFd8)
-
-### Exercise 08: Neural language model
-
-2024-12-12
-
-* See the Python project under [exercises/ex04](exercises/ex08)
-
-### Lecture 09: BERT part 2
-
-2024-12-19
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture09-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=bXoMfRRoFaQ)
-
-### Lecture 10: Decoder-only models and GPT}
-
-2025-01-16
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture10-handout.pdf)
-* [YouTube video](https://www.youtube.com/watch?v=7z0aCX3pdNQ)
-
-
-### Lecture 11: Transformers and evolution of LLMs
-
-2025-01-23
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2024-lecture11-handout.pdf)
 
 
 
