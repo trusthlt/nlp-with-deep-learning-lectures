@@ -26,9 +26,9 @@ Subscribe the YouTube playlist to get updates on new lectures: TBD
 
 * [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture01-handout.pdf)
 
-### Exercise 01: TBD
+### Exercise 01: Evaluation
 
-* Python code under [exercises/ex01](exercises/ex01)
+* Assignments under [exercises/ex01](exercises/ex01)
 
 
 
