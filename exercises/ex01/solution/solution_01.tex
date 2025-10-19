@@ -1,0 +1,90 @@
+% !BIB program = bibtex
+% !TeX program = pdflatex
+\documentclass[11pt,a4wide,oneside]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\usepackage{url}
+
+\title{NLPwDL 2025, Exercise 1}
+\author{Prof.\ Dr.\ Ivan Habernal}
+\date{2025-10-15}
+
+\newif\ifsolution
+\solutiontrue
+
+\ifsolution
+\usepackage{draftwatermark}
+\SetWatermarkScale{7}
+\SetWatermarkText{Solution}
+\SetWatermarkColor[gray]{0.87}
+\fi
+
+
+\begin{document}
+
+\maketitle
+
+\section{Classification evaluation}
+
+Accuracy, precision, recall and, F1 measure are typical measures for evaluating the results of machine learning systems.
+Assume you built a simple multi classification model to solve Part Of Speech tagging which only operates on the three tags \texttt{NN}, \texttt{VB}, and \texttt{ADJ} (noun, verb, and adjective).
+
+
+\paragraph{Task 1}
+Compute the classifier's accuracy and precision, recall, and F1 measure for each individual class based on the following confusion matrix:
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ll|rrr}
+		&				& \multicolumn{3}{c}{predicted class} \\
+		&				& \texttt{NN}	& \texttt{VB}	& \texttt{ADJ} \\
+		\cline{2-5}
+		& \texttt{NN}	& 25			& 5				& 1 \\
+		true class		& \texttt{VB}	& 2				& 15			& 12 \\
+		& \texttt{ADJ}	& 1				& 6				& 0 \\
+	\end{tabular}
+\end{table}
+
+Hint: For $n$ classes and a confusion matrix $C \in \mathbb{R}^{n \times n}$, the evaluation measures are defined for class $i$ by:
+\begin{align*}
+	P_i = \frac{\text{TP}}{\text{TP+FP}} = \frac{C_{i,i}}{\sum_{j=1}^n C_{j,i}} \\
+	R_i = \frac{\text{TP}}{\text{TP+FN}} = \frac{C_{i,i}}{\sum_{j=1}^n C_{i,j}} \\
+\end{align*}
+and
+\[\mathit{F1} = \frac{2 \cdot P \cdot R}{P + R}\]
+
+\ifsolution
+\begin{align*}
+	P_\text{NN} &= \frac{25}{25+3} &= 0.89 \\
+	R_\text{NN} &= \frac{25}{25+6} &= 0.81 \\
+	F1_\text{NN} &= \frac{2 \cdot 0.89 \cdot 0.81}{0.89 + 0.81} &= 0.85 \\[0.75em]
+	P_\text{VB} &= \frac{15}{15+11} &= 0.58 \\
+	R_\text{VB} &= \frac{15}{15+14} &= 0.52 \\
+	F1_\text{VB} &= \frac{2 \cdot 0.58 \cdot 0.52}{0.58 + 0.52} &= 0.55 \\[0.75em]
+	P_\text{ADJ} &= \frac{0}{0+13} &= 0.00 \\
+	R_\text{ADJ} &= \frac{0}{0+7} &= 0.00 \\
+	F1_\text{ADJ} &= \text{undefined} \\    
+\end{align*}
+\fi
+
+\paragraph{Task 2} Implement a confusion matrix in Python from scratch. You can use \texttt{numpy}.
+
+\paragraph{Task 3} Verify your previous hand-crafted calculations. Implement macro-F1 score by (a) averaging F1 score for each class, and (b) by first averaging precision and recall over classes and then computing the F1 score.
+
+\paragraph{Task 4} Pretend you have a highly imbalanced test data of 990 \texttt{classA} examples and only 10 \texttt{classB} examples. You have two systems: \texttt{Model-One} classifies everything as \texttt{classA} and \texttt{Model-Two} throws a coin for each example and with 50\% probability classify the example as \texttt{classA} (and as \texttt{classB} otherwise). Compute all metrics for both systems.
+
+\paragraph{Task 5} Experiment with classification measures implemented in \texttt{scikit-learn}.\footnote{\url{https://scikit-learn.org/stable/modules/model_evaluation.html#precision-recall-f-measure-metrics}} Focus on F1 score and try several options of \texttt{average}: \texttt{micro}, \texttt{macro}. Compare with your implementation.
+
+\paragraph{Task 6 [Optional, try at home]} You might also want to look at Torch\-Eval, a lightweight evaluation framework well integrated to the PyTorch environment: \url{https://pytorch.org/torcheval/}
+
+\section{Text generation evaluation}
+
+\paragraph{Task 1} Play around with BLEU score using HuggingFace: \url{https://huggingface.co/spaces/evaluate-metric/bleu}
+
+\paragraph{Task 2} Compare the above to ROUGE metric:
+\url{https://huggingface.co/spaces/evaluate-metric/rouge}. Note that this implementation is just a wrapper of another library by Google Research: \url{https://github.com/google-research/google-research/tree/master/rouge}.
+
+\end{document}
