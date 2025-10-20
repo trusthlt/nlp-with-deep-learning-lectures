@@ -16,7 +16,7 @@ To see the previous full **2024/25** course content, checkout the [latest 2025 c
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: TBD
+Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcCbnLqv_KjFXmk4ROEtlcKX
 
 ## Lectures and exercises
 
