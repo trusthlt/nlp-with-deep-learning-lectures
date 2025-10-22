@@ -16,7 +16,7 @@ To see the previous full **2024/25** course content, checkout the [latest 2025 c
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: TBD
+Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcCbnLqv_KjFXmk4ROEtlcKX
 
 ## Lectures and exercises
 
@@ -29,6 +29,16 @@ Subscribe the YouTube playlist to get updates on new lectures: TBD
 ### Exercise 01: Evaluation
 
 * Assignments under [exercises/ex01](exercises/ex01)
+
+### Lecture 02: Gradient and backpropagation
+
+2025-10-23
+
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture02-handout.pdf)
+
+### Exercise 02: Tensors and TBD
+
+* Assignments under [exercises/ex02](exercises/ex02)
 
 
 
