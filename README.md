@@ -30,6 +30,16 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * Assignments under [exercises/ex01](exercises/ex01)
 
+### Lecture 02: Gradient and backpropagation
+
+2025-10-23
+
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture02-handout.pdf)
+
+### Exercise 02: Tensors and TBD
+
+* Assignments under [exercises/ex02](exercises/ex02)
+
 
 
 ## FAQ
