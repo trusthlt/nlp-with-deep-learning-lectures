@@ -25,6 +25,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2025-10-16
 
 * [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture01-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=9jWT7eh4eSc)
 
 ### Exercise 01: Evaluation
 
@@ -35,8 +36,9 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2025-10-23
 
 * [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture02-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=tLqtNWWzOCs)
 
-### Exercise 02: Tensors and TBD
+### Exercise 02: Tensors and derivatives
 
 * Assignments under [exercises/ex02](exercises/ex02)
 
