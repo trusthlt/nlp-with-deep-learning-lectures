@@ -31,7 +31,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 * Assignments under [exercises/ex01](exercises/ex01)
 
-### Lecture 02: Gradient and backpropagation
+### Lecture 02: Gradient
 
 2025-10-23
 
@@ -41,6 +41,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 ### Exercise 02: Tensors and derivatives
 
 * Assignments under [exercises/ex02](exercises/ex02)
+
+### Lecture 03: Backpropagation and binary text classification
+
+2025-10-30
+
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture03-handout.pdf)
+* YouTube recording TBD
 
 
 
