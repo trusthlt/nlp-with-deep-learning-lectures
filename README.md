@@ -35,7 +35,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2025-10-23
 
-* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture02-handout.pdf)
+* [Slides as PDF](/lectures/lecture02/pdf/nlpwdl2025-lecture02-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=tLqtNWWzOCs)
 
 ### Exercise 02: Tensors and derivatives
@@ -46,7 +46,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2025-10-30
 
-* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture03-handout.pdf)
+* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2025-lecture03-handout.pdf)
 * YouTube recording TBD
 
 
