@@ -1,0 +1,221 @@
+
+% TODO change "leftfootertext" to your liking
+\newcommand{\leftfootertext}{\insertsubtitle}  % just the \title{} text by default
+%\newcommand{\leftfootertext}{RNNs and encoder-decoder architectures}  % Your name, for instance
+
+
+% ------- RUB specifics ----------
+% adjust for 16:9
+% https://tex.stackexchange.com/questions/354022/modifying-the-margins-of-all-slides-in-beamer
+\setbeamersize{text margin left=0.3cm,text margin right=4.5cm} 
+
+
+% use Metropolis as the basis theme
+\usetheme[subsectionpage=progressbar]{metropolis}
+% blocks with background globally
+\metroset{block=fill}
+
+
+\usepackage{fontspec}
+% RUB fonts need to be installed
+% 'UprightFont = * Light' makes sure that the base font is RubFlama Light, which looks
+% lighter than RubFlama Regular (would be too thick for slides)
+\setsansfont[Scale=MatchLowercase, UprightFont = * Light, BoldFont = * Bold]{RubFlama}
+%\setsansfont{Arial} % Open source alternative if you don't have RubFlama
+
+% RUB color scheme
+% Dark blue: 0; 53; 96; #003560
+\definecolor{RUBDarkBlue}{RGB}{0, 53, 96}
+
+% Light yellow (table fill, etc.); 238; 250; 196; #EEFAC4
+\definecolor{RUBLightYellow}{RGB}{238, 250, 196}
+
+%Light green: 141; 174; 16
+\definecolor{RUBLightGreen}{RGB}{141, 174, 16}
+
+
+\setbeamercolor{titlelike}{fg=RUBDarkBlue}
+\setbeamercolor{subtitle}{fg=RUBLightGreen}
+\setbeamercolor{separation line}{fg=RUBLightGreen}
+\setbeamercolor{frametitle}{bg=white, fg=RUBDarkBlue}
+
+% horizontal line on title page and sections
+\setbeamercolor{alerted text}{fg=RUBLightGreen}
+
+
+% Adjust footer bottom (too large by default)
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\textwidth, sep=2ex]{footline}%
+    \usebeamerfont{page number in head/foot}%
+    \usebeamertemplate*{frame footer}
+    \hfill%
+    \usebeamertemplate*{frame numbering}
+  \end{beamercolorbox}%
+}
+
+
+% Lab name, numbering, etc. in footer
+\setbeamertemplate{frame numbering}{TrustHLT --- Prof.\ Dr.\ Ivan Habernal \hspace*{1ex} \includegraphics[width=7em]{img/rub-logo.pdf}\hspace*{1ex}}
+
+\setbeamertemplate{frame footer}{\hspace*{1ex}\insertframenumber \hspace*{2ex} \leftfootertext}
+
+% adjust the background to be completely white
+\setbeamercolor{background canvas}{bg=white}
+
+% logos on the title page
+\titlegraphic{%
+	\begin{picture}(0,0)
+		\put(435,0){\makebox(0,0)[rt]{\includegraphics[width=7em]{img/rub-logo.pdf}}}
+		\put(435,-170){\makebox(0,0)[rt]{\includegraphics[width=4em]{img/logo-trusthlt.pdf}}}
+		\put(435,-196){\makebox(0,0)[rt]{\includegraphics[width=9em]{img/logo-rctrust.pdf}}}
+	\end{picture}%
+}
+
+
+% show TOC at every section start
+\AtBeginSection{
+	\frame{
+		\vspace{2em}
+		\sectionpage
+		\hspace*{2.2em}\begin{minipage}{10cm}
+			\tableofcontents[currentsection]
+		\end{minipage}
+	}
+}
+
+% TOC without subsection
+\setcounter{tocdepth}{1} % only-- part,chapters,sections 
+
+% bullet points: rectangles
+\useinnertheme{rectangles}
+\setbeamercolor{itemize item}{fg=RUBLightGreen}
+\setbeamercolor{itemize subitem}{fg=RUBLightGreen}
+% enumerate: blue background for better readability
+\setbeamercolor{item projected}{bg=RUBDarkBlue}
+
+% make boxes (example, block, etc.) background lighter for readability
+\setbeamercolor{block title}{%
+	use=normal text,
+	fg=normal text.fg,
+	bg=normal text.bg!90!fg % lighter background in block title
+}
+\setbeamercolor{block body}{
+	use={block title, normal text},
+	bg=block title.bg!30!normal text.bg % lighter background in block body
+}
+
+
+% RUB colors in blocks
+\setbeamercolor{block title alerted}{%
+	use={block title, alerted text},
+	bg=RUBDarkBlue,
+	%fg=RUBLightYellow % looks bad
+	fg=white % better contrast
+}
+
+\setbeamercolor{block title example}{%
+	use={block title, example text},
+	fg=RUBLightGreen
+}
+
+
+% ------- end of RUB specifics ----------
+
+% all itemize with pause by default
+%\beamerdefaultoverlayspecification{<+->}
+
+
+% typeset mathematics on serif
+\usefonttheme[onlymath]{serif}
+
+% better bibliography using biber as backend
+\usepackage[natbib=true,backend=biber,style=authoryear-icomp,maxbibnames=30,maxcitenames=9,uniquelist=false,giveninits=true,doi=false,url=false,dashed=false,isbn=false]{biblatex}
+% shared bibliography
+\addbibresource{../../nlpwdl-bibliography.bib}
+% disable "ibid" for repeated citations
+\boolfalse{citetracker}
+
+
+
+\usepackage{xspace}
+
+
+% for derivatives, https://tex.stackexchange.com/a/412442
+\usepackage{physics}
+
+\usepackage{tikz}
+\usetikzlibrary{matrix, positioning}
+\usetikzlibrary{angles,quotes} % for angles
+\usetikzlibrary{backgrounds} % background
+\usetikzlibrary{decorations.pathreplacing} % curly braces
+\usetikzlibrary{calligraphy}
+\usetikzlibrary{calc} % for neural nets
+
+% for plotting functions
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+% sub-figures
+\usepackage{caption}
+\usepackage{subcaption}
+
+% book tabs
+\usepackage{booktabs}
+
+
+% argmin, argmax
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\!\max}
+\DeclareMathOperator*{\argmin}{arg\!\min}
+% softmax
+\DeclareMathOperator*{\softmax}{soft\!\max}
+% Mask
+\DeclareMathOperator*{\mask}{mask}
+
+% bold math
+\usepackage{bm}
+
+% for \mathclap
+\usepackage{mathtools}
+
+% algorithms
+\usepackage[noend]{algpseudocode}
+
+
+% for neurons and layers in tikz
+\tikzset{
+	neuron/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=blue!20},
+	param/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=green!20},
+	constant/.style={draw, rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!15},
+	% for citation nodes right top
+	ref/.style={anchor = north east, text width=7.8cm, yshift=-1.3cm, xshift=-0.2cm, scale=0.5},
+	state/.style={rectangle, inner sep=2pt, minimum width=0.75cm, fill=black!5},
+}
+
+% added in lecture 10
+\tikzset{
+	mtx/.style={
+		matrix of math nodes,
+		left delimiter={[}, right delimiter={]}
+	},
+	hlt/.style={opacity=0.1, line width=4 mm, line cap=round},
+	hltr/.style={opacity=0.5, rounded corners=2pt, inner sep=-1pt}
+}
+
+% for strike-through text (added in Lecture 06)
+\usepackage[normalem]{ulem}
+
+% added in Lecture 7
+% RNN
+\DeclareMathOperator*{\rnn}{RNN}
+% RNN star
+\DeclareMathOperator*{\rnnstar}{RNN^{*}}
+% bi-RNN
+\DeclareMathOperator*{\birnn}{biRNN}
+
+
+% added in Lecture 9
+\usetikzlibrary{fit} % for hightligting by calling "fit"
+
+% algorithms
+\usepackage[noend]{algpseudocode}
