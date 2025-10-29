@@ -49,6 +49,10 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2025-lecture03-handout.pdf)
 * YouTube recording TBD
 
+### Exercise 03: Backprop from scratch
+
+* Assignments under [exercises/ex03](exercises/ex03)
+
 
 
 ## FAQ
