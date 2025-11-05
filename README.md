@@ -47,11 +47,18 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2025-10-30
 
 * [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2025-lecture03-handout.pdf)
-* YouTube recording TBD
+* [YouTube recording](https://www.youtube.com/watch?v=yDKs2ryVtHE)
 
 ### Exercise 03: Backprop from scratch
 
 * Assignments under [exercises/ex03](exercises/ex03)
+
+### Lecture 04: Text classification and feed-forward networks
+
+2025-11-06
+
+* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2025-lecture04-handout.pdf)
+* YouTube recording TBD
 
 
 
