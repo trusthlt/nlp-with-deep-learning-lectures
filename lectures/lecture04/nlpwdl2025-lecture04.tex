@@ -1,0 +1,878 @@
+% !TeX program = lualatex
+% !BIB program = biber
+% Lualatex is important to render TTF fonts; with pdflatex it's just the regular one
+% ratio 16:9 -- https://tex.stackexchange.com/questions/14336/
+
+% compile two versions, inspired by https://tex.stackexchange.com/a/1501
+% use the script "compile-pdf.sh"
+\newif\ifhandout
+% if flags.tex does not exist, create an empty file to be able to compile in TeXstudio
+\input{flags}
+
+\ifhandout
+\documentclass[12pt,aspectratio=169,handout]{beamer}
+\else
+\documentclass[12pt,aspectratio=169]{beamer}
+\fi
+
+
+\input{header-include.tex}
+
+
+
+\title{Natural Language Processing with Deep Learning}
+\subtitle{Lecture 4 --- Text classification and feed-forward networks}
+\date{November 6, 2025}
+\author{Prof.\ Dr.\ Ivan Habernal}
+\institute{
+\texttt{www.trusthlt.org} \\
+Trustworthy Human Language Technologies Group (TrustHLT) \\
+Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
+
+
+
+\begin{document}
+
+\maketitle
+
+
+
+\begin{frame}{This lecture}
+
+\begin{itemize}
+\item Recap: Binary text classification
+\item Log-linear models, Cross-entropy loss, Stochastic gradient descent
+\item Multi-class classification and softmax
+\item Deep neural networks
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{Recap: Transform text into a fixed-size vector of real numbers}
+	
+What's our setup:
+$$f(\bm{x}) : \mathbb{R}^{d_{in}} \to \mathbb{R} \qquad
+f(\bm{x}) = \bm{x} \cdot \bm{w} + b$$
+
+What we need:
+$$\bm{x} \in \mathbb{R}^{d_{in}}$$
+	
+What we have:
+	
+\emph{One of my favorite movies ever,The Shawshank Redemption is a modern day classic  ...}
+
+Simple solution:
+
+\begin{itemize}
+	\item Bag-of-words (tokenized), $d_{in} = |V|$
+\end{itemize}
+	
+\end{frame}
+
+
+
+
+\section{Binary text classification}
+
+
+\subsection{Binary classification as a function}
+
+\begin{frame}{Linear function and its derivatives}
+	
+We have this linear function
+$$f(\bm{x}) : \mathbb{R}^{d_{in}} \to \mathbb{R} \qquad
+f(\bm{x}) = \bm{x} \cdot \bm{w} + b = \bm{x}_{[1]} \bm{w}_{[1]} + \ldots + \bm{x}_{[d_{in}]} \bm{w}_{[d_{in}]} + b $$
+
+\pause
+\begin{block}{Derivatives wrt.\ parameters $\bm{w}$ and $b$}
+$$
+\dv{f}{\bm{w}_{[i]}} = \bm{x}_{[i]} \qquad \dv{f}{b} = 1
+$$
+\end{block}
+
+
+\end{frame}
+
+
+\begin{frame}{Non-linear mapping to $[0, 1]$}
+
+We have this linear function
+$$f(\bm{x}) : \mathbb{R}^{d_{in}} \to \mathbb{R} \qquad
+f(\bm{x}) = \bm{x} \cdot \bm{w} + b$$
+which has an unbounded range $(-\infty, +\infty)$
+
+\bigskip
+
+However, each example's label is $y \in \{0, 1\}$
+
+\end{frame}
+
+
+\begin{frame}{Sigmoid (logistic) function}
+
+\begin{block}{Sigmoid function $\sigma(t) : \mathbb{R} \to \mathbb{R}$}
+	$$
+	\sigma(t) = \frac{\exp(t)}{\exp(t) + 1} = \frac{1}{1 + \exp(-t)}
+	$$
+\end{block}
+
+
+\begin{figure}
+\begin{tikzpicture}
+
+\begin{axis}[
+	xmin = -10, xmax = 10,
+	ymin = 0, ymax = 1,
+	xtick distance = 5,
+	ytick distance = 0.5,
+	grid = both,
+	minor tick num = 5,
+	major grid style = {lightgray},
+	minor grid style = {lightgray!25},
+	width = 0.9\textwidth,
+	height = 0.35\textwidth,
+	legend pos = north west
+	]
+	
+	\addplot[
+	domain = -10:10,
+	samples = 200,
+	smooth,
+	thick,
+	blue,
+	] {1/(1 + exp(-1 * x))};
+	
+\end{axis}
+\end{tikzpicture}
+\end{figure}
+
+Symmetric function, range of $\sigma(t) \in [0, 1]$, 
+
+	
+\end{frame}
+
+\begin{frame}{Sigmoid $\sigma(t) = \frac{1}{1 + \exp(-t)}$}
+
+\begin{block}{Derivative of sigmoid wrt.\ its input}
+$$
+\begin{aligned}
+\dv{\sigma}{t}
+&=\frac {\exp(t) \cdot (1+\exp(t)) - \exp(t) \cdot \exp(t)}{(1+\exp(t))^{2}} \\
+&= \ldots \\
+&= \sigma(t) \cdot \left( 1- \sigma(t) \right)
+\end{aligned}
+$$	
+\end{block}
+
+
+
+\end{frame}
+
+\begin{frame}{Our binary text classification function}
+
+Linear function through sigmoid --- log-linear model
+$$
+\hat{y} = \sigma(f(\bm{x})) = \frac{1}{1 + \exp(- (\bm{x} \cdot \bm{w} + b))}
+$$	
+
+\begin{figure}
+\begin{tikzpicture}	
+	%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+	\node (x) [constant] {$\bm{x}$};
+	\node (w) [param, below of=x] {$\bm{w}$};
+	\node (b) [param, below of=w] {$b$};
+	
+	\node (f) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \cdot \bm{w} + b$};
+	\node (s) [neuron, right of=f, xshift=1.5cm] {$\sigma$};
+	
+	\begin{scope}[thick, black, ->, >=latex]
+		\draw (x) -- (f);
+		\draw (w) -- (f);
+		\draw (b) -- (f);
+		\draw (f) -- (s);
+	\end{scope}	
+\end{tikzpicture}
+\caption{Computational graph; green nodes are trainable parameters, gray are inputs}
+\end{figure}
+	
+\end{frame}
+
+\begin{frame}{Decision rule of log-linear model}
+	
+Log-linear model
+$
+\hat{y} = \sigma(f(\bm{x})) = \frac{1}{1 + \exp(- (\bm{x} \cdot \bm{w} + b))}
+$	
+
+\begin{itemize}
+	\item Prediction = 1 if $\hat{y} > 0.5$	
+	\item Prediction = 0 if $\hat{y} < 0.5$
+\end{itemize}
+
+\bigskip
+
+Natural interpretation: Conditional probability of prediction = 1 given the input $\bm{x}$
+$$
+\begin{aligned}
+\sigma(f(\bm{x})) &= \Pr(\text{prediction} = 1 | \bm{x}) \\
+1 - \sigma(f(\bm{x})) &= \Pr(\text{prediction} = 0 | \bm{x})
+\end{aligned}
+$$
+
+\end{frame}
+
+\subsection{Finding the best model's parameters}
+
+
+
+\begin{frame}{Binary cross-entropy loss (logistic loss)}
+$$
+L_{\text{logistic}} = - y \log \hat{y} - (1 - y) \log (1 - \hat{y})
+$$
+
+\begin{block}{Partial derivative wrt.\ input $\hat{y}$}
+$$
+\dv{L_{\text{Logistic}}}{\hat{y}} =
+- \left(
+\frac{y}{\hat{y}} - \frac{1 - y}{1 - \hat{y}}
+\right)
+=
+- \frac{y - \hat{y}}{ \hat{y} (1 - \hat{y})}
+$$
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Full computational graph}
+\begin{figure}
+	\begin{tikzpicture}	
+		%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+		\node (x) [constant] {$\bm{x}$};
+		\node (w) [param, below of=x] {$\bm{w}$};
+		\node (b) [param, below of=w] {$b$};
+		
+		\node (f) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \cdot \bm{w} + b$};
+		\node (s) [neuron, right of=f, xshift=1.5cm] {$\sigma$};
+		
+		\node (l) [neuron, right of=s, xshift=1cm] {$L$};
+		\node (y) [constant, below of=s] {$y$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (f);
+			\draw (w) -- (f);
+			\draw (b) -- (f);
+			\draw (f) -- (s);
+			\draw (s) -- (l);
+			\draw (y) -- (l);
+		\end{scope}	
+	\end{tikzpicture}
+	\caption{Computational graph; green nodes are trainable parameters, gray are constant inputs}
+\end{figure}
+
+How can we minimize this loss function wrt.\ $\bm{w}$ and $b$?
+
+\pause
+\begin{itemize}
+	\item Recall: (a) Gradient descent and (b) backpropagation
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{(Online) Stochastic Gradient Descent}
+
+\begin{algorithmic}[1]
+	\Function{SGD}{$f(\bm{x}; \Theta)$, $(\bm{x}_1, \ldots, \bm{x}_n)$, $(\bm{y}_1, \ldots, \bm{y}_n)$, $L$}
+	\While{stopping criteria not met}
+		\State Sample a training example $\bm{x}_i, \bm{y}_i$
+		\State Compute the loss $L(f(\bm{x}_i; \Theta), \bm{y}_i)$
+		\State $\hat{\bm{g}} \gets$ gradient of $L(f(\bm{x}_i; \Theta), \bm{y}_i)$ wrt.\ $\Theta$
+		\State $\Theta \gets \Theta - \eta_t \hat{\bm{g}}$
+	\EndWhile
+	\State \Return $\Theta$
+	\EndFunction
+\end{algorithmic}
+
+Loss in line 4 is based on a \textbf{single training example} $\to$ a rough estimate of the corpus loss $\mathcal{L}$ we aim to minimize
+
+The noise in the loss computation may result in inaccurate gradients
+
+\end{frame}
+
+
+
+\begin{frame}{Minibatch Stochastic Gradient Descent}
+	
+	\begin{algorithmic}[1]
+		\Function{mbSGD}{$f(\bm{x}; \Theta)$, $(\bm{x}_1, \ldots, \bm{x}_n)$, $(\bm{y}_1, \ldots, \bm{y}_n)$, $L$}
+		\While{stopping criteria not met}
+		\State Sample $m$ examples $\{ (\bm{x}_1, \bm{y}_1), \ldots (\bm{x}_m, \bm{y}_m) \}$
+		\State $\hat{\bm{g}} \gets 0$
+		\For{$i = 1$ to $m$}
+			\State Compute the loss $L(f(\bm{x}_i; \Theta), \bm{y}_i)$
+			\State $\hat{\bm{g}} \gets \hat{\bm{g}}\ + $ gradient of $\frac{1}{m} L(f(\bm{x}_i; \Theta), \bm{y}_i)$ wrt.\ $\Theta$
+		\EndFor
+		\State $\Theta \gets \Theta - \eta_t \hat{\bm{g}}$
+		\EndWhile
+		\State \Return $\Theta$
+		\EndFunction
+	\end{algorithmic}
+	
+
+\end{frame}
+
+\begin{frame}{Properties of Minibatch Stochastic Gradient Descent}
+
+\begin{itemize}
+\item The minibatch size can vary in size from $m = 1$ to $m = n$
+\item Higher values provide better estimates of the corpus-wide gradients, while smaller values allow more updates and in turn faster convergence
+\item Lines 6+7: May be easily parallelized
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+\section{From binary to multi-class task}
+
+\begin{frame}{Our binary text classification function}
+	
+	Linear function through sigmoid --- log-linear model
+	$$
+	\hat{y} = \sigma(f(\bm{x})) = \frac{1}{1 + \exp(- (\bm{x} \cdot \bm{w} + b))}
+\qquad \hat{y} \in (0, 1), y \in \{0, 1\}
+	$$	
+	
+\begin{figure}
+	\begin{tikzpicture}	
+		%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+		\node (x) [constant] {$\bm{x}$};
+		\node (w) [param, below of=x] {$\bm{w}$};
+		\node (b) [param, below of=w] {$b$};
+		
+		\node (f) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \cdot \bm{w} + b$};
+		\node (s) [neuron, right of=f, xshift=1.5cm] {$\sigma$};
+		
+		\node (l) [neuron, right of=s, xshift=1cm] {$L$};
+		\node (y) [constant, below of=s] {$y$};
+		
+		\begin{scope}[thick, black, ->, >=latex]
+			\draw (x) -- (f);
+			\draw (w) -- (f);
+			\draw (b) -- (f);
+			\draw (f) -- (s);
+			\draw (s) -- (l) node [midway, above] {$\hat{y}$};
+			\draw (y) -- (l);
+		\end{scope}	
+	\end{tikzpicture}
+	\caption{Computational graph; green nodes are trainable parameters, gray are constant inputs}
+\end{figure}
+
+	
+\end{frame}
+
+
+
+\begin{frame}{From binary to multi-class labels}
+	
+	So far we mapped our gold label $y \in \{0, 1\}$
+	
+	\begin{itemize}
+		\item Categorical: There is no `ordering'
+		\item Example: Classify the language of a document into 6 languages (En, Fr, De, It, Es, Other)
+	\end{itemize}
+	
+	\pause
+	\begin{block}{One-hot encoding of labels}
+		$$
+		\begin{aligned}
+			\text{En} &= \begin{pmatrix}1 & 0 & 0 & 0 & 0 & 0\end{pmatrix} \qquad
+			\text{Fr} = \begin{pmatrix}0 & 1 & 0 & 0 & 0 & 0\end{pmatrix} \\
+			\text{De} &= \begin{pmatrix}0 & 0 & 1 & 0 & 0 & 0\end{pmatrix} \qquad \ldots
+		\end{aligned}
+		$$
+	$\bm{y} \in \mathbb{R}^{d_{out}}$ where $d_{out}$ is the number of classes
+	\end{block}
+	
+\end{frame}
+
+\begin{frame}{Possible solution: Six weight vectors and biases}
+	
+	Consider for each language $\ell \in \{\text{En}, \text{Fr}, \text{De}, \text{It}, \text{Es}, \text{Other}\}$
+	\begin{itemize}
+		\item Weight vector $\bm{w}^{\ell}$ (e.g., $\bm{w}^{\text{Fr}})$
+		\item Bias $b^{\ell}$ (e.g., $b^{\text{Fr}})$
+	\end{itemize}
+	\pause We can predict the language resulting in the highest score
+	$$
+	\hat{y} = f(\bm{x}) = \argmax_{
+		\ell \in \{\text{En}, \text{Fr}, \text{De}, \text{It}, \text{Es}, \text{Other}\}
+	}
+	\bm{x} \cdot \bm{w}^{\ell} + b^{\ell}
+	$$
+	
+	\pause
+	But we can re-arrange the $\bm{w} \in \mathbb{R}^{d_{in}}$ vectors into columns of a matrix $\bm{W} \in \mathbb{R}^{d_{in} \times 6}$ and $\bm{b} \in \mathbb{R}^6$, to get
+	$$f(\bm{x}) = \bm{x} \bm{W} + \bm{b}$$
+	
+\end{frame}
+
+
+\begin{frame}{Projecting input vector to output vector $f(\bm{x}) : \mathbb{R}^{d_{in}} \to \mathbb{R}^{d_{out}}$}
+	
+	\pause
+	\begin{block}{Recall from lecture 3: High-dimensional linear functions}
+		Function $f(\bm{x}) : \mathbb{R}^{d_{in}} \to \mathbb{R}^{d_{out}}$
+		$$f(\bm{x}) = \bm{x} \bm{W} + \bm{b}$$
+		where
+		$\bm{x} \in \mathbb{R}^{d_{in}} \qquad
+		\bm{W} \in \mathbb{R}^{d_{in} \times d_{out}} \qquad
+		\bm{b} \in \mathbb{R}^{d_{out}}$
+	\end{block}	
+	
+	
+\end{frame}
+
+\begin{frame}{Prediction of multi-class classifier}
+	Project the input $\bm{x}$ to an output $\bm{y}$
+	$$\bm{\hat{y}} = f(\bm{x}) = \bm{x} \bm{W} + \bm{b}$$
+	and pick the element of $\bm{\hat{y}}$ with the highest value
+	$$
+	\text{prediction} = \hat{y} = \argmax_{i} \bm{\hat{y}}_{[i]}
+	$$
+	
+	\begin{block}{Sanity check}
+		What is $\hat{y}$?
+		
+		\pause
+		Index of $1$ in the one-hot. 
+		For example, if $\hat{y} = 3$, then the document is in German
+		$\text{De} = \begin{pmatrix}0 & 0 & 1 & 0 & 0 & 0\end{pmatrix}$
+	\end{block}
+	
+\end{frame}
+
+\subsection{Representations}
+
+
+\begin{frame}{Two representations of the input document}
+	$$\bm{\hat{y}} = \bm{x} \bm{W} + \bm{b}$$
+	
+	Vector $\bm{x}$ is a document representation
+	\begin{itemize}
+		\item Bag of words, for example ($d_{in} = |V|$ dimensions, sparse)
+	\end{itemize}
+	
+	Vector $\bm{\hat{y}}$ is \textbf{also} a document representation
+	\begin{itemize}
+		\item More compact (only 6 dimensions)
+		\item More specialized for the language prediction task
+	\end{itemize}
+	
+\end{frame}
+
+
+\begin{frame}{Learned representations --- central to deep learning}
+	Representations are central to deep learning
+	
+	One could argue that the main power of deep-learning is the ability to learn good representations
+\end{frame}
+
+
+\subsection{From multi-dimensional linear transformation to probabilities}
+
+\begin{frame}{Turning output vector into probabilities of classes}
+	
+	\begin{block}{Recap: Categorical probability distribution}
+		Categorical random variable $X$ is defined over $K$ categories, typically mapped to natural numbers $1, 2, \ldots, K$, for example En = 1, De = 2, $\ldots$
+		
+		\pause
+		Each category parametrized with probability $\Pr(X = k) = p_k$
+		
+		\pause
+		Must be valid probability distribution: $\sum_{i =1}^{K} \Pr(X = i) = 1$
+	\end{block}
+	
+	\pause
+	How to turn an \textbf{unbounded} vector in $\mathbb{R}^K$ into a categorical probability distribution?
+	
+\end{frame}
+
+\begin{frame}{The softmax function $\softmax (\bm{x}): \mathbb{R}^K \to \mathbb{R}^K$}
+	
+	\begin{block}{Softmax}
+		Applied element-wise, for each element $\bm{x}_{[i]}$ we have
+		$$
+		\softmax (\bm{x}_{[i]}) = \frac{\exp(\bm{x}_{[i]})}{
+			\sum_{k=1}^{K} \exp(\bm{x}_{[k]})
+		}
+		$$
+	\end{block}
+	
+	\pause
+	\begin{itemize}
+		\item Nominator: Non-linear bijection from $\mathbb{R}$ to $(0; \infty)$
+		\item Denominator: Normalizing constant to ensure $\sum_{j = 1}^{K} \softmax (\bm{x}_{[j]}) = 1$
+	\end{itemize}
+	
+	\pause
+	We also need to know how to compute the partial derivative of $\softmax (\bm{x}_{[i]})$ wrt.\ each argument $\bm{x}_{[k]}$: $\pdv{\softmax (\bm{x}_{[i]})}{\bm{x}_{[k]}}$
+	
+\end{frame}
+
+
+\begin{frame}{Softmax can be smoothed with a `temperature' $T$}
+	\vspace{-1em}
+	$$
+	\softmax (\bm{x}_{[i]}; T) = \frac{
+		\exp(\frac{\bm{x}_{[i]}}{T})
+	}{
+		\sum_{k=1}^{K} \exp(
+		\frac{\bm{x}_{[k]}}{T})
+	}
+	$$
+	
+	\pause
+	\begin{block}{Example: Softmax of $\bm{x} = (3, 0, 1)$ at different $T$}
+		\includegraphics[width=0.90\linewidth]{img/temperatures.png}
+		
+		High temperature $\to$ uniform distribution
+		
+		Low temperature $\to$ `spiky' distribution, all mass on the largest element
+		
+	\end{block}
+
+
+\begin{tikzpicture}[overlay, remember picture] 
+	\node at (current page.north east)[ref] {Figure from \fullcite{Murphy.2012} \par};
+\end{tikzpicture}
+	
+\end{frame}
+
+
+\section{Loss function for softmax}
+
+\begin{frame}{Categorical cross-entropy loss (aka.\ negative log likelihood)}
+	
+	Vector representing the gold-standard categorical distribution over the classes/labels $1, \ldots, K$:
+	$$
+	\bm{y} = (\bm{y_{[1]}}, \bm{y}_{[2]}, \ldots, \bm{y}_{[K]})
+	$$
+	Output from softmax:
+	$$
+	\bm{\hat{y}} = (\bm{\hat{y}_{[1]}}, \bm{\hat{y}}_{[2]}, \ldots, \bm{\hat{y}}_{[K]})
+	$$
+	which is in fact $\bm{\hat{y}_{[i]}} = \Pr(y = i| \bm{x})$
+	
+	
+	\begin{block}{Cross entropy loss}
+		$$
+		L_{\text{cross-entropy}} (\bm{\hat{y}, \bm{y}}) =
+		- \sum_{k = 1}^{K} \bm{y}_{[k]} \log \left(  \bm{\hat{y}}_{[k]} \right)
+		$$	
+	\end{block}	
+\end{frame}
+
+
+
+\section{Stacking transformations and non-linearity}
+
+
+\begin{frame}
+	\begin{figure}
+		\vspace{-1.3em}
+		\includegraphics[width=1.25\linewidth]{img/linear1.png}	
+		\caption{Linear model can tackle only linearly-separable problems (\url{http://playground.tensorflow.org})}
+	\end{figure}	
+\end{frame}
+
+\begin{frame}
+	\begin{figure}
+		\vspace{-1.3em}
+		\includegraphics[width=1.25\linewidth]{img/linear2.png}	
+		\caption{Linear model can tackle only linearly-separable problems (\url{http://playground.tensorflow.org})}
+	\end{figure}	
+\end{frame}
+
+
+\begin{frame}{Stacking linear layers on top of each other --- still linear!}
+	\vspace{-1em}
+	$$
+	\bm{x} \in \mathbb{R}^{d_{in}} \qquad
+	\bm{W^1} \in \mathbb{R}^{d_{in} \times d_1} \qquad
+	\bm{b^1} \in \mathbb{R}^{d_1} \qquad
+	\bm{W^2} \in \mathbb{R}^{d_1 \times d_{out}} \qquad
+	\bm{b^2} \in \mathbb{R}^{d_{out}} \qquad
+	$$
+	$$
+	f(\bm{x}) = \left(
+	\bm{x} \bm{W^1} + \bm{b^1}
+	\right)
+	\bm{W^2} + \bm{b^2}
+	$$
+	
+	\begin{figure}
+		\begin{tikzpicture}	
+			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+			\node (x) [constant] {$\bm{x}$};
+			\node (w) [param, below of=x] {$\bm{W^1}$};
+			\node (b) [param, below of=w] {$\bm{b^1}$};
+			
+			\node (f1) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \bm{W^1} + \bm{b^1}$};
+			\node (f2) [neuron, right of=f1, xshift=1.5cm] {$\bm{h^1} \bm{W^2} + \bm{b^2}$};
+			
+			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
+			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
+			
+			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
+			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
+			
+			\begin{scope}[thick, black, ->, >=latex]
+				\draw (x) -- (f1);
+				\draw (w) -- (f1);
+				\draw (b) -- (f1);
+				\draw (f1) -- (f2);
+				\draw (f2) -- (l);
+				\draw (w2) -- (f2);
+				\draw (b2) -- (f2);
+				\draw (y) -- (l);
+			\end{scope}	
+		\end{tikzpicture}
+		\caption{Computational graph; green circles are trainable parameters, gray are constant inputs}
+	\end{figure}	
+	
+\end{frame}
+
+
+\begin{frame}
+	\begin{figure}
+		\vspace{-1.3em}
+		\includegraphics[width=1.25\linewidth]{img/linear3.png}	
+		\caption{Linear hidden layers do not help (\url{http://playground.tensorflow.org})}
+	\end{figure}	
+\end{frame}
+
+
+
+
+\begin{frame}{Adding non-linear function $g: \mathbb{R}^{d_1} \to \mathbb{R}^{d_1}$}
+	\vspace{-1em}
+	$$
+	f(\bm{x}) = g \left(
+	\bm{x} \bm{W^1} + \bm{b^1}
+	\right)
+	\bm{W^2} + \bm{b^2}
+	$$
+	
+	\begin{figure}
+		\begin{tikzpicture}	
+			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+			\node (x) [constant] {$\bm{x}$};
+			\node (w) [param, below of=x] {$\bm{W^1}$};
+			\node (b) [param, below of=w] {$\bm{b^1}$};
+			
+			\node (f1) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \bm{W^1} + \bm{b^1}$};
+			
+			\node (g) [neuron, right of=f1, xshift=1.5cm] {$g$};
+			\node (f2) [neuron, right of=g, xshift=1.5cm] {$\bm{h^1} \bm{W^2} + \bm{b^2}$};
+			
+			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
+			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
+			
+			\node (l) [neuron, right of=f2, xshift=1cm] {$L$};
+			\node (y) [constant, below of=f2, xshift=1.5cm] {$\bm{y}$};
+			
+			\begin{scope}[thick, black, ->, >=latex]
+				\draw (x) -- (f1);
+				\draw (w) -- (f1);
+				\draw (b) -- (f1);
+				\draw (f1) -- (g);
+				\draw (g) -- (f2);
+				\draw (f2) -- (l);
+				\draw (w2) -- (f2);
+				\draw (b2) -- (f2);
+				\draw (y) -- (l);
+			\end{scope}	
+		\end{tikzpicture}
+		\caption{Computational graph; green circles are trainable parameters, gray are constant inputs}
+	\end{figure}	
+	
+\end{frame}
+
+
+
+\begin{frame}{Non-linear function $g$: Rectified linear unit (ReLU) activation}
+	
+	
+	\begin{columns}
+		
+		\begin{column}{0.6\linewidth}
+			
+			$$
+			\mathrm{ReLU}(z) =
+			\begin{cases}
+				0  & \quad \text{if } z < 0\\
+				z  & \quad \text{if } z \geq 0
+			\end{cases}
+			$$
+			
+		or \hspace{0.4em} $\mathrm{ReLU}(z) = \max(0, z)$
+			
+			
+			
+			
+		\end{column}
+		
+		\begin{column}{0.4\linewidth}
+			\begin{figure}
+				\begin{tikzpicture}
+					
+					\begin{axis}[
+						xmin = -5, xmax = 5,
+						ymin = -5, ymax = 5,
+						xtick distance = 5,
+						ytick distance = 5,
+						grid = both,
+						minor tick num = 5,
+						major grid style = {lightgray},
+						minor grid style = {lightgray!25},
+						width = \textwidth,
+						height = \textwidth,
+						legend pos = north west
+						]
+						
+						\addplot[
+						domain = -5:0,
+						samples = 10,
+						smooth,
+						thick,
+						blue,
+						] {0};
+						
+						\addplot[
+						domain = 0:5,
+						samples = 10,
+						smooth,
+						thick,
+						blue,
+						] {x};
+						
+						
+					\end{axis}
+					
+				\end{tikzpicture}
+				\caption{ReLU function}
+			\end{figure}
+		\end{column}
+	\end{columns}
+	
+	
+\end{frame}
+
+
+\begin{frame}
+	\begin{figure}
+		\vspace{-1.3em}
+		\includegraphics[width=1.25\linewidth]{img/linear4.png}	
+		\caption{XOR solvable with, e.g., ReLU (\url{http://playground.tensorflow.org})}
+	\end{figure}	
+\end{frame}
+
+
+\begin{frame}{XOR example in super-simplified sentiment classification}
+	\begin{figure}
+		\vspace{-1.3em}
+		\includegraphics[width=1.2\linewidth]{img/xor1.pdf}	
+		\caption{$V = \{\text{not}, \text{bad}, \text{good}\}$, binary features $\in \{0, 1\}$}
+	\end{figure}	
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Multi-layer perceptron (MLP) aka.\ feed-forward network}
+	\vspace{-1em}
+	$$
+	f(\bm{x}) = \sigma \left( g \left(
+	\bm{x} \bm{W^1} + \bm{b^1}
+	\right)
+	\bm{W^2} + \bm{b^2} \right)
+	$$
+	
+	\begin{figure}
+		\begin{tikzpicture}	
+			%\node (a1) [draw, circle, inner sep=0pt, minimum width=0.75cm, fill=green!20] {$a_1$};
+			\node (x) [constant] {$\bm{x}$};
+			\node (w) [param, below of=x] {$\bm{W^1}$};
+			\node (b) [param, below of=w] {$\bm{b^1}$};
+			
+			\node (f1) [neuron, right of=w, xshift=1.5cm] {$\bm{x} \bm{W^1} + \bm{b^1}$};
+			
+			\node (g) [neuron, right of=f1, xshift=1.5cm] {$g$};
+			\node (f2) [neuron, right of=g, xshift=1.5cm] {$\bm{h^1} \bm{W^2} + \bm{b^2}$};
+			
+			\node (w2) [param, below of=f2, xshift=-1.5cm, yshift=0cm] {$\bm{W^2}$};
+			\node (b2) [param, below of=f2, xshift=-0.5cm, yshift=-0.5cm] {$\bm{b^2}$};
+			
+			\node (sigma) [neuron, right of=f2, xshift=2cm] {$\sigma$ or softmax};
+			
+			\node (l) [neuron, right of=sigma, xshift=1.5cm] {$L$};
+			\node (y) [constant, below of=sigma, xshift=1.5cm] {$\bm{y}$};
+			
+			\begin{scope}[thick, black, ->, >=latex]
+				\draw (x) -- (f1);
+				\draw (w) -- (f1);
+				\draw (b) -- (f1);
+				\draw (f1) -- (g);
+				\draw (g) -- (f2);
+				\draw (f2) -- (sigma);
+				\draw (sigma) -- (l);
+				\draw (w2) -- (f2);
+				\draw (b2) -- (f2);
+				\draw (y) -- (l);
+			\end{scope}	
+		\end{tikzpicture}
+		\caption{Computational graph; green boxes are trainable parameters, gray are constant inputs}
+	\end{figure}	
+	
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{License and credits}
+	
+	\begin{columns}
+		\begin{column}{0.7\textwidth}
+			Licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+		\end{column}
+		\begin{column}{0.2\textwidth}
+			\includegraphics[width=0.9\linewidth]{img/cc-by-sa-icon.pdf}
+		\end{column}
+	\end{columns}
+	
+	\bigskip
+	
+	Credits
+	
+	\begin{scriptsize}
+		
+		Ivan Habernal
+		
+		Content from ACL Anthology papers licensed under CC-BY \url{https://www.aclweb.org/anthology}
+		
+	\end{scriptsize}
+	
+\end{frame}
+
+
+
+\end{document}
+
