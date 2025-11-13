@@ -57,8 +57,15 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2025-11-06
 
-* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2025-lecture04-handout.pdf)
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2025-lecture04-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=L6gQB2REJtg)
+
+### Lecture 05: Language models and word embeddings
+
+2025-11-13
+
+* [Slides as PDF](/lectures/lecture05/pdf/nlpwdl2025-lecture05-handout.pdf)
+* [YouTube recording TBD](https://www.youtube.com/watch?v=TBD)
 
 
 
