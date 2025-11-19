@@ -32,7 +32,12 @@ class OnlineGradientDescent:
             gold_label_node.set_value(example.label)
 
             # --- TODO EX5_TASK_2 ---
+            loss_value: float = loss_node.value()
+            print(loss_value)
 
+            loss_node.update_parameters_by_gradient_step(learning_rate)
+
+            loss_node.clean_cache_recursively()
             # --- EX5_TASK_2 ---
 
 

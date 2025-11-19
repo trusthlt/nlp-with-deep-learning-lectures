@@ -30,7 +30,30 @@ class LinearLayer(Layer):
     def __init__(self, output_dim: int, previous_layer: Layer):
         super().__init__()
         # --- EX5_TASK_1 ---
+        # pythonic one-liner
+        # self.nodes = [LinearNode(
+        #     previous_layer.nodes,
+        #     [ParameterNode(0.01) for _ in previous_layer.nodes], ParameterNode(0.01))
+        # for _ in range(output_dim)]
 
+        # # I need to create output_dim LinearNode objects
+        for _ in range(output_dim):
+            # create n parameters of the same size as the previous layer
+            parameter_list: List[ParameterNode] = []
+            for _ in range(len(previous_layer.nodes)):
+                parameter_list.append(ParameterNode(0.01))
+            #
+            # Not like that!
+            # parameter_list = [ParameterNode(0.01)] * len(previous_layer.nodes)
+            [ParameterNode(0.01) for _ in previous_layer.nodes]
+
+            bias: ParameterNode = ParameterNode(0.01)
+
+            k_th_linear_node: LinearNode = LinearNode(
+                previous_layer.nodes, parameter_list, bias)
+
+            # add this output node to this layer's node list
+            self.nodes.append(k_th_linear_node)
         # --- EX5_TASK_1 ---
 
 
