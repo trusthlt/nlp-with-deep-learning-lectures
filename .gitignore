@@ -307,3 +307,4 @@ TSWLatexianTemp*
 .DS_Store
 
 # add your own
+.idea/
