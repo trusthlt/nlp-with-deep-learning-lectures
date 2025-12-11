@@ -79,7 +79,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2025-12-04
 
-* [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2025-lecture07-handout.pdf)
+* [Slides as PDF](/lectures/lecture07/pdf/nlpwdl2025-lecture07-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=Zez1mZJbk2c)
 
 ### Lecture 08: BERT part two
@@ -87,7 +87,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2025-12-11
 
 
-* [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2025-lecture08-handout.pdf)
+* [Slides as PDF](/lectures/lecture08/pdf/nlpwdl2025-lecture08-handout.pdf)
 * [YouTube recording TBD]()
 
 ## FAQ
