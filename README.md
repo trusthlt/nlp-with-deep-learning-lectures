@@ -73,15 +73,22 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2025-11-20
 
 * [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2025-lecture06-handout.pdf)
-* [YouTube recording TBD]()
+* [YouTube recording](https://www.youtube.com/watch?v=TI0MyXkF6v0)
 
 ### Lecture 07: BERT as encoder transformer
 
 2025-12-04
 
 * [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2025-lecture07-handout.pdf)
-* [YouTube recording TBD]()
+* [YouTube recording](https://www.youtube.com/watch?v=Zez1mZJbk2c)
 
+### Lecture 08: BERT part two
+
+2025-12-11
+
+
+* [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2025-lecture08-handout.pdf)
+* [YouTube recording TBD]()
 
 ## FAQ
 
