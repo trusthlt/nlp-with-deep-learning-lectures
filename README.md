@@ -90,6 +90,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture08/pdf/nlpwdl2025-lecture08-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=hVMzHk7PCNM)
 
+### Lecture 09: Decoder-only models and GPT
+
+2025-12-17
+
+
+* [Slides as PDF](/lectures/lecture09/pdf/nlpwdl2025-lecture09-handout.pdf)
+* [YouTube recording TBD]()
+
 ## FAQ
 
 * What are some essential pre-requisites?
