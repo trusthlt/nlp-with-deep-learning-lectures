@@ -94,9 +94,16 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2025-12-17
 
-
 * [Slides as PDF](/lectures/lecture09/pdf/nlpwdl2025-lecture09-handout.pdf)
-* [YouTube recording TBD]()
+* [YouTube recording](https://www.youtube.com/watch?v=Yln_V90w7f8)
+
+### Lecture 10: Evolution of transformer models
+
+2026-01-08
+
+* [Slides as PDF](/lectures/lecture10/pdf/nlpwdl2025-lecture10-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=atWR7L6p0V8)
+
 
 ## FAQ
 
