@@ -104,6 +104,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture10/pdf/nlpwdl2025-lecture10-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=atWR7L6p0V8)
 
+### Lecture 11: Retrieval augmented generation
+
+2026-01-15
+
+* [Slides as PDF](/lectures/lecture11/pdf/nlpwdl2025-lecture11-handout.pdf)
+* [YouTube recording](TBD)
+
 
 ## FAQ
 
