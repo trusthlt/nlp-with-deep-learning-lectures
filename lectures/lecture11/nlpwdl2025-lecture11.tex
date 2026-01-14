@@ -1,0 +1,601 @@
+% !TeX program = lualatex
+% !BIB program = biber
+% Lualatex is important to render TTF fonts; with pdflatex it's just the regular one
+% ratio 16:9 -- https://tex.stackexchange.com/questions/14336/
+
+% compile two versions, inspired by https://tex.stackexchange.com/a/1501
+% use the script "compile-pdf.sh"
+\newif\ifhandout
+% if flags.tex does not exist, create an empty file to be able to compile in TeXstudio
+\input{flags}
+
+\ifhandout
+\documentclass[12pt,aspectratio=169,handout]{beamer}
+\else
+\documentclass[12pt,aspectratio=169]{beamer}
+\fi
+
+
+\input{header-include.tex}
+
+
+
+\title{Natural Language Processing with Deep Learning}
+\subtitle{Lecture 11 --- Retrieval augmented generation}
+\date{January 15, 2026}
+\author{Prof.\ Dr.\ Ivan Habernal}
+\institute{
+\texttt{www.trusthlt.org} \\
+Trustworthy Human Language Technologies Group (TrustHLT) \\
+Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
+
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Motivation\footnote{This lecture is heavily based on the excellent book by \citet{Jurafsky.Martin.2026}}}
+
+Important function of large language models is to fill human information needs
+
+For example factoid questions in short texts like the following:
+
+\texttt{Where is the Louvre Museum located?}
+
+To get an LLM to answer these questions, we can just prompt it!
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Jurafsky.Martin.2026} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Prompting LLM answers factoid questions}
+
+For example a pretrained LLM that has been instruction-tuned on answering questions could directly answer the question
+
+\texttt{Where is the Louvre Museum located?}
+
+by performing conditional generation given this prefix, and take the response as the
+answer.
+
+This works because \pause
+\begin{itemize}
+\item LLMs have processed a lot of facts in their pretraining data, including the location of the Louvre, and have encoded this information in their parameters
+\end{itemize}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Meng.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Prompting LLM answers factoid questions}
+
+This works because
+\begin{itemize}
+\item Factual knowledge of this type seems to be stored in the connections in the very large feedforward layers of transformers
+\end{itemize}
+
+But: knowledge stored in the feedforward weights of the LLM leads to a number of problems with prompting as a method for correctly generating factual texts or answers
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Meng.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}{Problem \#1 of simple prompting: LLMs hallucinate}
+Hallucination is a response that is not faithful to the facts of the world
+
+
+LMs sometimes give incorrect factual responses even when the correct facts are stored in the parameters
+
+This seems to be caused by the feedforward layers failing to recall the knowledge stored in their parameters \citep{Jiang.et.al.2024.NAACL.hallucination}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Jiang.et.al.2024.NAACL.hallucination} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+\begin{frame}{Problem \#2 of simple prompting: Proprietary data}
+
+Answer from pre-trained parameters does not allow us to ask questions about proprietary data
+
+\pause
+
+\begin{itemize}
+\item proprietary data like personal email
+\item healthcare application: LLM to medical records
+\item company may have internal documents that contain answers for customer service or internal use
+\item legal firms need to ask questions about legal discovery from proprietary documents
+\end{itemize}
+
+\pause
+
+None of this data (hopefully) was in the large web-based corpora that large language models are pre-trained on
+\end{frame}
+
+
+
+\begin{frame}{Problem \#3 of simple prompting: Static knowledge}
+
+LLMs were pretrained once, at a particular time
+
+LLMs \textbf{cannot} talk about about rapidly changing information (like something that
+happened last week) since they won't have up-to-date information from after their
+release data
+
+\end{frame}
+
+
+\begin{frame}{One solution to these problems: RAG}
+
+Give a language model external sources of knowledge, use those documents in answering questions
+
+This method is called retrieval-augmented generation (RAG)
+
+\begin{enumerate}
+\item we use information retrieval (IR) techniques to retrieve documents that are likely to have information that might help answer the question
+\item then we use LLM to generate an answer given these documents
+\end{enumerate}
+
+\end{frame}
+
+
+\section{Information retrieval}
+
+
+\begin{frame}{Information retrieval}
+
+\begin{itemize}
+\item User has an information need
+\item And has some collection of documents
+\item User wants to find a relevant document which satisfies their needs
+\end{itemize}
+
+Typical examples: Web search, RAG
+
+\end{frame}
+
+
+\begin{frame}{In most cases we do ranked retrieval}
+\includegraphics[width=\linewidth]{img/ir1.jpg}
+
+The retriever returns top-$k$ documents
+
+These are ranked
+
+We can show the user these, or some subset
+\end{frame}
+
+
+
+
+
+\begin{frame}{Document Relevance Score}
+Goal is to assign a score to each document
+for whether it meets the user's information
+need
+
+Instead, we just approximate this by the
+textual similarity between the query and the
+document
+\end{frame}
+
+
+\begin{frame}{Two architectures}
+
+Sparse retrieval
+\begin{itemize}
+\item represent query and doc as vectors of word counts
+\item weighted by tf-idf, BM25
+\end{itemize}
+
+Dense retrieval
+\begin{itemize}
+\item Use LLM to represent query and doc as embeddings
+In both cases, similarity is dot product or cosine
+between query and document representations
+\end{itemize}
+
+
+\end{frame}
+
+
+\subsection{Sparse retrieval: the vector model of IR}
+
+
+\begin{frame}{The vector space model of IR}
+Represent a document as a vector of counts of the words it contains: Bag-of-words representation
+
+\includegraphics[width=0.8\linewidth]{img/bow1.jpg}
+
+\end{frame}
+
+
+\begin{frame}{Term-document matrix}
+
+\includegraphics[width=\linewidth]{img/matrix1.jpg}
+
+\end{frame}
+
+
+
+
+\begin{frame}{The vector space model of IR}
+Represent a document as a vector of counts of the words it contains: Bag-of-words representation
+
+\includegraphics[width=0.8\linewidth]{img/bow1.jpg}
+
+\end{frame}
+
+
+\begin{frame}{Term-document matrix}
+
+\includegraphics[width=\linewidth]{img/matrix1.jpg}
+
+\end{frame}
+
+
+
+\begin{frame}{Visualizing document vectors}
+
+In two dimensions only: \texttt{battle} and \texttt{fool}
+
+\includegraphics[width=\linewidth]{img/bow2.jpg}
+
+\end{frame}
+
+
+
+\begin{frame}{Term weighting: tf-idf and BM25}
+
+In IR, we don't use raw word counts like $(1, 114, 36, 20)$ for \emph{As You Like It}
+
+Instead we compute a \textbf{term weight} for each document word
+
+Two common term weighting schemes
+\begin{itemize}
+\item tf-idf
+\item variant of tf-idf called BM25
+\end{itemize}
+
+term frequency \textbf{tf} and the inverse document frequency \textbf{idf}
+
+\end{frame}
+
+
+\begin{frame}{Term frequency}
+
+The \textbf{tf} term tells us how frequent the word is
+
+\pause
+
+Words that occur more often in a document are likely to be informative about the document's contents
+
+\pause
+
+We usually use the $\log_{10}$ of the word frequency, rather than the raw count.
+
+\begin{itemize}
+\item The intuition is that a word appearing 100 times in a document doesn't make that word 100 times more likely to be relevant to the meaning of the document
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Term frequency}
+
+So if we define $\mathrm{count}(t,d)$ as the raw count of term $t$ in document $d$, then $\mathrm{tf}_{t,d}$ is
+\pause
+
+$$
+\mathrm{tf}_{t,d} =
+\begin{cases}
+1 + \log_{10} \mathrm{count}(t,d) & \text{if } \mathrm{count}(t,d) > 0\\
+0 & \text{otherwise}
+\end{cases}
+$$
+\end{frame}
+
+\begin{frame}{Document frequency}
+Document frequency $\mathrm{df}_t$ of a term $t$ is the number of documents the term $t$ occurs in
+\pause
+
+\begin{itemize}
+\item Terms that occur in only a few documents are useful for discriminating those documents from the rest of the collection \pause
+\item Terms that occur across the entire collection are not as helpful
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Inverse document frequency}
+Document frequency $\mathrm{df}_t$ of a term $t$ is the number of documents the term $t$ occurs in
+
+
+\begin{block}{Inverse document frequency of term $t$}
+$$
+\mathrm{idf}_t = \log_{10} \frac{N}{\mathrm{df}_t}
+$$
+where $N$ is the total number of documents
+\end{block}
+
+\pause
+
+\begin{itemize}
+\item The fewer documents in which a term occurs, the higher this weight
+\item The lowest weight of 0 is assigned to terms that occur in every document
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{tf-idf}
+
+The tf-idf value for word $t$ in document $d$ is then the product
+$$
+\textrm{tf-idf}(t, d) = \mathrm{tf}_{t, d} \cdot \mathrm{idf}_t
+$$
+\end{frame}
+
+
+\begin{frame}{Document scoring}
+
+We have each document $d$ and the query $q$ represented as vectors $\bm{d} \in \mathbb{R}^n$ and $\bm{q} \in \mathbb{R}^n$
+
+How do we measure their similarity score?
+
+\pause
+
+Cosine similarity
+$$
+\cos(\bm{q}, \bm{d}) = \frac{\bm{q} \cdot \bm{d}}{\norm{\bm{q}} \norm{\bm{d}}}
+$$
+
+
+\end{frame}
+
+\section{Evaluation IR}
+
+
+\begin{frame}{Evaluation}
+
+The same \textbf{precision} and \textbf{recall} metrics we have been using
+
+\pause
+We make the assumption that each document returned by the IR system is \textbf{either relevant} to our purposes or \textbf{not relevant}
+
+\pause
+Unfortunately, these metrics do not adequately measure the performance of a system
+that ranks the documents it returns. For comparing two ranked retrieval systems, we need a metric that prefers the one that ranks the relevant documents higher.
+
+\end{frame}
+
+\begin{frame}{Towards Mean Average Precision (MAP)}
+
+\includegraphics[width=\linewidth]{img/map1.jpg}
+
+\pause
+
+Let $R_r$ be the set of relevant documents at or above $r$
+
+\pause
+
+Let $\mathrm{Precision}_r(d)$ be precision measured at the rank at which document $d$ was found
+
+\end{frame}
+
+\begin{frame}{Mean Average Precision (MAP)}
+
+Let $R_r$ be the set of relevant documents at or above $r$
+
+Let $\mathrm{Precision}_r(d)$ be precision measured at the rank at which document $d$ was found
+
+\pause
+The average precision $\mathrm{AP}$ for a single query is
+$$
+\mathrm{AP} = \frac{1}{\abs{R_r}} \sum_{d \in R_r} \mathrm{Precision}_r(d)
+$$
+\pause
+and the Mean Average Precision for a set of queries $Q$ is
+$$
+\mathrm{MAP} = \frac{1}{\abs{Q}} \sum_{q \in Q} \mathrm{AP}(q)
+$$
+\end{frame}
+
+\subsection{Dense information retrieval}
+
+\begin{frame}{Vector representation}
+
+Transformer-based model for representing both the query and the document collection
+
+Recall SentenceBERT, but gazillions of other models...
+
+\end{frame}
+
+\begin{frame}{IR benchmark/leader-board example}
+
+
+\includegraphics[width=\linewidth]{img/leaderbord.jpg}
+
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+Octen-Embedding-8B: ``Octen-Embedding-8B is a text embedding model designed for semantic search and retrieval tasks. This model is fine-tuned from Qwen/Qwen3-Embedding-8B and supports multiple languages, providing high-quality embeddings for various applications.'' --- ``Qwen3 Embedding model series is the latest proprietary model of the Qwen family, specifically designed for text embedding and ranking tasks'' \par};
+\end{tikzpicture}
+
+
+
+\end{frame}
+
+
+
+\section{Retrieval Augmented Generation}
+
+\begin{frame}{RAG in a nutshell}
+
+\includegraphics[width=\linewidth]{img/rag1.jpg}
+
+\end{frame}
+
+
+\begin{frame}{RAG algorithm}
+
+The idea of RAG is to condition on the retrieved passages, jointly with some prompt text, for example like
+\texttt{Based on these texts, answer this question: ...}
+
+Given a document collection $D$ and a user query $q$, the most basic RAG algorithm is
+\begin{enumerate}
+\item Call a retriever to return $R(q) = d_1, \ldots, d_k$, the top-$k$ relevant passages from $D$
+\item Create a prompt that includes $q$ and the retrieved passages
+\item Call an LLM with the prompt
+\end{enumerate}
+
+
+\end{frame}
+
+\begin{frame}{LLM prompting with RAG}
+
+\begin{block}{Schema of a prompt}
+\noindent{}\texttt{retrieved passage 1 \\
+retrieved passage 2 \\
+... \\
+retrieved passage k \\
+Based on these texts, answer this question: What year
+was the premiere of The Magic Flute?
+}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Extensions of basic RAG}
+
+\pause
+
+In \textbf{agent-based RAG}, the system decides when to call a \textbf{retrieval agent} and for which collection
+
+\pause
+
+There may be noise in the retrieved passages; some of
+them may be irrelevant or wrong, or in an unhelpful order. How can we encourage
+the LLM to focus on the good passages? Some RAG architectures add a \textbf{reranker}
+that reranks or reorders passages after they are retrieved
+
+\end{frame}
+
+\begin{frame}{Knowledge citation (or Answer Attribution)}
+
+\includegraphics[width=0.75\linewidth]{img/citation1.jpg}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{gao-etal-2023-enabling} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+\begin{frame}{Knowledge citation (or Answer Attribution)}
+
+The simplest way for generating knowledge citations is to specify it as part of the prompt. 
+
+\begin{example}
+\texttt{Write an answer for the given question using only the
+provided search results (some of which might be irrelevant)
+and cite them properly... Always cite for any factual claim}
+\end{example}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{gao-etal-2023-enabling} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+\begin{frame}{Answer Attribution can be Unfaithful}
+
+``The aforementioned approaches do not account for attributions' faithfulness, i.e. whether the selected documents influence the LLM during the generation.''
+
+``Indeed, the presence of an entailment relation or high semantic similarity does not imply that the retrieved document had an influence on the answer generation process.''
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{qi-etal-2024-model} \par};
+\end{tikzpicture}
+
+	
+\end{frame}
+
+
+
+
+\begin{frame}{First RAG papers}
+
+``We demonstrated a \textbf{simple technique} to greatly improve factual unsupervised cloze QA by
+providing context documents as additional inputs. We used oracle documents to establish an
+upper bound to this improvement, and found that \textbf{using off-the-shelf information retrieval}
+is sufficient to achieve performance on par with the supervised DrQA system. We also
+investigated how brittle language models' factual predictions were to \textbf{noisy and irrelevant
+context} documents.''
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{petroni2020how} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+
+
+
+
+\begin{frame}{License and credits}
+
+	\begin{columns}
+		\begin{column}{0.7\textwidth}
+			Licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+		\end{column}
+		\begin{column}{0.2\textwidth}
+			\includegraphics[width=0.9\linewidth]{img/cc-by-sa-icon.pdf}
+		\end{column}
+	\end{columns}
+	
+	\bigskip
+	
+	Credits
+	
+	\begin{scriptsize}
+		
+		Ivan Habernal
+		
+		Content from ACL Anthology papers licensed under CC-BY \url{https://www.aclweb.org/anthology}
+
+This lecture re-used materials from \citet{Jurafsky.Martin.2026}. They explicitly state: \emph{``Feel free to use the draft chapters and slides in your classes, print it out, whatever, the resulting feedback we get from you makes the book better!''}, see \url{https://web.stanford.edu/~jurafsky/slp3/}
+		
+	
+	\end{scriptsize}
+	
+\end{frame}
+
+
+\end{document}
+
