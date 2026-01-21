@@ -1,0 +1,771 @@
+% !TeX program = lualatex
+% !BIB program = biber
+% Lualatex is important to render TTF fonts; with pdflatex it's just the regular one
+% ratio 16:9 -- https://tex.stackexchange.com/questions/14336/
+
+% compile two versions, inspired by https://tex.stackexchange.com/a/1501
+% use the script "compile-pdf.sh"
+\newif\ifhandout
+% if flags.tex does not exist, create an empty file to be able to compile in TeXstudio
+\input{flags}
+
+\ifhandout
+\documentclass[12pt,aspectratio=169,handout]{beamer}
+\else
+\documentclass[12pt,aspectratio=169]{beamer}
+\fi
+
+
+\input{header-include.tex}
+
+
+
+\title{Natural Language Processing with Deep Learning}
+\subtitle{Lecture 12 --- Inference-time reasoning and scaling}
+\date{January 22, 2026}
+\author{Prof.\ Dr.\ Ivan Habernal}
+\institute{
+\texttt{www.trusthlt.org} \\
+Trustworthy Human Language Technologies Group (TrustHLT) \\
+Ruhr University Bochum \& Research Center Trustworthy Data Science and Security}
+
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{frame}{Motivating inference-time scaling and reasoning}
+
+So far we have talked about
+\begin{itemize}
+\item Pre-training large LLMs
+\item Fine-tuning, instruction tuning
+\item ICL (in-context-learning), few-show, zero shot
+\end{itemize}
+
+But even big models struggle with ``unbounded multi-step computation, such as adding integers'' or other types of reasoning
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Nye.et.al.2021.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Reasoning abilities}
+
+LLMs can exhibit \emph{emergent behaviors}, including reasoning abilities, when scaled to a sufficient size 
+
+\begin{itemize}
+\item achieving such capabilities in pre-training typically demands substantial computational resources
+\end{itemize}
+
+\end{frame}
+
+
+\section{Inference-time scaling}
+
+\begin{frame}{Introducing ``Scratchpad''}
+
+These same models are able to perform complex multi-step computations
+
+\begin{itemize}
+\item even in the few-shot regime
+\end{itemize}
+
+when asked to perform the operation step by step, showing the results of intermediate computations
+
+\pause
+\bigskip
+
+\citet{Nye.et.al.2021.arXiv} train Transformers to perform multi-step computations by asking them to emit intermediate computation steps into a ``scratchpad''
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Nye.et.al.2021.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+\begin{frame}{Training on immediate steps}
+
+The main idea: To solve a given algorithmic task, simply encode the intermediate steps of the algorithm as text and train the model to emit them to a buffer called ``scratchpad''
+
+\begin{itemize}
+\item At training time, the model will be given the input plus target for standard likelihood-based training
+\item At test time, the model will be given only the input and will be required to predict the target, e.g., by beam search or temperature sampling
+\end{itemize}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Nye.et.al.2021.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+
+\begin{frame}{Training on immediate steps}
+
+\includegraphics[width=0.7\linewidth]{img/scratchpad.png}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Nye.et.al.2021.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+
+\begin{frame}{``Scratchpad'' paper summary and limitations}
+
+\begin{itemize}
+\item Models were \textbf{fine-tuned} on 100k examples
+\item Limit experiments to problems where the scratchpad text fits within the model generation window (512 tokens)
+\end{itemize}
+
+Experiments on long addition, polynomial evaluation, and Python code execution: allowing models to read from and write to a simple scratchpad can improve their performance on algorithmic tasks
+
+
+``A clear next step is to try to learn to use the scratchpad without direct supervision.''
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Nye.et.al.2021.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\section{Chain of Thought (CoT) prompting}
+
+
+
+\begin{frame}{Towards chain-of-thought}
+
+How the reasoning ability of large language models can be unlocked by a simple method motivated by two ideas:
+
+\begin{enumerate}
+\item Techniques for arithmetic reasoning can benefit from generating natural language rationales that lead to the final answer \pause
+\item LLMs offer in-context few-shot learning via prompting (instead of finetuning a separate language model checkpoint for each new task, one can simply prompt the model with a few input/output exemplars demonstrating the task)
+\end{enumerate}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wei.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+
+\begin{frame}{Standard few-shot prompting vs.\ CoT few-shot prompting}
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\includegraphics[width=\linewidth,clip,trim=0cm 0cm 45cm 0cm]{img/cot3comparison.png}
+\end{column}
+
+\pause
+
+\begin{column}{0.5\textwidth}
+\includegraphics[width=\linewidth,clip,trim=45cm 0cm 0cm 0cm]{img/cot3comparison.png}
+\end{column}
+
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Chain-of-thought: Full prompt example}
+
+\includegraphics[width=0.87\linewidth]{img/cot1ex.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wei.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+\begin{frame}{Chain-of-thought: Performance}
+
+\includegraphics[height=0.85\textheight]{img/cot2.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wei.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Attractive properties of CoT}
+
+
+\begin{enumerate}
+\item allows models to decompose multi-step problems into intermediate steps, additional computation can be allocated to problems that require more steps \pause
+\item provides an ``interpretable'' window into the behavior of the model, suggesting how it might have arrived at a particular answer \pause
+\item can be used for tasks such as math word problems, commonsense reasoning, and symbolic manipulation; any task that humans can solve via language \pause
+\item can be readily elicited in sufficiently large off-the-shelf LLM simply by few-shot prompting \pause
+\end{enumerate}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wei.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\section{How many examples we need for CoT?}
+
+
+\begin{frame}{CoT might be even easier}
+
+LLMs are decent zero-shot reasoners by adding a simple prompt, \texttt{Let's think step by step}, to facilitate step-by-step thinking before answering each question
+
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Kojima.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+
+
+\end{frame}
+
+
+
+\begin{frame}{``Step-by-step" \citep{Kojima.et.al.2022.NeurIPS}}
+
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+% trim is always: left bottom right top
+\includegraphics[width=1.1\linewidth,clip,trim=0cm 20cm 54cm 0cm]{img/step-by-step1.png}
+
+\pause
+\includegraphics[width=1.1\linewidth,clip,trim=0cm 0cm 54cm 33cm]{img/step-by-step1.png}
+\end{column}
+
+\pause
+
+\begin{column}{0.5\textwidth}
+% trim is always: left bottom right top
+\includegraphics[width=1.1\linewidth,clip,trim=53cm 20cm 0cm 0cm]{img/step-by-step1.png}
+
+\pause
+\includegraphics[width=1.1\linewidth,clip,trim=53cm 0cm 0cm 33cm]{img/step-by-step1.png}
+\end{column}
+
+
+\end{columns}
+
+
+
+
+\end{frame}
+
+
+
+
+
+
+
+\begin{frame}{Implementation of ``step-by-step"}
+
+
+\includegraphics[width=\linewidth]{img/step-by-step2.png}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Kojima.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{How much the prompt ``step-by-step" matters}
+
+
+\includegraphics[width=0.85\linewidth]{img/step-by-step3.png}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Kojima.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+\begin{frame}{``Step-by-step'' is task-agnostic}
+
+\begin{itemize}
+\item Their \emph{Zero-shot-CoT} is versatile and task-agnostic, unlike most prior task-specific prompt engineering in the forms of examples (few-shot) or templates (zero-shot) \pause
+\item Facilitates step-by-step answers across various reasoning tasks, including arithmetic, symbolic reasoning, commonsense reasoning, Strategy QA, and other logical reasoning tasks \textbf{without modifying the prompt per task}
+\end{itemize}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Kojima.et.al.2022.NeurIPS} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+\section{Testing CoT on hard questions}
+
+
+
+\begin{frame}{Few-shot versus Few-shot+CoT on BIG-Bench Hard}
+
+Selected a subset of 23 difficult BIG-Bench tasks for which no prior result has outperformed the average human-rater score
+
+\includegraphics[width=0.75\linewidth]{img/cot-humans-big-bench-hard2.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Suzgun.et.al.2023.FindingsACL} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+
+\begin{frame}{Few-shot versus CoT+FewShot}
+
+\includegraphics[width=\linewidth]{img/cot-humans-big-bench-hard1.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Suzgun.et.al.2023.FindingsACL} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Side-note: An interesting disclaimer}
+
+\includegraphics[width=\linewidth]{img/cot-humans-big-bench-hard3.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Suzgun.et.al.2023.FindingsACL} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+\section{Decoding strategies and self-consistency}
+
+
+
+
+
+
+
+\begin{frame}{Self-consistency intuition}
+
+A salient aspect of humanity is that people think differently
+
+\begin{itemize}
+\item in tasks requiring deliberate thinking, there are likely several ways to attack the problem
+\end{itemize}
+
+\pause
+Such a process can be simulated in language models via sampling from the language model's decoder
+
+\begin{itemize}
+\item a model can generate several plausible responses to a math question that all arrive at the same correct answer
+\end{itemize}
+ 
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wang.et.al.2023.ICLR} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+\begin{frame}{Self-consistency}
+
+\includegraphics[width=\linewidth]{img/selfconsistency2.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wang.et.al.2023.ICLR} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Self-consistency intuition}
+
+
+LLMs are not perfect reasoners, the model might also produce an incorrect reasoning path or make a mistake in one of the reasoning steps
+
+\begin{itemize}
+\item such solutions are less likely to arrive at the same answer
+\end{itemize}
+
+\pause
+
+Hypothesis: Correct reasoning processes, even if they are diverse, tend to have greater agreement in their final answer than incorrect processes
+
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wang.et.al.2023.ICLR} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+
+%\begin{frame}{Self-consistency}
+%a new decoding strategy, self-consistency, to replace the naive greedy decoding used in chain-of-thought prompting
+%
+%Self-consistency leverages the intuition that complex reasoning tasks typically admit multiple reasoning paths that reach a correct answer
+%\begin{tikzpicture}[overlay, remember picture]
+%\node at (current page.north east)[ref] {
+%\fullcite{Wang.et.al.2023.ICLR} \par};
+%\end{tikzpicture}
+%\end{frame}
+
+
+
+\begin{frame}{Self-consistency: Temperatures and sampling}
+
+\includegraphics[width=\linewidth]{img/selfconsistency3.png}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wang.et.al.2023.ICLR} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+
+\begin{frame}{Self-consistency: Scaling the number of reasoning paths}
+
+\includegraphics[width=\linewidth]{img/selfconsistency1.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Wang.et.al.2023.ICLR} \par};
+\end{tikzpicture}
+
+
+\end{frame}
+
+
+\section{`Thinking' in commercial models}
+
+
+
+\begin{frame}{`Thinking' in Gemini 2.5 --- just add tokens (?)}
+
+``We integrated Thinking with other Gemini capabilities, including native multimodal inputs (images, text, video, audio) and long context (1M+ tokens). For any of these capabilities, the model decides for itself how long to think before providing an answer. We also provide the ability to set a Thinking budget, constraining the model to respond within a desired number of tokens. This allows users to trade off performance with cost.''
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Comanici.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{`Thinking' in Gemini 2.5}
+
+\includegraphics[width=\linewidth]{img/gemini1.png}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Comanici.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+\section{Text-time scaling}
+
+
+
+\begin{frame}{Test-time scaling}
+
+\citet{Muennighoff.et.al.2025.EMNLP} asked what is the simplest approach to achieve test-time scaling and strong reasoning performance
+
+\pause
+
+Budget forcing to control test-time compute
+
+\begin{itemize}
+\item by forcefully terminating the model's thinking process
+\item or lengthening it by appending \texttt{Wait} multiple times to the model's generation when it tries to end
+\end{itemize}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Muennighoff.et.al.2025.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+\begin{frame}{Test-time scaling}
+
+\includegraphics[width=0.62\linewidth]{img/budget-forcing1.png}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Muennighoff.et.al.2025.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}{Test-time scaling}
+
+Training on only 1,000 samples with next-token prediction and controlling thinking duration via a simple test-time technique (budget forcing) leads to a strong reasoning model that scales in performance with more test-time compute
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Muennighoff.et.al.2025.EMNLP} \par};
+\end{tikzpicture}
+
+\end{frame}
+
+
+
+\section{So what are reasoning tokens really?}
+
+
+\begin{frame}{Reasoning tokens}
+
+LLMs can somehow reason
+
+\begin{itemize}
+\item A key factor to achieve this was letting models generate a sequence of tokens before their final answer, which significantly improves performance
+\end{itemize}
+
+\citet{Levy.et.al.2025.arXiv} refer to this sequence of symbols, which includes phrases such as \emph{therefore}, \emph{consider} and \emph{it follows that} as the \textbf{reasoning tokens}, and explicitly distinguish this name from \textbf{reasoning text}, which is the same tokens when interpreted by a reader according to their English semantics.
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}{Reasoning tokens as explanation?}
+
+The combination of
+\begin{enumerate}
+\item utility in improving the answer
+\item appearance as a readable English text
+\end{enumerate}
+may lead to the following inference:
+\begin{itemize}
+\item \emph{The reasoning text is a faithful explanation of the model's reasoning process}
+\end{itemize}
+
+This is strengthened by metaphors like ``Chain-of-Thought'', which imply that the steps in the text are ``thoughts'' that explain the process.
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}{The illusion of explanation}
+
+\emph{The reasoning text is a faithful explanation of the model's reasoning process}
+
+Empirical findings contradict this inference!
+
+\begin{itemize}
+\item The reasoning text is \textbf{not} a faithful explanation of the model's reasoning process
+\end{itemize}
+
+While those findings clarify what the reasoning tokens are not, they leave a conceptual vacuum as to what they are
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+
+\begin{frame}{State over Tokens: Contemporary view on reasoning tokens}
+
+\begin{itemize}
+\item To understand reasoning tokens, we must focus on the functional role they play, rather than their appearance, which empirical research has found to be deceiving.
+\item To this end, we advocate viewing them as representing State over Tokens (SoT), which characterizes the reasoning tokens as a computational device that enables the persistence of a process across separate and stateless computation cycles.
+\end{itemize}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+
+\begin{frame}{State over Tokens: Contemporary view on reasoning tokens}
+
+\begin{itemize}
+\item We argue that in order to understand the role of the reasoning tokens, we should interpret this sequence of tokens not using their semantics when read as English text, but as the state carriers of a computational process.
+\end{itemize}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{State over Tokens: Contemporary view on reasoning tokens}
+
+\begin{block}{The Whiteboard Analogy}
+Consider a hypothetical scenario: you are placed in a room with a problem written on a whiteboard. Your task is to solve it, but under a peculiar constraint: every 10 seconds, your memory is completely wiped and resets to the same state as it was when you first entered the room. Within each interval, you can read what is on the board and add a single word. These rounds repeat until you finally write down the solution. [...]
+\end{block}
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+
+\begin{frame}{State over Tokens: Contemporary view on reasoning tokens}
+
+\begin{block}{The Whiteboard Analogy}
+[...] How might you solve a problem under such constraints? You may write intermediate results on the board: numbers, conclusions, or partial computations--that you can use when you return after being ``reset''. You might perform several mental calculations before writing down just the result so the whiteboard may not capture every calculation that you did within each cycle. [...]
+\end{block}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}{State over Tokens: Contemporary view on reasoning tokens}
+
+\begin{block}{The Whiteboard Analogy}
+[...] Moreover, you may use an encoding scheme when writing on the board: abbreviations, symbols, or even apparent gibberish that will mean something specific to you when you encounter it in the next cycle. All in all, an outside observer may interpret the whiteboard text incorrectly.
+\end{block}
+
+
+\begin{tikzpicture}[overlay, remember picture]
+\node at (current page.north east)[ref] {
+\fullcite{Levy.et.al.2025.arXiv} \par};
+\end{tikzpicture}
+\end{frame}
+
+
+
+
+
+
+
+
+
+\begin{frame}{License and credits}
+
+	\begin{columns}
+		\begin{column}{0.7\textwidth}
+			Licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+		\end{column}
+		\begin{column}{0.2\textwidth}
+			\includegraphics[width=0.9\linewidth]{img/cc-by-sa-icon.pdf}
+		\end{column}
+	\end{columns}
+	
+	\bigskip
+	
+	Credits
+	
+	\begin{scriptsize}
+		
+		Ivan Habernal
+		
+		Content from ACL Anthology papers licensed under CC-BY \url{https://www.aclweb.org/anthology}
+
+	
+	\end{scriptsize}
+	
+\end{frame}
+
+
+\end{document}
+
