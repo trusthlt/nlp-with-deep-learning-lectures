@@ -109,8 +109,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2026-01-15
 
 * [Slides as PDF](/lectures/lecture11/pdf/nlpwdl2025-lecture11-handout.pdf)
-* [YouTube recording](TBD)
+* [YouTube recording](https://www.youtube.com/watch?v=ChW09qynoYM)
 
+### Lecture 12: Inference-time scaling and reasoning
+
+2026-01-22
+
+* [Slides as PDF](/lectures/lecture12/pdf/nlpwdl2025-lecture12-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=ZbaFQjWB6Vo)
 
 ## FAQ
 
