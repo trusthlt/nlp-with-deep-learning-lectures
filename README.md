@@ -1,4 +1,4 @@
-# Natural Language Processing with Deep Learning 2025/2026
+# Natural Language Processing with Deep Learning 2026/2027
 
 This repository contains **slide decks**, **programming exercises**, and links to **recorded lectures videos** for the course "Natural Language Processing with Deep Learning" (Ruhr University Bochum, winter term 2025/2026).
 
@@ -12,111 +12,20 @@ The content is licensed under [Creative Commons CC BY-SA 4.0](https://creativeco
 
 **Note:** The following content is continuously updated as the winter term progresses.
 
-To see the previous full **2024/25** course content, checkout the [latest 2025 commit](https://github.com/trusthlt/nlp-with-deep-learning-lectures/tree/21220643af8459666e63573143645fae7f4da9b2).
+To see the previous full **2025/26** course content, checkout the [latest 2026 commit](https://github.com/trusthlt/nlp-with-deep-learning-lectures/tree/751182ea7a6a6f2246bbd8313329ecd09d270dbc).
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PL6WLGVNe6ZcCbnLqv_KjFXmk4ROEtlcKX
+Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=TBD
 
 ## Lectures and exercises
 
 ### Lecture 01: NLP tasks and evaluation
 
-2025-10-16
+2026-10-12
 
-* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2025-lecture01-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=9jWT7eh4eSc)
-
-### Exercise 01: Evaluation
-
-* Assignments under [exercises/ex01](exercises/ex01)
-
-### Lecture 02: Gradient
-
-2025-10-23
-
-* [Slides as PDF](/lectures/lecture02/pdf/nlpwdl2025-lecture02-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=tLqtNWWzOCs)
-
-### Exercise 02: Tensors and derivatives
-
-* Assignments under [exercises/ex02](exercises/ex02)
-
-### Lecture 03: Backpropagation and binary text classification
-
-2025-10-30
-
-* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2025-lecture03-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=yDKs2ryVtHE)
-
-### Exercise 03: Backprop from scratch
-
-* Assignments under [exercises/ex03](exercises/ex03)
-
-### Lecture 04: Text classification and feed-forward networks
-
-2025-11-06
-
-* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2025-lecture04-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=L6gQB2REJtg)
-
-### Lecture 05: Language models and word embeddings
-
-2025-11-13
-
-* [Slides as PDF](/lectures/lecture05/pdf/nlpwdl2025-lecture05-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=QXtXAMuKpyU)
-
-
-### Lecture 06: Word embeddings and RNNs
-
-2025-11-20
-
-* [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2025-lecture06-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=TI0MyXkF6v0)
-
-### Lecture 07: BERT as encoder transformer
-
-2025-12-04
-
-* [Slides as PDF](/lectures/lecture07/pdf/nlpwdl2025-lecture07-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=Zez1mZJbk2c)
-
-### Lecture 08: BERT part two
-
-2025-12-11
-
-
-* [Slides as PDF](/lectures/lecture08/pdf/nlpwdl2025-lecture08-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=hVMzHk7PCNM)
-
-### Lecture 09: Decoder-only models and GPT
-
-2025-12-17
-
-* [Slides as PDF](/lectures/lecture09/pdf/nlpwdl2025-lecture09-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=Yln_V90w7f8)
-
-### Lecture 10: Evolution of transformer models
-
-2026-01-08
-
-* [Slides as PDF](/lectures/lecture10/pdf/nlpwdl2025-lecture10-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=atWR7L6p0V8)
-
-### Lecture 11: Retrieval augmented generation
-
-2026-01-15
-
-* [Slides as PDF](/lectures/lecture11/pdf/nlpwdl2025-lecture11-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=ChW09qynoYM)
-
-### Lecture 12: Inference-time scaling and reasoning
-
-2026-01-22
-
-* [Slides as PDF](/lectures/lecture12/pdf/nlpwdl2025-lecture12-handout.pdf)
-* [YouTube recording](https://www.youtube.com/watch?v=ZbaFQjWB6Vo)
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture01-handout.pdf)
+* [YouTube recording](TBD)
 
 ## FAQ
 
