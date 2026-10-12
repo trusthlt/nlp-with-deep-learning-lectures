@@ -1,8 +1,0 @@
-requests
-beautifulsoup4
-spacy
-sentence-transformers
-transformers
-torch
-faiss-cpu
-numpy
