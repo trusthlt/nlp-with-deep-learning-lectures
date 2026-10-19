@@ -16,7 +16,7 @@ To see the previous full **2025/26** course content, checkout the [latest 2026 c
 
 ## YouTube Playlist
 
-Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=TBD
+Subscribe the YouTube playlist to get updates on new lectures: https://www.youtube.com/playlist?list=PLNbpljxKk0TU
 
 ## Lectures and exercises
 
@@ -25,7 +25,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2026-10-12
 
 * [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture01-handout.pdf)
-* [YouTube recording](TBD)
+* [YouTube recording](https://www.youtube.com/watch?v=do5NI3QwYVU)
+
+### Lecture 02: Backpropagation
+
+2026-10-19
+
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture02-handout.pdf)
+* [YouTube recording] TBD
 
 ## FAQ
 
