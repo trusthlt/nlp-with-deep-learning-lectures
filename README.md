@@ -34,6 +34,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture02-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=mtEyJLP36KM)
 
+### Lecture 03: Backpropagation (this time for real) and text classification
+
+2026-10-26
+
+* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture03-handout.pdf)
+
+
 ## FAQ
 
 * What are some essential pre-requisites?
