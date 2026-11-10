@@ -31,15 +31,22 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 
 2026-10-19
 
-* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture02-handout.pdf)
+* [Slides as PDF](/lectures/lecture02/pdf/nlpwdl2026-lecture02-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=mtEyJLP36KM)
 
 ### Lecture 03: Backpropagation (this time for real) and text classification
 
 2026-10-26
 
-* [Slides as PDF](/lectures/lecture01/pdf/nlpwdl2026-lecture03-handout.pdf)
+* [Slides as PDF](/lectures/lecture03/pdf/nlpwdl2026-lecture03-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=9ANIuCC58Nw)
 
+### Lecture 04: Log-linear models and feed-forward network
+
+2026-11-09
+
+* [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2026-lecture04-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=IEr6O1UxYCg)
 
 ## FAQ
 
