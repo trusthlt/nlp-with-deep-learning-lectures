@@ -48,6 +48,14 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture04/pdf/nlpwdl2026-lecture04-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=IEr6O1UxYCg)
 
+### Lecture 05: Neural language models and word embeddings
+
+2026-11-16
+
+* [Slides as PDF](/lectures/lecture05/pdf/nlpwdl2026-lecture05-handout.pdf)
+* [YouTube recording]()
+
+
 ## FAQ
 
 * What are some essential pre-requisites?
