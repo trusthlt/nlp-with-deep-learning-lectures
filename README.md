@@ -53,7 +53,7 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 2026-11-16
 
 * [Slides as PDF](/lectures/lecture05/pdf/nlpwdl2026-lecture05-handout.pdf)
-* [YouTube recording]()
+* [YouTube recording](https://www.youtube.com/watch?v=yxBK7-wO2uw)
 
 
 ## FAQ
