@@ -55,6 +55,13 @@ Subscribe the YouTube playlist to get updates on new lectures: https://www.youtu
 * [Slides as PDF](/lectures/lecture05/pdf/nlpwdl2026-lecture05-handout.pdf)
 * [YouTube recording](https://www.youtube.com/watch?v=yxBK7-wO2uw)
 
+### Lecture 06: Word embeddings and RNNs
+
+2026-11-23
+
+* [Slides as PDF](/lectures/lecture06/pdf/nlpwdl2026-lecture06-handout.pdf)
+* [YouTube recording](https://www.youtube.com/watch?v=NWiJ7PZvLk8)
+
 
 ## FAQ
 
